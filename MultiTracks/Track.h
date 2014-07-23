@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "tinyxml2.h"
 #include "TopographicObjectContainer.h"
 
 namespace mt
@@ -30,7 +31,7 @@ public:
 
 	double GetLength() const;
 
-	void LoadXML(tinyxml2::XMLElement* element);
+	static Track* LoadXML(tinyxml2::XMLElement* element);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);
 
 private:

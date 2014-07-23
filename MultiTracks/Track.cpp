@@ -74,9 +74,10 @@ double Track::GetLength() const
 	return len;
 }
 
-void Track::LoadXML(tinyxml2::XMLElement* element)
+Track* Track::LoadXML(tinyxml2::XMLElement* element)
 {
-	mName = element->Attribute("name");
+	Track* track = new Track();
+	track->mName = element->Attribute("name");
 
 	/*Attribute color = trackElement.getAttribute(COLOR);
 	if(color != null) try { track.getProperties().set(COLOR, new Color(color.getIntValue())); } catch(DataConversionException e) {}
@@ -89,7 +90,7 @@ void Track::LoadXML(tinyxml2::XMLElement* element)
 	{
 		Section* s = new Section;
 		s->LoadXML(e);
-		mSections.push_back(s);
+		track->mSections.push_back(s);
 		e = e->NextSiblingElement();
 	}
 				
@@ -99,9 +100,8 @@ void Track::LoadXML(tinyxml2::XMLElement* element)
 		e = e->FirstChildElement("l");
 		while(e)
 		{
-			Location* l = new Location;
-			l->LoadXML(e);
-			mLocations.push_back(l);
+			Location* l = Location::LoadXML(e);
+			track->mLocations.push_back(l);
 			e = e->NextSiblingElement();
 		}
 	}
@@ -109,11 +109,12 @@ void Track::LoadXML(tinyxml2::XMLElement* element)
 	e = element->FirstChildElement("alternatives");
 	while(e)
 	{
-		Track* alternative = new Track;
-		alternative->LoadXML(e);
-		mAlternatives.push_back(alternative);
+		Track* alternative = Track::LoadXML(e);
+		track->mAlternatives.push_back(alternative);
 		e = e->NextSiblingElement();
 	}
+
+	return track;
 }
 	
 tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)

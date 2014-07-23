@@ -1,17 +1,49 @@
 #ifndef __MULTITRACKS_PROJECT_H__
 #define __MULTITRACKS_PROJECT_H__
 
+#include <vector>
+#include <map>
+
+#include "tinyxml2.h"
+
 namespace mt
 {
 namespace track
 {
 
+class Track;
+
 class Project
 {
+public:
+	typedef std::vector<Track*> TrackList;
+	typedef std::map<std::string, TrackList> TrackMap;
+
+public:
+	Project();
+	~Project();
+
+	void SetName(std::string name) { mName = name; }
+	std::string GetName() const { return mName; }
+
+	void AddTrack(Track* track, std::string group);
+	const TrackList& GetTracks(std::string group) const;
+	std::vector<std::string> GetGroups() const;
+
+	void Clear();
+
+	bool LoadXML(std::string file);
+	void LoadXML(tinyxml2::XMLDocument* doc);
+
+private:
+	void LoadSectionDatabaseXML(tinyxml2::XMLElement* db);
+	void LoadTrackGroupXML(tinyxml2::XMLElement* group);
+	void LoadMapXML(tinyxml2::XMLElement* map);
+
 private:
 	std::string mFile;
 	std::string mName;
-	std::map<std::string, std::vector<Track>> mTracks;
+	TrackMap mTracks;
 };
 
 }
