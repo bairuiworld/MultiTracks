@@ -16,8 +16,8 @@ class Track;
 class Project
 {
 public:
-	typedef std::vector<Track*> TrackList;
-	typedef std::map<std::string, TrackList> TrackMap;
+	using TrackList = std::vector<Track*>;
+	using TrackMap = std::map<std::string, TrackList>;
 
 public:
 	Project();

@@ -12,8 +12,8 @@ class Location;
 class TopographicObjectContainer
 {
 public:
-	typedef std::list<Section*> SectionList;
-	typedef std::list<Location*> LocationList;
+	using SectionList = std::list<Section*>;
+	using LocationList = std::list<Location*>;
 
 public:
 	void Add(Section* section);

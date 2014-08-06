@@ -14,7 +14,7 @@ class Location;
 class Section
 {
 public:
-	typedef std::vector<Location*> LocationList;
+	using LocationList = std::vector<Location*>;
 
 public:
 	Section();

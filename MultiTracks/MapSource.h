@@ -13,7 +13,7 @@ namespace map
 class MapSource
 {
 public:
-	MapSource(std::string name, std::string url, int tilesize, std::string header);
+	MapSource(std::string name, std::string url, int tilesize, std::string header, std::string header2 = "");
 	~MapSource();
 
 	void AddHeader(std::string header);
@@ -21,6 +21,7 @@ public:
 
 public:
 	static MapSource MAPS;
+	static MapSource IGN;
 
 private:
 	std::string mName;
