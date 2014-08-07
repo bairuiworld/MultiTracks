@@ -4,7 +4,6 @@
 #include <list>
 
 namespace mt {
-namespace track {
 
 class Section;
 class Location;
@@ -27,7 +26,6 @@ protected:
 	LocationList mLocations;
 };
 
-}
 }
 
 #endif // __MULTITRACKS_TOPOGRAPHICSOBJECTCONTAINER_H__

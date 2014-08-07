@@ -4,13 +4,10 @@
 #include <vector>
 #include <string>
 #include <curl\curl.h>
+#include "Vector.h"
 
 namespace mt
 {
-namespace map
-{
-
-class Point3D;
 
 class MapSource
 {
@@ -19,7 +16,9 @@ public:
 	~MapSource();
 
 	void AddHeader(std::string header);
-	void InitSession(CURL* curl, const Point3D& coord);
+	void InitSession(CURL* curl, const Vector3i& coord);
+
+	int GetTileSize() const { return mTileSize; }
 
 public:
 	static MapSource MAPS;
@@ -32,7 +31,6 @@ private:
 	int mTileSize;
 };
 
-}
 }
 
 #endif // !__MULTITRACKS_MAPSOURCE_H__

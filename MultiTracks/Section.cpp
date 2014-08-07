@@ -4,7 +4,6 @@
 #include "Section.h"
 
 namespace mt {
-namespace track {
 
 Section::Section() : mParent(nullptr)
 {
@@ -153,5 +152,4 @@ tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc)
 	return section;
 }
 
-}
 }

@@ -102,7 +102,7 @@
     <ClInclude Include="Location.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapSource.h" />
-    <ClInclude Include="Point3D.h" />
+    <ClInclude Include="MapViewport.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="Section.h" />
@@ -110,6 +110,7 @@
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TopographicObjectContainer.h" />
     <ClInclude Include="Track.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

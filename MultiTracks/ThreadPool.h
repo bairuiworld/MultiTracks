@@ -13,8 +13,6 @@
 
 namespace mt
 {
-namespace util
-{
 
 class ThreadPool
 {
@@ -98,7 +96,6 @@ inline ThreadPool::~ThreadPool()
         workers[i].join();
 }
 
-}
 }
 
 #endif // !__MULTITRACKS_TREADPOOL_H__

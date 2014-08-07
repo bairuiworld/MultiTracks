@@ -3,14 +3,10 @@
 #include "MapSource.h"
 #include "Tile.h"
 
-#include <iostream>
-
 namespace mt
 {
-namespace map
-{
 
-Tile::Tile(const Point3D& coord, MapSource* mapSource) :
+Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
 	mCoordinates(coord), mMapSource(mapSource), mPixbuf(), mLoaded(false)
 {
 
@@ -43,7 +39,6 @@ size_t Tile::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void
 
 void Tile::DownloadTask()
 {
-	std::cout << "Download " << mCoordinates.x << ", " << mCoordinates.y << ", " << mCoordinates.z << std::endl;
 	CURL* curl;
 	CURLcode res;
  
@@ -73,5 +68,4 @@ void Tile::DownloadTask()
 	curl_easy_cleanup(curl);
 }
 
-}
 }

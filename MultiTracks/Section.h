@@ -6,7 +6,6 @@
 #include "tinyxml2.h"
 
 namespace mt {
-namespace track {
 
 class TopographicObjectContainer;
 class Location;
@@ -64,7 +63,6 @@ private:
 	TopographicObjectContainer* mParent;
 };
 
-}
 }
 
 #endif // __MULTITRACKS_SECTION_H__

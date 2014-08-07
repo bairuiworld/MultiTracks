@@ -3,8 +3,6 @@
 
 namespace mt
 {
-namespace track
-{
 
 Project::Project() : mName("Nouveau projet")
 {
@@ -110,5 +108,4 @@ void Project::LoadMapXML(tinyxml2::XMLElement* map)
 
 }
 
-}
 }

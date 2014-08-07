@@ -2,10 +2,10 @@
 #define __MULTITRACKS_MAP_H__
 
 #include <map>
+#include "Vector.h"
+#include "Location.h"
 
 namespace mt
-{
-namespace map
 {
 
 class MapSource;
@@ -15,14 +15,15 @@ class Tile;
 class Map
 {
 private:
-	using TileMap = std::map<Point3D, Tile*>;
+	using TileMap = std::map<Vector3i, Tile*>;
 	using TileList = std::list<Tile*>;
 
 public:
 	Map(MapSource* mapSource);
 	~Map();
 
-	Tile* GetTile(const Point3D& coord);
+	Tile* GetTile(const Vector3i& coord);
+	int getSize(int zoom);
 
 private:
 	MapSource* mMapSource;
@@ -32,7 +33,6 @@ private:
 	unsigned int mCacheSize;
 };
 
-}
 }
 
 #endif // !__MULTITRACKS_MAP_H__

@@ -3,7 +3,6 @@
 #include "Location.h"
 
 namespace mt {
-namespace track {
 
 const double Location::mEpsilon = 1./(3600*1000); // 0.001"
 const double Location::mEarthRadius = 6371; // km
@@ -11,6 +10,13 @@ const double Location::mEarthRadius = 6371; // km
 Location::Location() { Set(0, 0); }
 Location::Location(double latitude, double longitude, double elevation) { Set(latitude, longitude, elevation); }
 Location::Location(const Location& location) { Set(location.mLatitude, location.mLongitude, location.mElevation); }
+
+void Location::operator =(const Location& rhs)
+{
+	mLatitude = rhs.mLatitude;
+	mLongitude = rhs.mLongitude;
+	mElevation = rhs.mElevation;
+}
 
 void Location::Set(double latitude, double longitude, double elevation)
 {
@@ -21,9 +27,9 @@ void Location::Set(double latitude, double longitude, double elevation)
 
 double Location::GetDistance(const Location& l)
 {
-	double K1 = sin(math::toRadians(l.mLatitude - mLatitude)/2);
-    double K2 = sin(math::toRadians(l.mLongitude - mLongitude)/2);
-    return mEarthRadius*2*asin(sqrt(K1*K1 + cos(math::toRadians(l.mLatitude))*cos(math::toRadians(mLatitude))*K2*K2));
+	double K1 = sin(toRadians(l.mLatitude - mLatitude)/2);
+    double K2 = sin(toRadians(l.mLongitude - mLongitude)/2);
+    return mEarthRadius*2*asin(sqrt(K1*K1 + cos(toRadians(l.mLatitude))*cos(toRadians(mLatitude))*K2*K2));
 }
 
 bool Location::operator ==(const Location& rhs) const
@@ -56,5 +62,4 @@ tinyxml2::XMLElement* Location::SaveXML(tinyxml2::XMLDocument* doc)
 	return l;
 }
 
-} // track
 } // mt

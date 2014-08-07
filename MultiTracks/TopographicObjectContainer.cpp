@@ -3,8 +3,6 @@
 
 namespace mt
 {
-namespace track
-{
 
 void TopographicObjectContainer::Add(Section* section)
 {
@@ -19,5 +17,4 @@ void TopographicObjectContainer::InsertAfter(Section* after, Section* section)
 	mSections.insert(it, section);
 }
 
-}
 }

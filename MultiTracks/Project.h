@@ -8,8 +8,6 @@
 
 namespace mt
 {
-namespace track
-{
 
 class Track;
 
@@ -47,5 +45,5 @@ private:
 };
 
 }
-}
+
 #endif // !__MULTITRACKS_PROJECT_H__

@@ -4,8 +4,6 @@
 
 namespace mt
 {
-namespace track
-{
 
 Track::Track() : mName("Unnamed track"), mParent(nullptr)
 {
@@ -155,5 +153,4 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 	return track;
 }
 
-}
 }

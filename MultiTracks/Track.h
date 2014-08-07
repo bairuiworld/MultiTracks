@@ -8,8 +8,6 @@
 
 namespace mt
 {
-namespace track
-{
 
 class Track : public TopographicObjectContainer
 {
@@ -40,6 +38,5 @@ private:
 	Track* mParent;
 };
 
-}
 }
 #endif // !__MULTITRACKS_TRACK_H__

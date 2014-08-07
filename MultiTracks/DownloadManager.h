@@ -5,24 +5,21 @@
 
 namespace mt
 {
-namespace map
-{
 
 class DownloadManager
 {
 	DownloadManager() = delete;
 
 public:
-	static void Init() { mPool = new util::ThreadPool(6); }
+	static void Init() { mPool = new ThreadPool(6); }
 	static void CleanUp() { delete mPool; }
 
-	static util::ThreadPool* GetPool() { return mPool; }
+	static ThreadPool* GetPool() { return mPool; }
 
 private:
-	static util::ThreadPool* mPool;
+	static ThreadPool* mPool;
 };
 
-}
 }
 
 #endif // !__MULTITRACKS_DOWNLOADMANAGER_H__

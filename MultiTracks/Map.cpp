@@ -4,8 +4,6 @@
 
 namespace mt
 {
-namespace map
-{
 
 Map::Map(MapSource* mapSource) :
 	mMapSource(mapSource), mCacheSize(2)
@@ -19,7 +17,7 @@ Map::~Map()
 		delete tile;
 }
 
-Tile* Map::GetTile(const Point3D& coord)
+Tile* Map::GetTile(const Vector3i& coord)
 {
 	TileMap::const_iterator it = mCache.find(coord);
 	if(it == mCache.end())
@@ -46,5 +44,4 @@ Tile* Map::GetTile(const Point3D& coord)
 	}
 }
 
-}
 }

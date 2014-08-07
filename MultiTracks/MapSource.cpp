@@ -1,9 +1,6 @@
-#include "Point3D.h"
 #include "MapSource.h"
 
 namespace mt
-{
-namespace map
 {
 
 MapSource MapSource::MAPS("maps", 
@@ -36,16 +33,15 @@ void MapSource::AddHeader(std::string header)
 	mHeaders = curl_slist_append(mHeaders, header.c_str());
 }
 
-void MapSource::InitSession(CURL* curl, const Point3D& coord)
+void MapSource::InitSession(CURL* curl, const Vector3i& coord)
 {
 	std::string url = mUrl;
-	url.replace(url.find("%x"), 2, std::to_string(coord.x));
-	url.replace(url.find("%y"), 2, std::to_string(coord.y));
-	url.replace(url.find("%z"), 2, std::to_string(coord.z));
+	url.replace(url.find("%x"), 2, std::to_string(coord.GetX()));
+	url.replace(url.find("%y"), 2, std::to_string(coord.GetY()));
+	url.replace(url.find("%z"), 2, std::to_string(coord.GetZ()));
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	if(mHeaders != nullptr)
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, mHeaders);
 }
 
-}
 }

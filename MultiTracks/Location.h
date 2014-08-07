@@ -5,7 +5,6 @@
 #include "Properties.h"
 
 namespace mt {
-namespace track {
 
 class Location
 {
@@ -17,6 +16,8 @@ public:
 	Location();
 	Location(double latitude, double longitude, double elevation = 0);
 	Location(const Location& location);
+
+	void operator =(const Location& rhs);
 
 	void Set(double latitude, double longitude, double elevation = 0);
 	void SetLatitude(double latitude)	{ mLatitude = latitude; }
@@ -40,7 +41,6 @@ protected:
 	double mElevation;
 };
 
-} // track
 } // mt
 
 #endif // __MULTITRACKS_LOCATION_H__
