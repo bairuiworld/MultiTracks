@@ -1,10 +1,9 @@
 #include <gdkmm\pixbufloader.h>
 #include "DownloadManager.h"
-#include "Point3D.h"
 #include "MapSource.h"
 #include "Tile.h"
 
-#include <fstream>
+#include <iostream>
 
 namespace mt
 {
@@ -19,10 +18,19 @@ Tile::Tile(const Point3D& coord, MapSource* mapSource) :
 
 bool Tile::Download(bool background)
 {
-	auto future = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
-	if(!background)
-		future.wait();
+	if(!mFuture.valid())
+	{
+		mFuture = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
+		if(!background)
+			mFuture.wait();
+	}
 	return mLoaded;
+}
+
+void Tile::Wait()
+{
+	if(mFuture.valid())
+		mFuture.wait();
 }
 
 size_t Tile::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -35,6 +43,7 @@ size_t Tile::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void
 
 void Tile::DownloadTask()
 {
+	std::cout << "Download " << mCoordinates.x << ", " << mCoordinates.y << ", " << mCoordinates.z << std::endl;
 	CURL* curl;
 	CURLcode res;
  

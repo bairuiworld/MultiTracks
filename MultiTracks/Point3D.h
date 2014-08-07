@@ -13,6 +13,12 @@ public:
 	Point3D(const Point3D& rhs) : x(rhs.x), y(rhs.y), z(rhs.z) {}
 
 	bool operator ==(const Point3D& rhs) { return x == rhs.x && y == rhs.y && z == rhs.z; }
+	bool operator <(const Point3D& rhs) const
+	{
+		if(x != rhs.x) return x < rhs.x;
+		if(y != rhs.y) return y < rhs.y;
+		return z < rhs.z;
+	}
 
 public:
 	int x, y, z;

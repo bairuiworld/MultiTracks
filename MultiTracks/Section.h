@@ -64,10 +64,6 @@ private:
 	TopographicObjectContainer* mParent;
 };
 
-/*template <class LocItr>
-void Add(LocItr begin, LocItr end)*/
-
-
 }
 }
 

@@ -10,6 +10,8 @@ namespace mt
 namespace map
 {
 
+class Point3D;
+
 class MapSource
 {
 public:
