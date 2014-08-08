@@ -3,13 +3,12 @@
 
 #include <map>
 #include "Vector.h"
-#include "Location.h"
 
 namespace mt
 {
 
 class MapSource;
-class Point3D;
+class MapViewport;
 class Tile;
 
 class Map
@@ -22,11 +21,14 @@ public:
 	Map(MapSource* mapSource);
 	~Map();
 
+	MapViewport* GetViewport();
+
 	Tile* GetTile(const Vector3i& coord);
 	int getSize(int zoom);
 
 private:
 	MapSource* mMapSource;
+	MapViewport* mMapViewport;
 	TileMap mCache;
 	TileList mCacheUsage;
 

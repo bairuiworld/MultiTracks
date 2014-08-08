@@ -89,6 +89,7 @@
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapSource.cpp" />
+    <ClCompile Include="MapViewport.cpp" />
     <ClCompile Include="MultiTracks.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="Section.cpp" />

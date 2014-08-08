@@ -1,4 +1,5 @@
 #include "MapSource.h"
+#include "MapViewport.h"
 #include "Tile.h"
 #include "Map.h"
 
@@ -8,7 +9,7 @@ namespace mt
 Map::Map(MapSource* mapSource) :
 	mMapSource(mapSource), mCacheSize(2)
 {
-
+	mMapViewport = new MapViewport(mMapSource);
 }
 
 Map::~Map()

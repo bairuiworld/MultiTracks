@@ -12,6 +12,10 @@ namespace mt
 	public:
 		Vector() = default;
 		Vector(std::initializer_list<T> l);
+		Vector(T x);
+		Vector(T x, T y);
+		Vector(T x, T y, T z);
+		Vector(const Vector<T, N>& rhs);
 
 		T GetX() const;
 		T GetY() const;
@@ -40,6 +44,37 @@ namespace mt
 	Vector<T, N>::Vector(std::initializer_list<T> l)
 	{
 		Set(l);
+	}
+
+	template <class T, int N>
+	Vector<T, N>::Vector(T x)
+	{
+		static_assert(N >= 1, "Wrong number of parameters");
+		mValues[0] = x;
+	}
+
+	template <class T, int N>
+	Vector<T, N>::Vector(T x, T y)
+	{
+		static_assert(N >= 2, "Wrong number of parameters");
+		mValues[0] = x;
+		mValues[1] = y;
+	}
+
+	template <class T, int N>
+	Vector<T, N>::Vector(T x, T y, T z)
+	{
+		static_assert(N >= 3, "Wrong number of parameters");
+		mValues[0] = x;
+		mValues[1] = y;
+		mValues[2] = z;
+	}
+
+	template <class T, int N>
+	Vector<T, N>::Vector(const Vector<T, N>& rhs)
+	{
+		for(int i(0); i<N; i++)
+			mValues[i] = rhs.mValues[i];
 	}
 
 	template <class T, int N>
