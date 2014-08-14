@@ -1,4 +1,3 @@
-#include <gdkmm\pixbufloader.h>
 #include "DownloadManager.h"
 #include "MapSource.h"
 #include "Tile.h"
@@ -7,9 +6,14 @@ namespace mt
 {
 
 Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
-	mCoordinates(coord), mMapSource(mapSource), mPixbuf(), mLoaded(false)
+	mCoordinates(coord), mMapSource(mapSource), mImage(nullptr), mLoaded(false)
 {
 
+}
+
+Tile::~Tile()
+{
+	delete mImage;
 }
 
 bool Tile::Download(bool background)
@@ -25,6 +29,7 @@ bool Tile::Download(bool background)
 
 void Tile::Wait()
 {
+	if(mLoaded) return;
 	if(mFuture.valid())
 		mFuture.wait();
 }
@@ -32,8 +37,8 @@ void Tile::Wait()
 size_t Tile::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	size_t realsize = size*nmemb;
-	Glib::RefPtr<Gdk::PixbufLoader>* loader = static_cast<Glib::RefPtr<Gdk::PixbufLoader>*>(userp);
-	(*loader)->write((guint8*)contents, realsize);
+	std::string* data = static_cast<std::string*>(userp);
+	data->append((const char*)contents, realsize);
 	return realsize;
 }
 
@@ -41,13 +46,13 @@ void Tile::DownloadTask()
 {
 	CURL* curl;
 	CURLcode res;
- 
-	Glib::RefPtr<Gdk::PixbufLoader> loader = Gdk::PixbufLoader::create();
+	
+	std::string data;
  
 	curl = curl_easy_init();
 	mMapSource->InitSession(curl, mCoordinates);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Tile::WriteMemoryCallback);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&loader);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&data);
 	res = curl_easy_perform(curl);
 	
 	int res_code;
@@ -55,13 +60,25 @@ void Tile::DownloadTask()
 
 	if(res == CURLE_OK && res_code == 200)
 	{
-		loader->close();
+		HGLOBAL hBlock = GlobalAlloc(GHND, data.size());
+		if(hBlock != NULL)
+		{
+			LPVOID pBlock = GlobalLock(hBlock);
+			if(pBlock != NULL)
+			{
+				memmove(pBlock, data.data(), data.size());
+				IStream* pStream;
+				if(CreateStreamOnHGlobal(hBlock, FALSE, &pStream) == S_OK)
+					mImage = new Gdiplus::Image(pStream);
+				GlobalUnlock(pBlock);
+			}
+			GlobalFree(hBlock);
+		}
 
-		mPixbuf = loader->get_pixbuf();
-		if(mPixbuf)
+		if(mImage)
 		{
 			mLoaded = true;
-			signal_ready.emit(this);
+			SignalReady.emit(this);
 		}
 	}
  

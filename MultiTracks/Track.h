@@ -5,11 +5,12 @@
 #include <vector>
 #include "tinyxml2.h"
 #include "TopographicObjectContainer.h"
+#include "Component.h"
 
 namespace mt
 {
 
-class Track : public TopographicObjectContainer
+class Track : public TopographicObjectContainer, public Component
 {
 public:
 	Track();

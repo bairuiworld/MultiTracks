@@ -3,10 +3,11 @@
 
 #include "tinyxml2.h"
 #include "Properties.h"
+#include "Component.h"
 
 namespace mt {
 
-class Location
+class Location : public Component
 {
 protected:
 	static const double mEpsilon;

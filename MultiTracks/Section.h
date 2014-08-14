@@ -4,13 +4,14 @@
 #include <vector>
 #include <algorithm>
 #include "tinyxml2.h"
+#include "Component.h"
 
 namespace mt {
 
 class TopographicObjectContainer;
 class Location;
 
-class Section
+class Section : public Component
 {
 public:
 	using LocationList = std::vector<Location*>;

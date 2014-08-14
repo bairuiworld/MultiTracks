@@ -1,9 +1,8 @@
 #ifndef __MULTITRACKS_TILE_H__
 #define __MULTITRACKS_TILE_H__
 
-#include <gdkmm\pixbuf.h>
-#include <glibmm\refptr.h>
-#include <sigc++\sigc++.h>
+#include <gdiplus.h>
+#include "SimpleSignal.h"
 #include "ThreadPool.h"
 #include "Vector.h"
 
@@ -11,19 +10,22 @@ namespace mt
 {
 
 class MapSource;
+class Image;
 
 class Tile
 {
 public:
 	Tile(const Vector3i& coord, MapSource* mapSource);
+	Tile(const Tile& rhs) = delete;
+	~Tile();
 
 	bool Download(bool background);
 	void Wait();
 
 	const Vector3i& GetCoordinates() const { return mCoordinates; }
-	Glib::RefPtr<Gdk::Pixbuf> GetPixbuf() const { return mPixbuf; }
-
-	sigc::signal<void, Tile*> signal_ready;
+	Gdiplus::Image* GetImage() const { return mImage; }
+	
+	sig::Signal<void(Tile*)> SignalReady;
 
 private:
 	void DownloadTask();
@@ -32,7 +34,7 @@ private:
 private:
 	Vector3i mCoordinates;
 	MapSource* mMapSource;
-	Glib::RefPtr<Gdk::Pixbuf> mPixbuf;
+	Gdiplus::Image* mImage;
 	bool mLoaded;
 	std::future<void> mFuture;
 };
