@@ -9,9 +9,15 @@ namespace mt
 {
 
 MapViewport::MapViewport(MapSource* mapSource, int zoom, const Vector2d& origin) :
-	mMapSource(mapSource), mZoom(zoom), mOrigin(origin)
+	mMapSource(mapSource), mOrigin(origin)
 {
+	SetZoom(zoom);
+}
 
+void MapViewport::SetZoom(int zoom)
+{
+	mZoom = zoom;
+	mMapSize = (int)(std::pow(2, mZoom)*mMapSource->GetTileSize());
 }
 
 Location MapViewport::PixelToLocation(const Vector2d& pixel) const
@@ -55,6 +61,26 @@ Vector3i MapViewport::GetTileCoordinate(const Location& l) const
 	if(ytile < 0) ytile = 0;
 	if(ytile >= (1<<mZoom)) ytile = (1<<mZoom) - 1;
 	return Vector3i(xtile, ytile, mZoom);
+}
+
+Vector3i MapViewport::GetNorthWestTileCoordinate()
+{
+	int w = mOrigin.GetX() ? static_cast<int>(std::floor( mMapSize/mOrigin.GetX() )) : 0;
+	int h = mOrigin.GetY() ? static_cast<int>(std::floor( mMapSize/mOrigin.GetY() )) : 0;
+	return Vector3i(w, h, mZoom);
+}
+
+Vector3i MapViewport::GetSouthEastTileCoordinate()
+{
+	int w = static_cast<int>(std::floor( mMapSize/(mOrigin.GetX() + mViewDimension.GetX()) ));
+	int h = static_cast<int>(std::floor( mMapSize/(mOrigin.GetY() + mViewDimension.GetY()) ));
+	return Vector3i(w, h, mZoom);
+}
+
+Vector2i MapViewport::GetTileOrigin(const Vector3i& coordinate)
+{
+	return Vector2i(static_cast<int>(std::floor( coordinate.GetX()*mMapSource->GetTileSize() - mOrigin.GetX() )),
+					static_cast<int>(std::floor( coordinate.GetY()*mMapSource->GetTileSize() - mOrigin.GetY() )));
 }
 
 }

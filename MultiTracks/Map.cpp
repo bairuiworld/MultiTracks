@@ -45,4 +45,31 @@ Tile* Map::GetTile(const Vector3i& coord)
 	}
 }
 
+/*void Map::Draw(Cairo::RefPtr<Cairo::Context> cr)
+{
+	Vector3i northWestTile = mMapViewport->GetNorthWestTileCoordinate();
+	Vector3i southEastTile = mMapViewport->GetSouthEastTileCoordinate();
+	Vector2i origin = mMapViewport->GetTileOrigin(northWestTile);
+	int xTileCount = southEastTile.GetX() - northWestTile.GetX() + 1;
+	int yTileCount = southEastTile.GetY() - northWestTile.GetY() + 1;
+	int tileCount = xTileCount*yTileCount;
+	
+	for(int i = 0; i<xTileCount; i++)
+	{
+		for(int j = 0; j<yTileCount; j++)
+		{
+			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
+			Tile* tile = GetTile(coord);
+			Glib::RefPtr<Gdk::Pixbuf> pix = tile->GetPixbuf();
+			if(!pix)
+			{
+				//tile->signal_ready.connect([&](Tile* tile) { signal_new_tile.emit(); });
+				continue;
+			}
+			Gdk::Cairo::set_source_pixbuf(cr, pix, -origin.GetX() + i*mMapSource->GetTileSize(), -origin.GetY() + j*mMapSource->GetTileSize());
+			cr->paint();
+		}
+	}
+}*/
+
 }

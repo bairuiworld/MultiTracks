@@ -2,6 +2,7 @@
 #define __MULTITRACKS_MAP_H__
 
 #include <map>
+#include <list>
 #include "Vector.h"
 
 namespace mt
@@ -21,10 +22,13 @@ public:
 	Map(MapSource* mapSource);
 	~Map();
 
-	MapViewport* GetViewport();
+	MapViewport* GetViewport() const { return mMapViewport; };
 
 	Tile* GetTile(const Vector3i& coord);
-	int getSize(int zoom);
+
+	//void Draw(Cairo::RefPtr<Cairo::Context> cr);
+
+	//sigc::signal<void> signal_new_tile;
 
 private:
 	MapSource* mMapSource;

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{42F7ED90-D410-4D3F-828C-F8464FB664C8}</ProjectGuid>
+    <ProjectGuid>{D2805C0E-6307-4403-BBFC-E8874B9C4EF5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>MultiTracks</RootNamespace>
   </PropertyGroup>
@@ -34,11 +34,9 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\..\..\..\..\Program Files (x86)\gtkmm\MSVC\gtkmm-vc100-d-2_4.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\..\..\..\..\Program Files (x86)\gtkmm\MSVC\gtkmm-vc100-2_4.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -53,14 +51,13 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;NOMINMAX;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4250;4996;4099</DisableSpecificWarnings>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tinyxml2d.lib;%(AdditionalDependencies);libcurl.lib</AdditionalDependencies>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <AdditionalDependencies>tinyxml2d.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -71,47 +68,64 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NOMINMAX;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <DisableSpecificWarnings>4250;4996;4099</DisableSpecificWarnings>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>tinyxml2.lib;%(AdditionalDependencies);libcurl.lib</AdditionalDependencies>
-      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <AdditionalDependencies>tinyxml2.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="DownloadManager.cpp" />
+    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="EntityRenderer.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="MapRenderer.cpp" />
     <ClCompile Include="MapSource.cpp" />
     <ClCompile Include="MapViewport.cpp" />
     <ClCompile Include="MultiTracks.cpp" />
     <ClCompile Include="Project.cpp" />
+    <ClCompile Include="Register.cpp" />
     <ClCompile Include="Section.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TopographicObjectContainer.cpp" />
     <ClCompile Include="Track.cpp" />
+    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="DownloadManager.h" />
+    <ClInclude Include="DrawingArea.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityRenderer.h" />
+    <ClInclude Include="Layout.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="MapRenderer.h" />
     <ClInclude Include="MapSource.h" />
     <ClInclude Include="MapViewport.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Properties.h" />
+    <ClInclude Include="Register.h" />
     <ClInclude Include="Section.h" />
+    <ClInclude Include="SimpleSignal.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TopographicObjectContainer.h" />
     <ClInclude Include="Track.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="Widget.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
