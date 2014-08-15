@@ -10,10 +10,14 @@ namespace mt
 
 void f() {}
 
-MapRenderer::MapRenderer(Map* map, ww::Widget* parent) :
-	ww::DrawingArea(parent), mMap(map)
+MapRenderer::MapRenderer(Map* map) :
+	mMap(map)
 {
-	mMap->SignalNewTile += [this, parent]() { parent->Invalidate(); };
+	mMap->SignalNewTile += [this]()
+	{ 
+		if(mParent)
+			mParent->Invalidate();
+	};
 }
 
 void MapRenderer::OnPaint(Gdiplus::Graphics* g)

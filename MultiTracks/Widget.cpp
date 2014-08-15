@@ -12,12 +12,13 @@ Widget::Widget() :
 
 }
 
-Widget::Widget(const char* className, int style, Widget* parent) :
-	mParent(parent), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr)
+Widget::Widget(const char* className, int style) :
+	mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr)
 {
+	if(!(style & WS_OVERLAPPEDWINDOW)) style |= WS_POPUP;
 	mhWnd = CreateWindowEx(0, className, "", style | WS_VISIBLE,
 						   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-						   parent ? parent->GetHandle() : HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
+						   HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
 	if(!mhWnd) return;
 
 	SubClass();
@@ -32,12 +33,14 @@ Widget::~Widget()
 
 void Widget::Add(Widget* widget)
 {
-	/*Widget* parent = widget->GetParent();
+	Widget* parent = widget->GetParent();
 	if(parent == this) return;
 	if(parent != nullptr)
-		parent->Remove(widget);*/
+		parent->Remove(widget);
 	mChildren.push_back(widget);
-	//widget->SetParent(this);
+	widget->SetParent(this);
+	if(mLayout)
+		mLayout->Apply(this);
 }
 
 void Widget::Remove(Widget* widget)
@@ -58,6 +61,24 @@ RECT Widget::GetBounds() const
 void Widget::SetBounds(const RECT& rc)
 {
 	MoveWindow(mhWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, true);
+}
+
+void Widget::SetParent(Widget* parent)
+{
+	int style = GetWindowLong(mhWnd, GWL_STYLE);
+	if(parent)
+	{
+		style &= ~WS_POPUP;
+		style |= WS_CHILD;
+		SetWindowLong(mhWnd, GWL_STYLE, style);
+		::SetParent(mhWnd, parent->mhWnd);
+	}
+	else
+	{
+		SetWindowLong(mhWnd, GWL_STYLE, style & ~WS_CHILD);
+		::SetParent(mhWnd, HWND_DESKTOP);
+	}
+	mParent = parent;
 }
 
 void Widget::SetLayout(Layout* layout)

@@ -15,7 +15,7 @@ class Widget
 {
 public:
 	Widget();
-	Widget(const char* className, int style, Widget* parent);
+	Widget(const char* className, int style);
 	virtual ~Widget();
 
 	using WidgetList = std::vector<Widget*>;
@@ -33,11 +33,12 @@ public:
 	HWND GetHandle() const { return mhWnd; }
 
 	Widget* GetParent() const { return mParent; }
-	void SetParent(Widget* container) { mParent = container; }
-
+	
 	void Invalidate();
 
 protected:
+	void SetParent(Widget* parent);
+	
 	virtual void OnClose();
 	virtual void OnResize(int width, int height);
 	virtual void OnPaint(Gdiplus::Graphics* g);

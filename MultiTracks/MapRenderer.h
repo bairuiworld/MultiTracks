@@ -15,7 +15,7 @@ class Map;
 class MapRenderer : public ww::DrawingArea
 {
 public:
-	MapRenderer(Map* map, ww::Widget* parent);
+	MapRenderer(Map* map);
 
 protected:
 	virtual void OnPaint(Gdiplus::Graphics* g);

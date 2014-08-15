@@ -6,7 +6,7 @@ namespace ww
 
 const char* Window::ClassName = "wwWindow";
 
-Window::Window(const char* title) : Register(ClassName), Widget(ClassName, WS_OVERLAPPEDWINDOW, nullptr)
+Window::Window(const char* title) : Register(ClassName), Widget(ClassName, WS_OVERLAPPEDWINDOW)
 {
 	SetWindowText(mhWnd, title);
 }

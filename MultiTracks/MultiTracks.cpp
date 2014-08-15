@@ -58,7 +58,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		ww::Window win;
 		mt::Map map(&mt::MapSource::MAPS);
 		map.GetViewport()->SetZoom(4);
-		mt::MapRenderer* renderer = new mt::MapRenderer(&map, &win);
+		mt::MapRenderer* renderer = new mt::MapRenderer(&map);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 

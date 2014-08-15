@@ -12,7 +12,7 @@ class DrawingArea : public Register, public Widget
 public:
 	static const char* ClassName;
 
-	DrawingArea(Widget* parent);
+	DrawingArea();
 };
 
 }
