@@ -3,11 +3,13 @@
 #include "Tile.h"
 #include "Map.h"
 
+#include <iostream>
+
 namespace mt
 {
 
 Map::Map(MapSource* mapSource) :
-	mMapSource(mapSource), mCacheSize(2)
+	mMapSource(mapSource), mCacheSize(500)
 {
 	mMapViewport = new MapViewport(mMapSource);
 }
@@ -45,7 +47,7 @@ Tile* Map::GetTile(const Vector3i& coord)
 	}
 }
 
-/*void Map::Draw(Cairo::RefPtr<Cairo::Context> cr)
+void Map::Draw(Gdiplus::Graphics* g)
 {
 	Vector3i northWestTile = mMapViewport->GetNorthWestTileCoordinate();
 	Vector3i southEastTile = mMapViewport->GetSouthEastTileCoordinate();
@@ -54,22 +56,23 @@ Tile* Map::GetTile(const Vector3i& coord)
 	int yTileCount = southEastTile.GetY() - northWestTile.GetY() + 1;
 	int tileCount = xTileCount*yTileCount;
 	
+	std::cout << xTileCount << " x " << yTileCount << std::endl;
+
 	for(int i = 0; i<xTileCount; i++)
 	{
 		for(int j = 0; j<yTileCount; j++)
 		{
 			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
 			Tile* tile = GetTile(coord);
-			Glib::RefPtr<Gdk::Pixbuf> pix = tile->GetPixbuf();
-			if(!pix)
+			Gdiplus::Image* im = tile->GetImage();
+			if(!im)
 			{
-				//tile->signal_ready.connect([&](Tile* tile) { signal_new_tile.emit(); });
+				tile->SignalReady += [&](Tile* tile) { SignalNewTile.emit(); };
 				continue;
 			}
-			Gdk::Cairo::set_source_pixbuf(cr, pix, -origin.GetX() + i*mMapSource->GetTileSize(), -origin.GetY() + j*mMapSource->GetTileSize());
-			cr->paint();
+			g->DrawImage(im, -origin.GetX() + i*mMapSource->GetTileSize(), -origin.GetY() + j*mMapSource->GetTileSize());
 		}
 	}
-}*/
+}
 
 }

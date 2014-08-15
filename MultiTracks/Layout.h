@@ -13,6 +13,11 @@ public:
 	virtual void Apply(Widget* widget) = 0;
 };
 
+class FillLayout : public Layout
+{
+	virtual void Apply(Widget* widget);
+};
+
 }
 
 #endif // !__WW_LAYOUT_H__

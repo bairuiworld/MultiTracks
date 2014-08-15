@@ -27,6 +27,9 @@ public:
 	Layout* GetLayout() const { return mLayout; }
 	void SetLayout(Layout* layout);
 
+	RECT GetBounds() const;
+	void SetBounds(const RECT& rc);
+
 	HWND GetHandle() const { return mhWnd; }
 
 	Widget* GetParent() const { return mParent; }
@@ -34,11 +37,11 @@ public:
 
 	void Invalidate();
 
+protected:
 	virtual void OnClose();
 	virtual void OnResize(int width, int height);
 	virtual void OnPaint(Gdiplus::Graphics* g);
 
-protected:
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	friend class Register;

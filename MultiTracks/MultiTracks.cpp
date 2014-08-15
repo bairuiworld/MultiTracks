@@ -19,6 +19,7 @@
 
 #include "Application.h"
 #include "Window.h"
+#include "Layout.h"
 
 #ifdef _DEBUG
 #	include <iostream>
@@ -45,16 +46,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//
 	{ // Force Gdi+ object cleanup before shutting down
-		mt::Tile tile(mt::Vector3i(5, 5, 5), &mt::MapSource::MAPS);
+		/*mt::Tile tile(mt::Vector3i(5, 5, 5), &mt::MapSource::MAPS);
 		tile.Download(true);
 		tile.Wait();
 		Gdiplus::Image* im = tile.GetImage();
 		CLSID pngClsid;
 		GetEncoderClsid(L"image/png", &pngClsid);
-		im->Save(L"a.png", &pngClsid, NULL);
+		im->Save(L"a.png", &pngClsid, NULL);*/
 
 		ww::Application app;
 		ww::Window win;
+		mt::Map map(&mt::MapSource::MAPS);
+		map.GetViewport()->SetZoom(4);
+		mt::MapRenderer* renderer = new mt::MapRenderer(&map, &win);
+		win.SetLayout(new ww::FillLayout);
+		win.Add(renderer);
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 

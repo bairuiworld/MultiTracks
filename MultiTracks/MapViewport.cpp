@@ -65,15 +65,15 @@ Vector3i MapViewport::GetTileCoordinate(const Location& l) const
 
 Vector3i MapViewport::GetNorthWestTileCoordinate()
 {
-	int w = mOrigin.GetX() ? static_cast<int>(std::floor( mMapSize/mOrigin.GetX() )) : 0;
-	int h = mOrigin.GetY() ? static_cast<int>(std::floor( mMapSize/mOrigin.GetY() )) : 0;
+	int w = static_cast<int>(std::floor( mOrigin.GetX()/mMapSource->GetTileSize() ));
+	int h = static_cast<int>(std::floor( mOrigin.GetY()/mMapSource->GetTileSize() ));
 	return Vector3i(w, h, mZoom);
 }
 
 Vector3i MapViewport::GetSouthEastTileCoordinate()
 {
-	int w = static_cast<int>(std::floor( mMapSize/(mOrigin.GetX() + mViewDimension.GetX()) ));
-	int h = static_cast<int>(std::floor( mMapSize/(mOrigin.GetY() + mViewDimension.GetY()) ));
+	int w = static_cast<int>(std::floor( (mOrigin.GetX() + mViewDimension.GetX())/mMapSource->GetTileSize() ));
+	int h = static_cast<int>(std::floor( (mOrigin.GetY() + mViewDimension.GetY())/mMapSource->GetTileSize() ));
 	return Vector3i(w, h, mZoom);
 }
 

@@ -1,9 +1,12 @@
 #ifndef __MULTITRACKS_MAP_H__
 #define __MULTITRACKS_MAP_H__
 
+#include <Windows.h>
+#include <gdiplus.h>
 #include <map>
 #include <list>
 #include "Vector.h"
+#include "SimpleSignal.h"
 
 namespace mt
 {
@@ -26,9 +29,9 @@ public:
 
 	Tile* GetTile(const Vector3i& coord);
 
-	//void Draw(Cairo::RefPtr<Cairo::Context> cr);
+	void Draw(Gdiplus::Graphics* g);
 
-	//sigc::signal<void> signal_new_tile;
+	sig::Signal<void()> SignalNewTile;
 
 private:
 	MapSource* mMapSource;

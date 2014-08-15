@@ -32,12 +32,12 @@ Widget::~Widget()
 
 void Widget::Add(Widget* widget)
 {
-	Widget* parent = widget->GetParent();
+	/*Widget* parent = widget->GetParent();
 	if(parent == this) return;
 	if(parent != nullptr)
-		parent->Remove(widget);
+		parent->Remove(widget);*/
 	mChildren.push_back(widget);
-	widget->SetParent(this);
+	//widget->SetParent(this);
 }
 
 void Widget::Remove(Widget* widget)
@@ -46,6 +46,18 @@ void Widget::Remove(Widget* widget)
 	if(it == mChildren.end()) return;
 	mChildren.erase(it);
 	widget->SetParent(nullptr);
+}
+
+RECT Widget::GetBounds() const
+{
+	RECT rc;
+	GetClientRect(mhWnd, &rc);
+	return rc;
+}
+
+void Widget::SetBounds(const RECT& rc)
+{
+	MoveWindow(mhWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, true);
 }
 
 void Widget::SetLayout(Layout* layout)
@@ -91,13 +103,19 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			else hDC = (HDC)wParam;
 			Gdiplus::Graphics g(hDC);
 			OnPaint(&g);
+			if(wParam == 0) EndPaint(hWnd, &ps);
 		} break;
+
+	case WM_ERASEBKGND:
+		return 0;
 
 	case WM_SIZE:
 		{
 			int width = LOWORD(lParam);
 			int height = HIWORD(lParam);
 			SignalResize.emit(width, height);
+			if(mLayout)
+				mLayout->Apply(this);
 			OnResize(width, height);
 		} break;
 	}
@@ -106,16 +124,9 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 void Widget::OnClose() {}
 
-void Widget::OnResize(int width, int height)
-{
-	if(mLayout)
-		mLayout->Apply(this);
-}
+void Widget::OnResize(int width, int height) {}
 
-void Widget::OnPaint(Gdiplus::Graphics* g)
-{
-
-}
+void Widget::OnPaint(Gdiplus::Graphics* g) {}
 
 LRESULT CALLBACK Widget::GlobalWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

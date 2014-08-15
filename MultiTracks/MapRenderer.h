@@ -2,6 +2,9 @@
 #define __MULTITRACKS_MAPRENDERER_H__
 
 #include <vector>
+#include <windows.h>
+#include <gdiplus.h>
+#include "DrawingArea.h"
 
 namespace mt
 {
@@ -9,12 +12,14 @@ namespace mt
 class Entity;
 class Map;
 
-class MapRenderer/* : public Gtk::DrawingArea*/
+class MapRenderer : public ww::DrawingArea
 {
 public:
-	MapRenderer(Map* map);
+	MapRenderer(Map* map, ww::Widget* parent);
 
 protected:
+	virtual void OnPaint(Gdiplus::Graphics* g);
+	virtual void OnResize(int width, int height);
 
 protected:
 	Map* mMap;
