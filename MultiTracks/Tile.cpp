@@ -21,7 +21,8 @@ bool Tile::Download(bool background)
 {
 	if(!mFuture.valid())
 	{
-		mFuture = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
+		//mFuture = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
+		mFuture = std::async(std::launch::async, std::bind(&Tile::DownloadTask, this));
 		if(!background)
 			mFuture.wait();
 	}
