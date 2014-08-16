@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <windowsx.h>
 #include <gdiplus.h>
 #include "Layout.h"
 #include "Widget.h"
@@ -7,13 +8,13 @@ namespace ww
 {
 
 Widget::Widget() : 
-	mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr)
+mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
 {
 
 }
 
 Widget::Widget(const char* className, int style) :
-	mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr)
+mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
 {
 	if(!(style & WS_OVERLAPPEDWINDOW)) style |= WS_POPUP;
 	mhWnd = CreateWindowEx(0, className, "", style | WS_VISIBLE,
@@ -128,7 +129,67 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		} break;
 
 	case WM_ERASEBKGND:
-		return 0;
+		return 0; // ???
+
+	case WM_LBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+		{
+			mIsMouseDown = true;
+			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+			MouseEvent ev(this, mMouseLastPos, 1, wParam,
+					  msg == WM_LBUTTONDOWN ? MouseButton::Left :
+					  msg == WM_RBUTTONDOWN ? MouseButton::Right :
+					  msg == WM_MBUTTONDOWN ? MouseButton::Middle :
+					  MouseButton::None);
+			SignalMouseDown.emit(ev);
+			OnMouseDown(ev);
+		} break;
+
+	case WM_LBUTTONUP:
+	case WM_RBUTTONUP:
+	case WM_MBUTTONUP:
+		{
+			mIsMouseDown = false;
+			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+			MouseEvent ev(this, mMouseLastPos, 1, wParam,
+						  msg == WM_LBUTTONUP ? MouseButton::Left :
+						  msg == WM_RBUTTONUP ? MouseButton::Right :
+						  msg == WM_MBUTTONUP ? MouseButton::Middle :
+						  MouseButton::None);
+			SignalMouseUp.emit(ev);
+			OnMouseUp(ev);
+		} break;
+
+	case WM_LBUTTONDBLCLK:
+	case WM_MBUTTONDBLCLK:
+	case WM_RBUTTONDBLCLK:
+		{
+			MouseEvent ev(this, POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}, 2, wParam,
+						  msg == WM_LBUTTONDBLCLK ? MouseButton::Left :
+						  msg == WM_MBUTTONDBLCLK ? MouseButton::Right :
+						  msg == WM_RBUTTONDBLCLK ? MouseButton::Middle :
+						  MouseButton::None);
+			SignalMouseDoubleClick.emit(ev);
+			OnMouseDoubleClick(ev);
+		} break;
+
+	case WM_MOUSEMOVE:
+		{
+			POINT mouseNewPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+			MouseEvent ev(this, mouseNewPos, 0, wParam, MouseButton::None, mMouseLastPos);
+			mMouseLastPos = mouseNewPos;
+			if(mIsMouseDown)
+			{
+				SignalMouseDrag.emit(ev);
+				OnMouseDrag(ev);
+			}
+			else
+			{
+				SignalMouseMove.emit(ev);
+				OnMouseMove(ev);
+			}
+		} break;
 
 	case WM_SIZE:
 		{
@@ -142,12 +203,6 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	}
 	return CallDefaultProc(hWnd, msg, wParam, lParam);
 }
-
-void Widget::OnClose() {}
-
-void Widget::OnResize(int width, int height) {}
-
-void Widget::OnPaint(Gdiplus::Graphics* g) {}
 
 LRESULT CALLBACK Widget::GlobalWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

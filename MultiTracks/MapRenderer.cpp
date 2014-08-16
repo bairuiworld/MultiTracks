@@ -28,6 +28,13 @@ void MapRenderer::OnPaint(Gdiplus::Graphics* g)
 		entity->Draw(cr, mMap->GetViewport());*/
 }
 
+void MapRenderer::OnMouseDrag(ww::MouseEvent ev)
+{
+	mMap->GetViewport()->MoveOrigin(ev.GetPrevPoint().x - ev.GetPoint().x, ev.GetPrevPoint().y - ev.GetPoint().y);
+	if(mParent)
+		mParent->Invalidate();
+}
+
 void MapRenderer::OnResize(int width, int height)
 {
 	mMap->GetViewport()->SetViewDimension(width, height);

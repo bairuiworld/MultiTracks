@@ -29,6 +29,8 @@ namespace mt
 		void SetZ(T v);
 		void Set(std::initializer_list<T> l);
 
+		void operator +=(std::initializer_list<T> l);
+
 		bool operator ==(const Vector<T, N>& rhs) const;
 		bool operator !=(const Vector<T, N>& rhs) const;
 
@@ -139,6 +141,14 @@ namespace mt
 		auto it = l.begin();
 		for(int i = 0; i<N, it != l.end(); i++, it++)
 			mValues[i] = *it;
+	}
+
+	template <class T, int N>
+	void Vector<T, N>::operator +=(std::initializer_list<T> l)
+	{
+		auto it = l.begin();
+		for(int i = 0; i<N, it != l.end(); i++, it++)
+			mValues[i] += *it;
 	}
 
 	template <class T, int N>

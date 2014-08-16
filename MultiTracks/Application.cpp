@@ -7,7 +7,7 @@ namespace ww
 
 Application::Application()
 {
-//	Window::Register();
+
 }
 
 int Application::Run()

@@ -16,6 +16,10 @@ public:
 
 	void SetViewDimension(int width, int height) { mViewDimension.Set({width, height}); }
 
+	Vector2d GetOrigin() const { return mOrigin; }
+	void SetOrigin(const Vector2d& origin);
+	void MoveOrigin(double dx, double dy);
+
 	int GetZoom() const { return mZoom; }
 	void SetZoom(int zoom);
 

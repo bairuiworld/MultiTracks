@@ -13,6 +13,7 @@ Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
 
 Tile::~Tile()
 {
+	mFuture.wait();
 	delete mImage;
 }
 

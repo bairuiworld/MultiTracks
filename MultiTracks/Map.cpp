@@ -55,8 +55,6 @@ void Map::Draw(Gdiplus::Graphics* g)
 	int xTileCount = southEastTile.GetX() - northWestTile.GetX() + 1;
 	int yTileCount = southEastTile.GetY() - northWestTile.GetY() + 1;
 	int tileCount = xTileCount*yTileCount;
-	
-	std::cout << xTileCount << " x " << yTileCount << std::endl;
 
 	for(int i = 0; i<xTileCount; i++)
 	{
@@ -70,7 +68,7 @@ void Map::Draw(Gdiplus::Graphics* g)
 				tile->SignalReady += [&](Tile* tile) { SignalNewTile.emit(); };
 				continue;
 			}
-			g->DrawImage(im, -origin.GetX() + i*mMapSource->GetTileSize(), -origin.GetY() + j*mMapSource->GetTileSize());
+			g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
 		}
 	}
 }

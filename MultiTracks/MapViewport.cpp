@@ -14,6 +14,22 @@ MapViewport::MapViewport(MapSource* mapSource, int zoom, const Vector2d& origin)
 	SetZoom(zoom);
 }
 
+void MapViewport::SetOrigin(const Vector2d& origin)
+{
+	mOrigin = origin;
+	if(mOrigin.GetX() < 0) mOrigin.SetX(0);
+	if(mOrigin.GetY() < 0) mOrigin.SetY(0);
+	if(mOrigin.GetX() > mMapSize - mViewDimension.GetX()) mOrigin.SetX(mMapSize - mViewDimension.GetX());
+	if(mOrigin.GetY() > mMapSize - mViewDimension.GetY()) mOrigin.SetY(mMapSize - mViewDimension.GetY());
+}
+
+void MapViewport::MoveOrigin(double dx, double dy)
+{
+	Vector2d v = mOrigin;
+	v += {dx, dy};
+	SetOrigin(v);
+}
+
 void MapViewport::SetZoom(int zoom)
 {
 	mZoom = zoom;
