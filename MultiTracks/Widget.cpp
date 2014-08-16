@@ -136,6 +136,7 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_MBUTTONDOWN:
 		{
 			mIsMouseDown = true;
+			SetCapture(hWnd);
 			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
 			MouseEvent ev(this, mMouseLastPos, 1, wParam,
 					  msg == WM_LBUTTONDOWN ? MouseButton::Left :
@@ -151,6 +152,7 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_MBUTTONUP:
 		{
 			mIsMouseDown = false;
+			ReleaseCapture();
 			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
 			MouseEvent ev(this, mMouseLastPos, 1, wParam,
 						  msg == WM_LBUTTONUP ? MouseButton::Left :

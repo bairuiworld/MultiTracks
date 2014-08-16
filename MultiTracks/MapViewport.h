@@ -15,6 +15,8 @@ public:
 	MapViewport(MapSource* mapSource, int zoom = 0, const Vector2d& origin = Vector2d(0, 0));
 
 	void SetViewDimension(int width, int height) { mViewDimension.Set({width, height}); }
+	int GetWidth() const { return mViewDimension.GetX(); }
+	int GetHeight() const { return mViewDimension.GetY(); }
 
 	Vector2d GetOrigin() const { return mOrigin; }
 	void SetOrigin(const Vector2d& origin);

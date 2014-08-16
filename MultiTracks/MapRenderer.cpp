@@ -22,7 +22,19 @@ MapRenderer::MapRenderer(Map* map) :
 
 void MapRenderer::OnPaint(Gdiplus::Graphics* g)
 {
-	mMap->Draw(g);
+	MapViewport* view = mMap->GetViewport();
+	HDC hDC = g->GetHDC();
+	HDC hMemDC = CreateCompatibleDC(hDC);
+	HBITMAP hMemBitmap = CreateCompatibleBitmap(hDC, view->GetWidth(), view->GetHeight());
+	SelectObject(hMemDC, hMemBitmap);
+	
+	Gdiplus::Graphics gMem(hMemDC);
+	mMap->Draw(&gMem);
+	BitBlt(hDC, 0, 0, view->GetWidth(), view->GetHeight(), hMemDC, 0, 0, SRCCOPY);
+	g->ReleaseHDC(hDC);
+
+	DeleteObject(hMemBitmap);
+	DeleteDC(hMemDC);
 
 	/*for(Entity* entity : mEntites)
 		entity->Draw(cr, mMap->GetViewport());*/
