@@ -48,6 +48,7 @@ protected:
 	virtual void OnMouseDoubleClick(MouseEvent ev) {}
 	virtual void OnMouseMove(MouseEvent ev) {}
 	virtual void OnMouseDrag(MouseEvent ev) {}
+	virtual void OnMouseWheel(MouseEvent ev) {}
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -76,6 +77,7 @@ public:
 	sig::Signal<void(MouseEvent)> SignalMouseDoubleClick;
 	sig::Signal<void(MouseEvent)> SignalMouseMove;
 	sig::Signal<void(MouseEvent)> SignalMouseDrag;
+	sig::Signal<void(MouseEvent)> SignalMouseWheel;
 };
 
 }

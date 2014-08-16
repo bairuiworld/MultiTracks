@@ -40,9 +40,23 @@ void MapRenderer::OnPaint(Gdiplus::Graphics* g)
 		entity->Draw(cr, mMap->GetViewport());*/
 }
 
+void MapRenderer::OnMouseDown(ww::MouseEvent ev)
+{
+	SetFocus(mhWnd);
+}
+
 void MapRenderer::OnMouseDrag(ww::MouseEvent ev)
 {
 	mMap->GetViewport()->MoveOrigin(ev.GetPrevPoint().x - ev.GetPoint().x, ev.GetPrevPoint().y - ev.GetPoint().y);
+	if(mParent)
+		mParent->Invalidate();
+}
+
+void MapRenderer::OnMouseWheel(ww::MouseEvent ev)
+{
+	MapViewport* view = mMap->GetViewport();
+	POINT pt = ev.GetPoint();
+	view->SetZoom(view->GetZoom() + ev.GetWheelRotation(), Vector2d(pt.x, pt.y));
 	if(mParent)
 		mParent->Invalidate();
 }

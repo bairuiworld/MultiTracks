@@ -193,6 +193,15 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			}
 		} break;
 
+	case WM_MOUSEWHEEL:
+		{
+			POINT pt = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+			ScreenToClient(mhWnd, &pt);
+			MouseEvent ev(this, pt, 0, GET_KEYSTATE_WPARAM(wParam), MouseButton::None, mMouseLastPos, GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
+			SignalMouseWheel.emit(ev);
+			OnMouseWheel(ev);
+		} break;
+
 	case WM_SIZE:
 		{
 			int width = LOWORD(lParam);

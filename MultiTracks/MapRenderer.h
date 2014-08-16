@@ -21,7 +21,9 @@ public:
 protected:
 	virtual void OnPaint(Gdiplus::Graphics* g);
 	virtual void OnResize(int width, int height);
+	virtual void OnMouseDown(ww::MouseEvent ev);
 	virtual void OnMouseDrag(ww::MouseEvent ev);
+	virtual void OnMouseWheel(ww::MouseEvent ev);
 
 protected:
 	Map* mMap;

@@ -41,4 +41,6 @@ bool MouseEvent::IsShiftPressed() const { return (mFlags & MK_SHIFT) != 0; }
 bool MouseEvent::IsCtrlPressed() const { return (mFlags & MK_CONTROL) != 0; }
 bool MouseEvent::IsAltPressed() const { return (mFlags & MK_ALT) != 0; }
 
+int MouseEvent::GetWheelRotation() const { return mDelta; }
+
 }

@@ -39,6 +39,8 @@ public:
 	bool IsShiftPressed() const;
 	bool IsAltPressed() const;
 
+	int GetWheelRotation() const;
+
 private:
 	POINT mPoint;
 	POINT mPrevPoint;

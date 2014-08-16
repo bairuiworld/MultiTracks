@@ -65,7 +65,7 @@ void Map::Draw(Gdiplus::Graphics* g)
 			Gdiplus::Image* im = tile->GetImage();
 			if(!im)
 			{
-				tile->SignalReady += [&](Tile* tile) { SignalNewTile.emit(); };
+				tile->SignalReady += [this](Tile* tile) { SignalNewTile.emit(); };
 				continue;
 			}
 			g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());

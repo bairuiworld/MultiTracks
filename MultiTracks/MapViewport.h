@@ -23,7 +23,7 @@ public:
 	void MoveOrigin(double dx, double dy);
 
 	int GetZoom() const { return mZoom; }
-	void SetZoom(int zoom);
+	void SetZoom(int zoom, const Vector2d& center = Vector2d(0, 0));
 
 	int GetMapSize() const { return mMapSize; }
 	Location PixelToLocation(const Vector2d& pixel) const;

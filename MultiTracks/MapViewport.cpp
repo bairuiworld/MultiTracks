@@ -30,10 +30,20 @@ void MapViewport::MoveOrigin(double dx, double dy)
 	SetOrigin(v);
 }
 
-void MapViewport::SetZoom(int zoom)
+void MapViewport::SetZoom(int zoom, const Vector2d& center)
 {
+	if(zoom > 18 || zoom < 3) return;
+
+	double ratioX = (double)(center.GetX() + mOrigin.GetX())/mMapSize;
+	double ratioY = (double)(center.GetY() + mOrigin.GetY())/mMapSize;
+
 	mZoom = zoom;
 	mMapSize = (int)(std::pow(2, mZoom)*mMapSource->GetTileSize());
+
+	mOrigin.Set({ratioX*mMapSize - center.GetX(), ratioY*mMapSize - center.GetY()});
+
+	if(mOrigin.GetX() < 0) mOrigin.SetX(0);
+	if(mOrigin.GetY() < 0) mOrigin.SetY(0);
 }
 
 Location MapViewport::PixelToLocation(const Vector2d& pixel) const
