@@ -28,9 +28,10 @@ public:
 
 	MapViewport* GetViewport() const { return mMapViewport; };
 
-	Tile* GetTile(const Vector3i& coord);
+	Tile* GetTile(const Vector3i& coord, bool download = true);
 
 	void Draw(Gdiplus::Graphics* g);
+	void PreloadTiles();
 
 	sig::Signal<void()> SignalNewTile;
 

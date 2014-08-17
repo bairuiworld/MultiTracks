@@ -46,15 +46,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//
 	{ // Force Gdi+ object cleanup before shutting down
-		/*mt::Tile tile(mt::Vector3i(5, 5, 5), &mt::MapSource::MAPS);
-		tile.Download(true);
-		tile.Wait();
-		Gdiplus::Image* im = tile.GetImage();
-		CLSID pngClsid;
-		GetEncoderClsid(L"image/png", &pngClsid);
-		im->Save(L"a.png", &pngClsid, NULL);*/
-
-		ww::Application app;
+/*		ww::Application app;
 		ww::Window win;
 		mt::Map map(&mt::MapSource::MAPS);
 		map.GetViewport()->SetZoom(4);
@@ -65,7 +57,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 
 		app.Run();
-		renderer->Save(L"a.png", mt::ImageFormat::png);
+		renderer->Save(L"a.png", mt::ImageFormat::png);*/
+
+		int count = 0;
+
+		mt::Map map(&mt::MapSource::IGN);
+		mt::MapRenderer renderer(&map);
+		mt::MapViewport* view = map.GetViewport();
+		view->SetZoom(4);
+		view->SetViewDimension(2000, 2000);
+		map.SignalNewTile += [&count]() { count++; std::cout << count << std::endl; };
+		renderer.Save(L"b.png", mt::ImageFormat::png);
+		std::cout << "done" << std::endl;
 	}
 
 	// Cleanup

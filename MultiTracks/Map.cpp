@@ -21,13 +21,14 @@ Map::~Map()
 	delete mMapViewport;
 }
 
-Tile* Map::GetTile(const Vector3i& coord)
+Tile* Map::GetTile(const Vector3i& coord, bool download)
 {
 	TileMap::const_iterator it = mCache.find(coord);
 	if(it == mCache.end())
 	{
 		Tile* tile = new Tile(coord, mMapSource);
-		tile->Download(true);
+		if(download)
+			tile->Download(true);
 		if(mCache.size() >= mCacheSize)
 		{
 			Tile* lessUsed = mCacheUsage.back();
@@ -67,7 +68,7 @@ void Map::Draw(Gdiplus::Graphics* g)
 			if(!im)
 			{
 				tile->SignalReady += [this](Tile* tile) {
-					std::unique_lock<std::mutex> lock(signal_mutex);
+					std::lock_guard<std::mutex> lock(signal_mutex);
 					SignalNewTile.emit();
 				};
 				continue;
@@ -75,6 +76,52 @@ void Map::Draw(Gdiplus::Graphics* g)
 			g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
 		}
 	}
+}
+
+void Map::PreloadTiles()
+{
+	Vector3i northWestTile = mMapViewport->GetNorthWestTileCoordinate();
+	Vector3i southEastTile = mMapViewport->GetSouthEastTileCoordinate();
+	Vector2i origin = mMapViewport->GetTileOrigin(northWestTile);
+	int xTileCount = southEastTile.GetX() - northWestTile.GetX() + 1;
+	int yTileCount = southEastTile.GetY() - northWestTile.GetY() + 1;
+	int tileCount = xTileCount*yTileCount;
+
+	std::mutex count_lock;
+	std::condition_variable cv;
+	int tileLeft = 0;
+
+	for(int i = 0; i<xTileCount; i++)
+	{
+		for(int j = 0; j<yTileCount; j++)
+		{
+			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
+			Tile* tile = GetTile(coord);
+			Gdiplus::Image* im = tile->GetImage();
+			if(!im)
+			{
+				{
+					std::lock_guard<std::mutex> lock(count_lock);
+					tileLeft++;
+				}
+				tile->Download(true);
+
+				tile->SignalReady += [this, &count_lock, &tileLeft, &cv](Tile* tile) {
+					std::lock_guard<std::mutex> lock(count_lock);
+					tileLeft--;
+					if(tileLeft <= 0)
+						cv.notify_all();
+
+					std::lock_guard<std::mutex> siglock(signal_mutex);
+					SignalNewTile.emit();
+				};
+			}
+		}
+	}
+
+	std::unique_lock<std::mutex> lock(count_lock);
+	while(tileLeft > 0)
+		cv.wait(lock);
 }
 
 }

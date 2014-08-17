@@ -19,6 +19,7 @@ std::shared_ptr<Gdiplus::Bitmap> MapRenderer::Draw() const
 	MapViewport* view = mMap->GetViewport();
 	std::shared_ptr<Gdiplus::Bitmap> bitmap = std::make_shared<Gdiplus::Bitmap>(view->GetWidth(), view->GetHeight());
 	Gdiplus::Graphics* g = Gdiplus::Graphics::FromImage(bitmap.get());
+	mMap->PreloadTiles();
 	InternalDraw(g);
 	delete g;
 	return bitmap;
