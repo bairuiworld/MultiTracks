@@ -18,6 +18,7 @@ class Task
 {
 public:
 	Task(std::function<void()> task_) : task(task_), state(State::waiting) {}
+	virtual ~Task() = default;
 
 	void operator()();
 
@@ -43,6 +44,7 @@ public:
 	TaskResult(std::function<void()> task, T res_) :
 		Task(task), res(res_->get_future())
 	{}
+	virtual ~TaskResult() = default;
 
 	const std::future<Ret>& GetFuture() { return res; }
 

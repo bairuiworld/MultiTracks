@@ -13,10 +13,31 @@ namespace mt
 class Entity;
 class Map;
 
-class MapRenderer : public ww::DrawingArea
+enum class ImageFormat { png, jpeg, bmp, gif, tiff };
+
+class MapRenderer
 {
 public:
 	MapRenderer(Map* map);
+	virtual ~MapRenderer() = default;
+
+	std::shared_ptr<Gdiplus::Bitmap> Draw() const;
+	void Draw(Gdiplus::Graphics* g) const;
+	void Save(const wchar_t* filename, ImageFormat imformat = ImageFormat::jpeg) const;
+
+protected:
+	void InternalDraw(Gdiplus::Graphics* g) const;
+
+protected:
+	Map* mMap;
+	std::vector<Entity*> mEntites;
+};
+
+class WindowMapRenderer : public MapRenderer, public ww::DrawingArea
+{
+public:
+	WindowMapRenderer(Map* map);
+	virtual ~WindowMapRenderer() = default;
 
 protected:
 	virtual void OnPaint(Gdiplus::Graphics* g);
@@ -24,10 +45,6 @@ protected:
 	virtual void OnMouseDown(ww::MouseEvent ev);
 	virtual void OnMouseDrag(ww::MouseEvent ev);
 	virtual void OnMouseWheel(ww::MouseEvent ev);
-
-protected:
-	Map* mMap;
-	std::vector<Entity*> mEntites;
 };
 
 }

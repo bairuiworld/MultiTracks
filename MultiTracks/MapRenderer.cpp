@@ -9,7 +9,97 @@ namespace mt
 {
 
 MapRenderer::MapRenderer(Map* map) :
-	mMap(map)
+mMap(map)
+{
+
+}
+
+std::shared_ptr<Gdiplus::Bitmap> MapRenderer::Draw() const
+{
+	MapViewport* view = mMap->GetViewport();
+	std::shared_ptr<Gdiplus::Bitmap> bitmap = std::make_shared<Gdiplus::Bitmap>(view->GetWidth(), view->GetHeight());
+	Gdiplus::Graphics* g = Gdiplus::Graphics::FromImage(bitmap.get());
+	InternalDraw(g);
+	delete g;
+	return bitmap;
+}
+
+void MapRenderer::Draw(Gdiplus::Graphics* g) const
+{
+	MapViewport* view = mMap->GetViewport();
+	HDC hDC = g->GetHDC();
+	HDC hMemDC = CreateCompatibleDC(hDC);
+	HBITMAP hMemBitmap = CreateCompatibleBitmap(hDC, view->GetWidth(), view->GetHeight());
+	SelectObject(hMemDC, hMemBitmap);
+
+	Gdiplus::Graphics gMem(hMemDC);
+	InternalDraw(&gMem);
+
+	BitBlt(hDC, 0, 0, view->GetWidth(), view->GetHeight(), hMemDC, 0, 0, SRCCOPY);
+	g->ReleaseHDC(hDC);
+
+	DeleteObject(hMemBitmap);
+	DeleteDC(hMemDC);
+}
+
+void MapRenderer::InternalDraw(Gdiplus::Graphics* g) const
+{
+	mMap->Draw(g);
+
+	/*for(Entity* entity : mEntites)
+	entity->Draw(cr, mMap->GetViewport());*/
+}
+
+int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
+{
+	UINT  num = 0;          // number of image encoders
+	UINT  size = 0;         // size of the image encoder array in bytes
+
+	Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
+
+	Gdiplus::GetImageEncodersSize(&num, &size);
+	if(size == 0)
+		return -1;  // Failure
+
+	pImageCodecInfo = (Gdiplus::ImageCodecInfo*)(malloc(size));
+	if(pImageCodecInfo == NULL)
+		return -1;  // Failure
+
+	GetImageEncoders(num, size, pImageCodecInfo);
+
+	for(UINT j = 0; j < num; ++j)
+	{
+		if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
+		{
+			*pClsid = pImageCodecInfo[j].Clsid;
+			free(pImageCodecInfo);
+			return j;  // Success
+		}
+	}
+
+	free(pImageCodecInfo);
+	return -1;  // Failure
+}
+
+void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
+{
+	const wchar_t* format = nullptr;
+	switch(imformat)
+	{
+	case ImageFormat::jpeg: format = L"image/jpeg"; break;
+	case ImageFormat::png:  format = L"image/png"; break;
+	case ImageFormat::bmp:  format = L"image/bmp"; break;
+	case ImageFormat::gif:  format = L"image/gif"; break;
+	case ImageFormat::tiff:  format = L"image/tiff"; break;
+	}
+
+	CLSID clsid;
+	GetEncoderClsid(format, &clsid);
+	Draw()->Save(filename, &clsid, NULL);
+}
+
+WindowMapRenderer::WindowMapRenderer(Map* map) :
+MapRenderer(map)
 {
 	mMap->SignalNewTile += [this]()
 	{ 
@@ -18,39 +108,24 @@ MapRenderer::MapRenderer(Map* map) :
 	};
 }
 
-void MapRenderer::OnPaint(Gdiplus::Graphics* g)
+void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g)
 {
-	MapViewport* view = mMap->GetViewport();
-	HDC hDC = g->GetHDC();
-	HDC hMemDC = CreateCompatibleDC(hDC);
-	HBITMAP hMemBitmap = CreateCompatibleBitmap(hDC, view->GetWidth(), view->GetHeight());
-	SelectObject(hMemDC, hMemBitmap);
-	
-	Gdiplus::Graphics gMem(hMemDC);
-	mMap->Draw(&gMem);
-	BitBlt(hDC, 0, 0, view->GetWidth(), view->GetHeight(), hMemDC, 0, 0, SRCCOPY);
-	g->ReleaseHDC(hDC);
-
-	DeleteObject(hMemBitmap);
-	DeleteDC(hMemDC);
-
-	/*for(Entity* entity : mEntites)
-		entity->Draw(cr, mMap->GetViewport());*/
+	Draw(g);
 }
 
-void MapRenderer::OnMouseDown(ww::MouseEvent ev)
+void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 {
 	SetFocus(mhWnd);
 }
 
-void MapRenderer::OnMouseDrag(ww::MouseEvent ev)
+void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)
 {
 	mMap->GetViewport()->MoveOrigin(ev.GetPrevPoint().x - ev.GetPoint().x, ev.GetPrevPoint().y - ev.GetPoint().y);
 	if(mParent)
 		mParent->Invalidate();
 }
 
-void MapRenderer::OnMouseWheel(ww::MouseEvent ev)
+void WindowMapRenderer::OnMouseWheel(ww::MouseEvent ev)
 {
 	MapViewport* view = mMap->GetViewport();
 	POINT pt = ev.GetPoint();
@@ -59,7 +134,7 @@ void MapRenderer::OnMouseWheel(ww::MouseEvent ev)
 		mParent->Invalidate();
 }
 
-void MapRenderer::OnResize(int width, int height)
+void WindowMapRenderer::OnResize(int width, int height)
 {
 	mMap->GetViewport()->SetViewDimension(width, height);
 }

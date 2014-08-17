@@ -16,6 +16,7 @@
 
 #include <curl/curl.h>
 #include <fstream>
+#include <windows.h>
 
 #include "Application.h"
 #include "Window.h"
@@ -23,10 +24,9 @@
 
 #ifdef _DEBUG
 #	include <iostream>
-#	include <windows.h>
 #endif
 
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
+
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -58,13 +58,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		ww::Window win;
 		mt::Map map(&mt::MapSource::MAPS);
 		map.GetViewport()->SetZoom(4);
-		mt::MapRenderer* renderer = new mt::MapRenderer(&map);
+		mt::WindowMapRenderer* renderer = new mt::WindowMapRenderer(&map);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 
 		app.Run();
+		renderer->Save(L"a.png", mt::ImageFormat::png);
 	}
 
 	// Cleanup
@@ -75,33 +76,3 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	return 0;
 }
 
-int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
-{
-	UINT  num = 0;          // number of image encoders
-	UINT  size = 0;         // size of the image encoder array in bytes
-
-	Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
-
-	Gdiplus::GetImageEncodersSize(&num, &size);
-	if(size == 0)
-		return -1;  // Failure
-
-	pImageCodecInfo = (Gdiplus::ImageCodecInfo*)(malloc(size));
-	if(pImageCodecInfo == NULL)
-		return -1;  // Failure
-
-	GetImageEncoders(num, size, pImageCodecInfo);
-
-	for(UINT j = 0; j < num; ++j)
-	{
-		if(wcscmp(pImageCodecInfo[j].MimeType, format) == 0)
-		{
-			*pClsid = pImageCodecInfo[j].Clsid;
-			free(pImageCodecInfo);
-			return j;  // Success
-		}
-	}
-
-	free(pImageCodecInfo);
-	return -1;  // Failure
-}
