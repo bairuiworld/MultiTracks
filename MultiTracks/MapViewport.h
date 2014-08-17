@@ -14,7 +14,7 @@ class MapViewport
 public:
 	MapViewport(MapSource* mapSource, int zoom = 0, const Vector2d& origin = Vector2d(0, 0));
 
-	void SetViewDimension(int width, int height) { mViewDimension.Set({width, height}); }
+	void SetViewDimension(int width, int height);
 	int GetWidth() const { return mViewDimension.GetX(); }
 	int GetHeight() const { return mViewDimension.GetY(); }
 
@@ -37,6 +37,9 @@ public:
 	Vector3i GetNorthWestTileCoordinate();
 	Vector3i GetSouthEastTileCoordinate();
 	Vector2i GetTileOrigin(const Vector3i& coordinate);
+
+private:
+	void CheckOrigin();
 
 private:
 	MapSource* mMapSource;

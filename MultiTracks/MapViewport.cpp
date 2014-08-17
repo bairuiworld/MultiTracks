@@ -14,13 +14,16 @@ MapViewport::MapViewport(MapSource* mapSource, int zoom, const Vector2d& origin)
 	SetZoom(zoom);
 }
 
+void MapViewport::SetViewDimension(int width, int height)
+{
+	mViewDimension.Set({width, height});
+	CheckOrigin();
+}
+
 void MapViewport::SetOrigin(const Vector2d& origin)
 {
 	mOrigin = origin;
-	if(mOrigin.GetX() < 0) mOrigin.SetX(0);
-	if(mOrigin.GetY() < 0) mOrigin.SetY(0);
-	if(mOrigin.GetX() > mMapSize - mViewDimension.GetX()) mOrigin.SetX(mMapSize - mViewDimension.GetX());
-	if(mOrigin.GetY() > mMapSize - mViewDimension.GetY()) mOrigin.SetY(mMapSize - mViewDimension.GetY());
+	CheckOrigin();
 }
 
 void MapViewport::MoveOrigin(double dx, double dy)
@@ -38,12 +41,17 @@ void MapViewport::SetZoom(int zoom, const Vector2d& center)
 	double ratioY = (double)(center.GetY() + mOrigin.GetY())/mMapSize;
 
 	mZoom = zoom;
-	mMapSize = (int)(std::pow(2, mZoom)*mMapSource->GetTileSize());
+	mMapSize = static_cast<int>(std::pow(2, mZoom)*mMapSource->GetTileSize());
 
-	mOrigin.Set({ratioX*mMapSize - center.GetX(), ratioY*mMapSize - center.GetY()});
+	SetOrigin(Vector2d{ratioX*mMapSize - center.GetX(), ratioY*mMapSize - center.GetY()});
+}
 
+void MapViewport::CheckOrigin()
+{
 	if(mOrigin.GetX() < 0) mOrigin.SetX(0);
 	if(mOrigin.GetY() < 0) mOrigin.SetY(0);
+	if(mOrigin.GetX() > mMapSize - mViewDimension.GetX()) mOrigin.SetX(mMapSize - mViewDimension.GetX());
+	if(mOrigin.GetY() > mMapSize - mViewDimension.GetY()) mOrigin.SetY(mMapSize - mViewDimension.GetY());
 }
 
 Location MapViewport::PixelToLocation(const Vector2d& pixel) const
