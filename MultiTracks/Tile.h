@@ -1,7 +1,9 @@
 #ifndef __MULTITRACKS_TILE_H__
 #define __MULTITRACKS_TILE_H__
 
+#include <Windows.h>
 #include <gdiplus.h>
+#include <mutex>
 #include "SimpleSignal.h"
 #include "ThreadPool.h"
 #include "Vector.h"
@@ -36,7 +38,8 @@ private:
 	MapSource* mMapSource;
 	Gdiplus::Image* mImage;
 	bool mLoaded;
-	std::future<void> mFuture;
+	std::shared_ptr<TaskResult<void>> mTask;
+	std::mutex signal_lock;
 };
 
 }

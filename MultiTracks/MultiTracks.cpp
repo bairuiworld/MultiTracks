@@ -5,13 +5,13 @@
 #include "Track.h"
 #include "TopographicObjectContainer.h"
 #include "MapSource.h"
+#include "DownloadManager.h"
 #include "Tile.h"
 #include "Map.h"
 #include "MapViewport.h"
 #include "MapRenderer.h"
 #include "Vector.h"
 #include "SimpleSignal.h"
-#include "DownloadManager.h"
 #include "Properties.h"
 
 #include <curl/curl.h>
@@ -38,8 +38,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 #endif
 	// Init
+	mt::DownloadManager::Init();
 	curl_global_init(CURL_GLOBAL_ALL);
-	//mt::DownloadManager::Init();
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);

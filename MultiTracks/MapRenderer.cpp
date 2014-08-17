@@ -8,8 +8,6 @@
 namespace mt
 {
 
-void f() {}
-
 MapRenderer::MapRenderer(Map* map) :
 	mMap(map)
 {

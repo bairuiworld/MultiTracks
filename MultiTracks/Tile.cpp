@@ -1,6 +1,7 @@
-#include "DownloadManager.h"
 #include "MapSource.h"
 #include "Tile.h"
+#include "DownloadManager.h"
+#include <iostream>
 
 namespace mt
 {
@@ -13,18 +14,18 @@ Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
 
 Tile::~Tile()
 {
-	mFuture.wait();
+	if(!mTask->Cancel())
+		mTask->GetFuture().wait();
 	delete mImage;
 }
 
 bool Tile::Download(bool background)
 {
-	if(!mFuture.valid())
+	if(!mTask)
 	{
-		//mFuture = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
-		mFuture = std::async(std::launch::async, std::bind(&Tile::DownloadTask, this));
+		mTask = DownloadManager::GetPool()->enqueue(std::bind(&Tile::DownloadTask, this));
 		if(!background)
-			mFuture.wait();
+			Wait();
 	}
 	return mLoaded;
 }
@@ -32,8 +33,8 @@ bool Tile::Download(bool background)
 void Tile::Wait()
 {
 	if(mLoaded) return;
-	if(mFuture.valid())
-		mFuture.wait();
+	if(mTask)
+		mTask->GetFuture().wait();
 }
 
 size_t Tile::WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -59,6 +60,7 @@ void Tile::DownloadTask()
 	
 	int res_code;
 	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &res_code);
+	curl_easy_cleanup(curl);
 
 	if(res == CURLE_OK && res_code == 200)
 	{
@@ -77,14 +79,10 @@ void Tile::DownloadTask()
 			GlobalFree(hBlock);
 		}
 
-		if(mImage)
-		{
-			mLoaded = true;
-			SignalReady.emit(this);
-		}
+		if(mImage) mLoaded = true;
 	}
- 
-	curl_easy_cleanup(curl);
+
+	SignalReady.emit(this);
 }
 
 }

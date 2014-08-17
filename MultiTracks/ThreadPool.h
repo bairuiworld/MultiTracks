@@ -14,25 +14,90 @@
 namespace mt
 {
 
+class Task
+{
+public:
+	Task(std::function<void()> task_) : task(task_), state(State::waiting) {}
+
+	void operator()();
+
+	enum class State { waiting, running, canceled, finished };
+
+	State GetState();
+	bool Cancel();
+
+private:
+	void SetState(State state);
+
+private:
+	std::function<void()> task;
+	std::mutex state_mutex;
+	State state;
+};
+
+template <class Ret>
+class TaskResult : public Task
+{
+public:
+	template <class T>
+	TaskResult(std::function<void()> task, T res_) :
+		Task(task), res(res_->get_future())
+	{}
+
+	const std::future<Ret>& GetFuture() { return res; }
+
+private:
+	std::future<Ret> res;
+	std::shared_ptr<Task> task;
+};
+
 class ThreadPool
 {
 public:
     ThreadPool(size_t);
     template<class F, class... Args>
-    auto enqueue(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>;
+	auto enqueue(F&& f, Args&&... args)->std::shared_ptr<TaskResult<typename std::result_of<F(Args...)>::type>>;
     ~ThreadPool();
 
 private:
     // need to keep track of threads so we can join them
     std::vector< std::thread > workers;
     // the task queue
-    std::queue< std::function<void()> > tasks;
+    std::queue<std::shared_ptr<Task>> tasks;
     
     // synchronization
     std::mutex queue_mutex;
     std::condition_variable condition;
     bool stop;
 };
+
+inline void Task::operator()()
+{
+	SetState(State::running);
+	task();
+	SetState(State::finished);
+}
+
+inline Task::State Task::GetState()
+{
+	std::unique_lock<std::mutex> lock(state_mutex);
+	return state;
+}
+
+inline void Task::SetState(State state_)
+{
+	std::unique_lock<std::mutex> lock(state_mutex);
+	state = state_;
+}
+
+inline bool Task::Cancel()
+{
+	std::unique_lock<std::mutex> lock(state_mutex);
+	if(state == State::running) return false;
+	state = State::canceled;
+	return true;
+}
+
  
 // the constructor just launches some amount of workers
 inline ThreadPool::ThreadPool(size_t threads) :
@@ -50,10 +115,11 @@ inline ThreadPool::ThreadPool(size_t threads) :
                         this->condition.wait(lock);
                     if(this->stop && this->tasks.empty())
                         return;
-                    std::function<void()> task(this->tasks.front());
+                    std::shared_ptr<Task> task(this->tasks.front());
                     this->tasks.pop();
                     lock.unlock();
-                    task();
+					if(task->GetState() == Task::State::waiting)
+						(*task)();
                 }
             }
         );
@@ -63,7 +129,7 @@ inline ThreadPool::ThreadPool(size_t threads) :
 // add new work item to the pool
 template<class F, class... Args>
 auto ThreadPool::enqueue(F&& f, Args&&... args) 
-    -> std::future<typename std::result_of<F(Args...)>::type>
+    -> std::shared_ptr<TaskResult<typename std::result_of<F(Args...)>::type>>
 {
     typedef typename std::result_of<F(Args...)>::type return_type;
     
@@ -71,17 +137,18 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
     if(stop)
         throw std::runtime_error("enqueue on stopped ThreadPool");
 
-    auto task = std::make_shared< std::packaged_task<return_type()> >(
+    auto fn = std::make_shared< std::packaged_task<return_type()> >(
             std::bind(std::forward<F>(f), std::forward<Args>(args)...)
         );
         
-    std::future<return_type> res = task->get_future();
+	std::shared_ptr<TaskResult<return_type>> task;
     {
         std::unique_lock<std::mutex> lock(queue_mutex);
-        tasks.push([task](){ (*task)(); });
+		task = std::make_shared<TaskResult<return_type>>([fn](){ (*fn)(); }, fn);
+        tasks.push(task);
     }
     condition.notify_one();
-    return res;
+    return task;
 }
 
 // the destructor joins all threads

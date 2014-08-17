@@ -5,6 +5,7 @@
 #include <gdiplus.h>
 #include <map>
 #include <list>
+#include <mutex>
 #include "Vector.h"
 #include "SimpleSignal.h"
 
@@ -38,6 +39,7 @@ private:
 	MapViewport* mMapViewport;
 	TileMap mCache;
 	TileList mCacheUsage;
+	std::mutex signal_mutex;
 
 	unsigned int mCacheSize;
 };

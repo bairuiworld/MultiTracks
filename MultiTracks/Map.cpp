@@ -18,6 +18,7 @@ Map::~Map()
 {
 	for(Tile* tile : mCacheUsage)
 		delete tile;
+	delete mMapViewport;
 }
 
 Tile* Map::GetTile(const Vector3i& coord)
@@ -65,7 +66,10 @@ void Map::Draw(Gdiplus::Graphics* g)
 			Gdiplus::Image* im = tile->GetImage();
 			if(!im)
 			{
-				tile->SignalReady += [this](Tile* tile) { SignalNewTile.emit(); };
+				tile->SignalReady += [this](Tile* tile) {
+					std::unique_lock<std::mutex> lock(signal_mutex);
+					SignalNewTile.emit();
+				};
 				continue;
 			}
 			g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
