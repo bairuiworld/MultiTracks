@@ -1,10 +1,14 @@
+#include <il/il.h>
+#include <il/ilut.h>
 #include "MapSource.h"
 #include "Tile.h"
 #include "DownloadManager.h"
 #include <iostream>
-
+#include <fstream>
 namespace mt
 {
+
+std::mutex Tile::devil_mutex;
 
 Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
 	mCoordinates(coord), mMapSource(mapSource), mImage(nullptr), mLoaded(false)
@@ -32,8 +36,10 @@ bool Tile::Download(bool background)
 
 void Tile::Wait()
 {
-	std::lock_guard<std::mutex> lock(loaded_mutex);
-	if(mLoaded) return;
+	{
+		std::lock_guard<std::mutex> lock(loaded_mutex);
+		if(mLoaded) return;
+	}
 	if(mTask)
 		mTask->GetFuture().wait();
 }
@@ -65,28 +71,20 @@ void Tile::DownloadTask()
 
 	if(res == CURLE_OK && res_code == 200)
 	{
-		HGLOBAL hBlock = GlobalAlloc(GHND, data.size());
-		if(hBlock != NULL)
+		std::lock_guard<std::mutex> lock(devil_mutex);
+		unsigned int imid;
+		ilGenImages(1, &imid);
+		ilBindImage(imid);
+		if(ilLoadL(IL_TYPE_UNKNOWN, data.data(), data.size()))
 		{
-			LPVOID pBlock = GlobalLock(hBlock);
-			if(pBlock != NULL)
-			{
-				memmove(pBlock, data.data(), data.size());
-				IStream* pStream;
-				if(CreateStreamOnHGlobal(hBlock, FALSE, &pStream) == S_OK)
-					mImage = new Gdiplus::Image(pStream);
-				GlobalUnlock(pBlock);
-			}
-			GlobalFree(hBlock);
+			HBITMAP hBitmap = ilutConvertToHBitmap(GetDC(NULL));
+			mImage = new Gdiplus::Bitmap(hBitmap, NULL);
 		}
-
-		if(mImage)
-		{
-			std::lock_guard<std::mutex> lock(loaded_mutex);
-			mLoaded = true;
-		}
+		ilDeleteImages(1, &imid);
 	}
 
+	std::lock_guard<std::mutex> lock(loaded_mutex);
+	mLoaded = true;
 	SignalReady.emit(this);
 }
 

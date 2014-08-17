@@ -41,6 +41,7 @@ private:
 	bool mLoaded;
 	std::shared_ptr<TaskResult<void>> mTask;
 	std::mutex loaded_mutex;
+	static std::mutex devil_mutex;
 };
 
 }

@@ -98,8 +98,7 @@ void Map::PreloadTiles()
 		{
 			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
 			Tile* tile = GetTile(coord);
-			Gdiplus::Image* im = tile->GetImage();
-			if(!im)
+			if(!tile->IsLoaded())
 			{
 				{
 					std::lock_guard<std::mutex> lock(count_lock);
@@ -121,6 +120,7 @@ void Map::PreloadTiles()
 	}
 
 	std::unique_lock<std::mutex> lock(count_lock);
+	if(tileLeft <= 0) return;
 	while(tileLeft > 0)
 		cv.wait(lock);
 }
