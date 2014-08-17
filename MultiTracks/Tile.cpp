@@ -32,6 +32,7 @@ bool Tile::Download(bool background)
 
 void Tile::Wait()
 {
+	std::lock_guard<std::mutex> lock(loaded_mutex);
 	if(mLoaded) return;
 	if(mTask)
 		mTask->GetFuture().wait();
@@ -79,7 +80,11 @@ void Tile::DownloadTask()
 			GlobalFree(hBlock);
 		}
 
-		if(mImage) mLoaded = true;
+		if(mImage)
+		{
+			std::lock_guard<std::mutex> lock(loaded_mutex);
+			mLoaded = true;
+		}
 	}
 
 	SignalReady.emit(this);

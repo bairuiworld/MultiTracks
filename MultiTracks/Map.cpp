@@ -64,8 +64,7 @@ void Map::Draw(Gdiplus::Graphics* g)
 		{
 			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
 			Tile* tile = GetTile(coord);
-			Gdiplus::Image* im = tile->GetImage();
-			if(!im)
+			if(!tile->IsLoaded())
 			{
 				tile->SignalReady += [this](Tile* tile) {
 					std::lock_guard<std::mutex> lock(signal_mutex);
@@ -73,7 +72,9 @@ void Map::Draw(Gdiplus::Graphics* g)
 				};
 				continue;
 			}
-			g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
+			Gdiplus::Image* im = tile->GetImage();
+			if(im)
+				g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
 		}
 	}
 }

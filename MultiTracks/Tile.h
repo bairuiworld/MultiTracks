@@ -26,6 +26,7 @@ public:
 
 	const Vector3i& GetCoordinates() const { return mCoordinates; }
 	Gdiplus::Image* GetImage() const { return mImage; }
+	bool IsLoaded() { std::lock_guard<std::mutex> lock(loaded_mutex); return mLoaded; }
 	
 	sig::Signal<void(Tile*)> SignalReady;
 
@@ -39,7 +40,7 @@ private:
 	Gdiplus::Image* mImage;
 	bool mLoaded;
 	std::shared_ptr<TaskResult<void>> mTask;
-	std::mutex signal_lock;
+	std::mutex loaded_mutex;
 };
 
 }
