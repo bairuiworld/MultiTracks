@@ -32,7 +32,7 @@ template <class T>
 Entity::Entity(T* component) :
 mComponent(component)
 {
-	mRenderer = RendererExists<T>::value ? RendererSelector<T>::type::GetDefault() : nullptr;
+	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
 }
 
 }

@@ -91,6 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		s.Add(&mt::Location(0, 0));
 		s.Add(&mt::Location(10, 20));
 		renderer->AddComponent(&s);
+		renderer->AddComponent(&s);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 

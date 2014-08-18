@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <gdiplus.h>
 #include <memory>
+#include <iostream>
 #include "Component.h"
 
 namespace mt
@@ -12,6 +13,9 @@ namespace mt
 struct NullRenderer {};
 template <class T> struct RendererSelector { typedef NullRenderer type; };
 template <class T> struct RendererExists { static const bool value = !std::is_same<RendererSelector<T>::type, NullRenderer>::value; };
+template <class T> struct DefaultRenderer { static const std::shared_ptr<typename RendererSelector<T>::type> value; };
+template <class T> const std::shared_ptr<typename RendererSelector<T>::type>
+	DefaultRenderer<T>::value = std::make_shared<typename RendererSelector<T>::type>();
 
 class MapViewport;
 
@@ -26,10 +30,6 @@ class SectionRenderer : public EntityRenderer
 {
 public:
 	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component);
-	static std::shared_ptr<SectionRenderer> GetDefault() { if(!mDefault) mDefault = std::make_shared<SectionRenderer>(); return mDefault; }
-
-private:
-	static std::shared_ptr<SectionRenderer> mDefault;
 };
 template <> struct RendererSelector<Section> { typedef SectionRenderer type; };
 
