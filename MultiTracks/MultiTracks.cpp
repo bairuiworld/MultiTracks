@@ -90,8 +90,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		mt::Section s;
 		s.Add(&mt::Location(0, 0));
 		s.Add(&mt::Location(10, 20));
-		renderer->AddComponent(&s);
-		renderer->AddComponent(&s);
+		mt::Track track;
+		track.Add(&s);
+		renderer->AddComponent(&track);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 

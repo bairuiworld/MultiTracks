@@ -33,6 +33,13 @@ public:
 };
 template <> struct RendererSelector<Section> { typedef SectionRenderer type; };
 
+class Track;
+class TrackRenderer : public EntityRenderer
+{
+public:
+	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component);
+};
+template <> struct RendererSelector<Track> { typedef TrackRenderer type; };
 }
 
 #endif // !__MULTITRACKS_ENTITYRENDERER_H__

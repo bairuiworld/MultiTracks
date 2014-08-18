@@ -1,4 +1,5 @@
 #include "Section.h"
+#include "Track.h"
 #include "MapViewport.h"
 #include "Component.h"
 #include "Properties.h"
@@ -27,6 +28,16 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 		last = point;
 		haslast = true;
 	}
+}
+
+void TrackRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)
+{
+	Track* track = static_cast<Track*>(component);
+	std::shared_ptr<SectionRenderer> sectionRenderer = DefaultRenderer<Section>::value;
+	
+	Track::SectionList sections = track->GetSections();
+	for(Section* section : sections)
+		sectionRenderer->Draw(g, viewport, section);
 }
 
 }
