@@ -7,8 +7,6 @@
 namespace mt
 {
 
-std::shared_ptr<SectionRenderer> SectionRenderer::mDefault;
-
 void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)
 {
 	Section* section = static_cast<Section*>(component);
