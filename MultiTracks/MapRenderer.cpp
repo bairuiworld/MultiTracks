@@ -14,6 +14,12 @@ mMap(map)
 
 }
 
+MapRenderer::~MapRenderer()
+{
+	for(Entity* entity : mEntities)
+		delete entity;
+}
+
 std::shared_ptr<Gdiplus::Bitmap> MapRenderer::Draw() const
 {
 	MapViewport* view = mMap->GetViewport();
@@ -45,10 +51,13 @@ void MapRenderer::Draw(Gdiplus::Graphics* g) const
 
 void MapRenderer::InternalDraw(Gdiplus::Graphics* g) const
 {
+	g->SetSmoothingMode(Gdiplus::SmoothingMode::SmoothingModeHighQuality);
+	Gdiplus::GraphicsState state = g->Save();
 	mMap->Draw(g);
+	g->Restore(state);
 
-	/*for(Entity* entity : mEntites)
-	entity->Draw(cr, mMap->GetViewport());*/
+	for(Entity* entity : mEntities)
+		entity->Draw(g, mMap->GetViewport());
 }
 
 int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
@@ -121,7 +130,7 @@ void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 
 void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)
 {
-	mMap->GetViewport()->MoveOrigin(ev.GetPrevPoint().x - ev.GetPoint().x, ev.GetPrevPoint().y - ev.GetPoint().y);
+	mMap->GetViewport()->MoveOrigin(static_cast<float>(ev.GetPrevPoint().x - ev.GetPoint().x), static_cast<float>(ev.GetPrevPoint().y - ev.GetPoint().y));
 	if(mParent)
 		mParent->Invalidate();
 }

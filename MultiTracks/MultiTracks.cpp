@@ -82,22 +82,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	//
 	{ // Force Gdi+ object cleanup before shutting down
-		/*mt::Tile t(mt::Vector3i(4, 4, 3), &mt::MapSource::IGN);
-		t.Download(false);
-		CLSID clsid;
-		GetEncoderClsid(L"image/png", &clsid);
-		Gdiplus::Image* im = t.GetImage();
-		Gdiplus::Bitmap* bm = new Gdiplus::Bitmap(im->GetWidth(), im->GetHeight());
-		Gdiplus::Graphics* g = Gdiplus::Graphics::FromImage(bm);
-		g->DrawImage(im, 0, 0);
-		delete g;
-		bm->Save(L"c.png", &clsid, nullptr);
-		return 0;*/
 		ww::Application app;
 		ww::Window win;
 		mt::Map map(&mt::MapSource::IGN);
 		map.GetViewport()->SetZoom(4);
 		mt::WindowMapRenderer* renderer = new mt::WindowMapRenderer(&map);
+		mt::Section s;
+		s.Add(&mt::Location(0, 0));
+		s.Add(&mt::Location(10, 20));
+		renderer->AddComponent(&s);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 

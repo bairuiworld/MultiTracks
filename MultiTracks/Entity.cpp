@@ -5,14 +5,14 @@
 namespace mt
 {
 
-/*void Entity::Draw(Cairo::RefPtr<Cairo::Context> cr, MapViewport* viewport)
+void Entity::Draw(Gdiplus::Graphics* g, MapViewport* viewport)
 {
 	if(mRenderer)
 	{
-		cr->save();
-		mRenderer->Draw(cr, viewport, mComponent);
-		cr->restore();
+		Gdiplus::GraphicsState state = g->Save();
+		mRenderer->Draw(g, viewport, mComponent);
+		g->Restore(state);
 	}
-}*/
+}
 
 }

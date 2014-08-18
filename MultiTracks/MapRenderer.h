@@ -6,11 +6,11 @@
 #include <gdiplus.h>
 #include "Event.h"
 #include "DrawingArea.h"
+#include "Entity.h"
 
 namespace mt
 {
 
-class Entity;
 class Map;
 
 enum class ImageFormat { png, jpeg, bmp, gif, tiff };
@@ -19,18 +19,21 @@ class MapRenderer
 {
 public:
 	MapRenderer(Map* map);
-	virtual ~MapRenderer() = default;
+	virtual ~MapRenderer();
 
 	std::shared_ptr<Gdiplus::Bitmap> Draw() const;
 	void Draw(Gdiplus::Graphics* g) const;
 	void Save(const wchar_t* filename, ImageFormat imformat = ImageFormat::jpeg) const;
+
+	template <class T>
+	void AddComponent(T* component);
 
 protected:
 	void InternalDraw(Gdiplus::Graphics* g) const;
 
 protected:
 	Map* mMap;
-	std::vector<Entity*> mEntites;
+	std::vector<Entity*> mEntities;
 };
 
 class WindowMapRenderer : public MapRenderer, public ww::DrawingArea
@@ -46,6 +49,12 @@ protected:
 	virtual void OnMouseDrag(ww::MouseEvent ev);
 	virtual void OnMouseWheel(ww::MouseEvent ev);
 };
+
+template <class T>
+void MapRenderer::AddComponent(T* component)
+{
+	mEntities.push_back(new Entity(component));
+}
 
 }
 
