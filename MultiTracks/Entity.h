@@ -32,7 +32,7 @@ template <class T>
 Entity::Entity(T* component) :
 mComponent(component)
 {
-	mRenderer = RendererExists<T>::value ? std::make_shared<typename RendererSelector<T>::type>() : nullptr;
+	mRenderer = RendererExists<T>::value ? RendererSelector<T>::type::GetDefault() : nullptr;
 }
 
 }

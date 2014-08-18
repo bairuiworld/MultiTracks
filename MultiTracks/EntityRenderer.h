@@ -10,17 +10,8 @@ namespace mt
 {
 
 struct NullRenderer {};
-template <class T>
-struct RendererSelector
-{
-	typedef NullRenderer type;
-};
-
-template <class T>
-struct RendererExists
-{
-	static const bool value = !std::is_same<RendererSelector<T>::type, NullRenderer>::value;
-};
+template <class T> struct RendererSelector { typedef NullRenderer type; };
+template <class T> struct RendererExists { static const bool value = !std::is_same<RendererSelector<T>::type, NullRenderer>::value; };
 
 class MapViewport;
 
@@ -35,13 +26,12 @@ class SectionRenderer : public EntityRenderer
 {
 public:
 	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component);
-};
+	static std::shared_ptr<SectionRenderer> GetDefault() { if(!mDefault) mDefault = std::make_shared<SectionRenderer>(); return mDefault; }
 
-template <>
-struct RendererSelector<Section>
-{
-	typedef SectionRenderer type;
+private:
+	static std::shared_ptr<SectionRenderer> mDefault;
 };
+template <> struct RendererSelector<Section> { typedef SectionRenderer type; };
 
 }
 

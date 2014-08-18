@@ -7,6 +7,8 @@
 namespace mt
 {
 
+std::shared_ptr<SectionRenderer> SectionRenderer::mDefault;
+
 void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)
 {
 	Section* section = static_cast<Section*>(component);
@@ -15,7 +17,7 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 	
 	Properties prop = component->GetProperties();
 	Gdiplus::Pen pen(Gdiplus::Color(prop.Get<int>("color", Gdiplus::Color::Black)),
-									prop.Get<int>("linewidth", 1));
+									prop.Get<float>("linewidth", 1));
 	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));
 
 	const Section::LocationList& locations = section->GetLocations();
