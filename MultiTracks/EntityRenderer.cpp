@@ -1,5 +1,7 @@
 #include "Section.h"
 #include "MapViewport.h"
+#include "Component.h"
+#include "Properties.h"
 #include "EntityRenderer.h"
 
 namespace mt
@@ -10,9 +12,11 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 	Section* section = static_cast<Section*>(component);
 	Vector2d last;
 	bool haslast = false;
-	Gdiplus::Pen pen(Gdiplus::Color(255, 0, 0), 4);
-	pen.SetDashStyle(Gdiplus::DashStyle::DashStyleDashDot);
-	pen.SetDashCap(Gdiplus::DashCap::DashCapTriangle);
+	
+	Properties prop = component->GetProperties();
+	Gdiplus::Pen pen(Gdiplus::Color(prop.Get<int>("color", Gdiplus::Color::Black)),
+									prop.Get<int>("linewidth", 1));
+	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));
 
 	const Section::LocationList& locations = section->GetLocations();
 	for(Location* location : locations)

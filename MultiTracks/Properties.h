@@ -56,7 +56,7 @@ public:
 			mChild->Pop();
 	}
 
-	bool Exists(std::string key)
+	bool Exists(std::string key) const
 	{
 		if(mChild && mChild->Exists(key)) return true;
 		PropertyMap::const_iterator it = mProperties.find(key);
@@ -75,7 +75,7 @@ public:
 	}
 
 	template <class T>
-	const T& Get(std::string key)
+	const T& Get(std::string key) const
 	{
 		if(mChild && mChild->Exists(key)) return mChild->Get<T>(key);
 		PropertyMap::const_iterator it = mProperties.find(key);
@@ -90,7 +90,7 @@ public:
 	}
 
 	template <class T>
-	const T& Get(std::string key, const T& bydefault)
+	const T& Get(std::string key, const T& bydefault) const
 	{
 		if(mChild && mChild->Exists(key)) return mChild->Get<T>(key, bydefault);
 		PropertyMap::const_iterator it = mProperties.find(key);

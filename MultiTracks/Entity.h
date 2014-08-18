@@ -7,6 +7,8 @@
 #include "Component.h"
 #include "EntityRenderer.h"
 
+#include <iostream>
+
 namespace mt
 {
 
@@ -30,7 +32,7 @@ template <class T>
 Entity::Entity(T* component) :
 mComponent(component)
 {
-	mRenderer = std::make_shared<typename RendererSelector<T>::type>();
+	mRenderer = RendererExists<T>::value ? std::make_shared<typename RendererSelector<T>::type>() : nullptr;
 }
 
 }

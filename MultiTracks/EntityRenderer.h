@@ -9,8 +9,18 @@
 namespace mt
 {
 
+struct NullRenderer {};
 template <class T>
-struct RendererSelector;
+struct RendererSelector
+{
+	typedef NullRenderer type;
+};
+
+template <class T>
+struct RendererExists
+{
+	static const bool value = !std::is_same<RendererSelector<T>::type, NullRenderer>::value;
+};
 
 class MapViewport;
 
