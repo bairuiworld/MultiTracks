@@ -25,7 +25,7 @@ void Location::Set(double latitude, double longitude, double elevation)
 	mElevation = elevation;
 }
 
-double Location::GetDistance(const Location& l)
+double Location::GetDistance(const Location& l) const
 {
 	double K1 = sin(toRadians(l.mLatitude - mLatitude)/2);
     double K2 = sin(toRadians(l.mLongitude - mLongitude)/2);
@@ -52,7 +52,7 @@ Location* Location::LoadXML(tinyxml2::XMLElement* element)
 	return loc;
 }
 
-tinyxml2::XMLElement* Location::SaveXML(tinyxml2::XMLDocument* doc)
+tinyxml2::XMLElement* Location::SaveXML(tinyxml2::XMLDocument* doc) const
 {
 	tinyxml2::XMLElement* l = doc->NewElement("l");
 	l->SetAttribute("lat", mLatitude);

@@ -1,3 +1,4 @@
+#include "Location.h"
 #include "Section.h"
 #include "Track.h"
 #include "MapViewport.h"
@@ -20,9 +21,9 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));
 
 	const Section::LocationList& locations = section->GetLocations();
-	for(Location* location : locations)
+	for(const Location& location : locations)
 	{
-		Vector2d point = viewport->LocationToPixel(*location);
+		Vector2d point = viewport->LocationToPixel(location);
 		if(haslast)
 			g->DrawLine(&pen, (float)last.GetX(), (float)last.GetY(), (float)point.GetX(), (float)point.GetY());
 		last = point;

@@ -3,7 +3,7 @@
 #include "Location.h"
 #include "Section.h"
 #include "Track.h"
-#include "TopographicObjectContainer.h"
+#include "MapObjectContainer.h"
 #include "MapSource.h"
 #include "DownloadManager.h"
 #include "Tile.h"
@@ -88,10 +88,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		map.GetViewport()->SetZoom(4);
 		mt::WindowMapRenderer* renderer = new mt::WindowMapRenderer(&map);
 		mt::Section s;
-		s.Add(&mt::Location(0, 0));
-		s.Add(&mt::Location(10, 20));
+		s.Add(mt::Location(0, 0));
+		s.Add(mt::Location(10, 20));
 		mt::Track track;
 		track.Add(&s);
+		track.GetProperties().Set("color", Gdiplus::Color::Red);
 		renderer->AddComponent(&track);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);

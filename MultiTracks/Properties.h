@@ -38,6 +38,8 @@ public:
 		delete mChild;
 	}
 
+	void SetParent(Properties* parent) { mParent = parent; }
+
 	void Push()
 	{
 		if(mChild) mChild->Push();

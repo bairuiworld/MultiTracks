@@ -8,29 +8,30 @@
 
 namespace mt {
 
-class TopographicObjectContainer;
+class MapObjectContainer;
 class Location;
 
 class Section : public Component
 {
 public:
-	using LocationList = std::vector<Location*>;
+	using LocationList = std::vector<Location>;
 
 public:
 	Section();
-	Section(TopographicObjectContainer* parent);
+	Section(MapObjectContainer* container);
 	Section(const Section& s);
 	~Section();
 
-	void Add(Location* location);
+	void Add(const Location& location);
 	template <class LocItr>	void Add(LocItr begin, LocItr end)
 	{
-		std::for_each(begin, end, [this](Location* location) { Add(location); });
+		std::for_each(begin, end, [this](const Location& location) { Add(location); });
 	}
 
 	void InsertAfter(LocationList::const_iterator after, const Location& location);
 	
-	Section* Split(LocationList::const_iterator after, Location* location = nullptr);
+	Section* Split(LocationList::const_iterator after);
+	Section* Split(LocationList::const_iterator after, const Location& location);
 
 	void Reverse();
 
@@ -46,7 +47,7 @@ public:
 	double GetLength() const;
 
 	void LoadXML(tinyxml2::XMLElement* element);
-	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);
+	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc) const;
 
 	/*public Area getBoundingRect()
 	{
@@ -61,7 +62,7 @@ public:
 
 private:
 	LocationList mLocations;
-	TopographicObjectContainer* mParent;
+	MapObjectContainer* mContainer;
 };
 
 }

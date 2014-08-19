@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 #include "tinyxml2.h"
-#include "TopographicObjectContainer.h"
+#include "MapObjectContainer.h"
 #include "Component.h"
 
 namespace mt
 {
 
-class Track : public TopographicObjectContainer, public Component
+class Track : public MapObjectContainer
 {
 public:
 	Track();

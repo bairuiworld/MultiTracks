@@ -1,58 +1,74 @@
 #include <iterator>
 #include "Location.h"
-#include "TopographicObjectContainer.h"
+#include "MapObjectContainer.h"
 #include "Section.h"
 
 namespace mt {
 
-Section::Section() : mParent(nullptr)
+Section::Section() : mContainer(nullptr)
 {
 
 }
 
-Section::Section(TopographicObjectContainer* parent) : mParent(parent)
+Section::Section(MapObjectContainer* container) : mContainer(container)
 {
-
+	mProperties.SetParent(&container->GetProperties());
 }
 
-Section::Section(const Section& section) : mParent(section.mParent)
+Section::Section(const Section& section) : mContainer(section.mContainer)
 {
 	Add(section.mLocations.begin(), section.mLocations.end());
 }
 
 Section::~Section()
 {
-	for(Location* location : mLocations)
-		delete location;
+
 }
 
-void Section::Add(Location* location)
+void Section::Add(const Location& location)
 {
-	mLocations.push_back(new Location(*location));
+	mLocations.push_back(location);
 }
 
 void Section::InsertAfter(LocationList::const_iterator after, const Location& location)
 {
-	mLocations.insert(after, new Location(location));
+	mLocations.insert(after, location);
 }
 
-Section* Section::Split(LocationList::const_iterator after, Location* location)
+Section* Section::Split(LocationList::const_iterator after)
 {
-	if(after == mLocations.begin() || after == mLocations.end()) return nullptr; // nothing to split
+	if(after == mLocations.begin() || after == mLocations.end() || after == mLocations.end() - 1)
+		return nullptr; // nothing to split
 
 	Section* right = new Section;
-	if(location == nullptr) right->Add(*after);
-	else                    right->Add(location);
+	right->Add(*after);
 	after++;
 
 	std::move(after, mLocations.cend(), std::back_inserter(right->mLocations));
 	mLocations.erase(after, mLocations.end());
 
-	if(location != nullptr)	Add(location);
-
-	if(mParent != nullptr)
-		mParent->InsertAfter(this, right);
+	if(mContainer != nullptr)
+		mContainer->InsertAfter(this, right);
 	
+	return right;
+}
+
+Section* Section::Split(LocationList::const_iterator after, const Location& location)
+{
+	if(after == mLocations.begin() || after == mLocations.end() || after == mLocations.end() - 1)
+		return nullptr; // nothing to split
+
+	Section* right = new Section;
+	right->Add(location);
+	after++;
+
+	std::move(after, mLocations.cend(), std::back_inserter(right->mLocations));
+	mLocations.erase(after, mLocations.end());
+	Add(location);
+
+	if(mContainer != nullptr)
+		mContainer->InsertAfter(this, right);
+
 	return right;
 }
 
@@ -64,13 +80,13 @@ void Section::Reverse()
 const Location* Section::GetFirstLocation() const
 {
 	if(mLocations.size() == 0) return nullptr;
-	return mLocations.front();
+	return &mLocations.front();
 }
 
 const Location* Section::GetLastLocation() const
 {
 	if(mLocations.size() == 0) return nullptr;
-	return mLocations.back();
+	return &mLocations.back();
 }
 
 double Section::GetElevationDifference() const
@@ -84,10 +100,10 @@ double Section::GetPositiveElevation() const
 	if(mLocations.size() <= 1) return 0;
 	LocationList::const_iterator it = mLocations.begin();
 	double d = 0;
-	double elev = (*it)->GetElevation();
+	double elev = (*it).GetElevation();
 	for(++it; it != mLocations.end(); it++)
 	{
-		double e = (*it)->GetElevation();
+		double e = (*it).GetElevation();
 		if(e > elev)
 			d += e - elev;
 		elev = e;
@@ -100,10 +116,10 @@ double Section::GetNegativeElevation() const
 	if(mLocations.size() <= 1) return 0;
 	LocationList::const_iterator it = mLocations.begin();
 	double d = 0;
-	double elev = (*it)->GetElevation();
+	double elev = (*it).GetElevation();
 	for(++it; it != mLocations.end(); it++)
 	{
-		double e = (*it)->GetElevation();
+		double e = (*it).GetElevation();
 		if(e < elev)
 			d += elev - e;
 		elev = e;
@@ -114,20 +130,20 @@ double Section::GetNegativeElevation() const
 std::vector<double> Section::GetElevationProfile() const
 {
 	std::vector<double> profile;
-	for(Location* l : mLocations)
-		profile.push_back(l->GetElevation());
+	for(const Location& l : mLocations)
+		profile.push_back(l.GetElevation());
 	return profile;
 }
 
 double Section::GetLength() const
 {
 	if(mLocations.size() <= 1) return 0;
-	Location* prev = mLocations.front();
+	const Location* prev = &mLocations.front();
 	double len = 0;
-	for(Location* l : mLocations)
+	for(const Location& l : mLocations)
 	{
-		len += prev->GetDistance(*l);
-		prev = l;
+		len += prev->GetDistance(l);
+		prev = &l;
 	}
 	return len;
 }
@@ -137,18 +153,18 @@ void Section::LoadXML(tinyxml2::XMLElement* element)
 	tinyxml2::XMLElement* location = element->FirstChildElement("l");
 	while(location != nullptr)
 	{
-		Location* loc = new Location();
-		loc->LoadXML(location);
+		Location loc;
+		loc.LoadXML(location);
 		mLocations.push_back(loc);
 		location = location->NextSiblingElement();
 	}
 }
 
-tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc)
+tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc) const
 {
 	tinyxml2::XMLElement* section = doc->NewElement("section");
-	for(Location* l : mLocations)
-		section->InsertEndChild(l->SaveXML(doc));
+	for(const Location& l : mLocations)
+		section->InsertEndChild(l.SaveXML(doc));
 	return section;
 }
 

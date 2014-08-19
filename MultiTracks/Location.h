@@ -28,13 +28,13 @@ public:
 	double GetLongitude() const { return mLongitude; }
 	double GetElevation() const { return mElevation; }
 
-	double GetDistance(const Location& l); // km
+	double GetDistance(const Location& l) const; // km
 
 	bool operator ==(const Location& rhs) const;
 	bool operator !=(const Location& rhs) const;
 
 	static Location* LoadXML(tinyxml2::XMLElement* element);
-	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);
+	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc) const;
 
 protected:
 	double mLatitude;

@@ -98,7 +98,7 @@
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="Section.cpp" />
     <ClCompile Include="Tile.cpp" />
-    <ClCompile Include="TopographicObjectContainer.cpp" />
+    <ClCompile Include="MapObjectContainer.cpp" />
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="Widget.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -125,7 +125,7 @@
     <ClInclude Include="SimpleSignal.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Tile.h" />
-    <ClInclude Include="TopographicObjectContainer.h" />
+    <ClInclude Include="MapObjectContainer.h" />
     <ClInclude Include="Track.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="Widget.h" />
