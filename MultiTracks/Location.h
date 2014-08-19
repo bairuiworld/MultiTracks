@@ -33,7 +33,7 @@ public:
 	bool operator ==(const Location& rhs) const;
 	bool operator !=(const Location& rhs) const;
 
-	static Location* LoadXML(tinyxml2::XMLElement* element);
+	static Location LoadXML(tinyxml2::XMLElement* element);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc) const;
 
 protected:

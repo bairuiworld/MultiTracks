@@ -22,24 +22,33 @@ class MapViewport;
 class EntityRenderer
 {
 public:
-	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component) = 0;
+	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component) = 0;
 };
 
 class Section;
 class SectionRenderer : public EntityRenderer
 {
 public:
-	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component);
+	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component);
 };
 template <> struct RendererSelector<Section> { typedef SectionRenderer type; };
+
+class MapObjectContainer;
+class MapObjectContainerRenderer : public EntityRenderer
+{
+public:
+	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component);
+};
+template <> struct RendererSelector<MapObjectContainer> { typedef MapObjectContainerRenderer type; };
 
 class Track;
 class TrackRenderer : public EntityRenderer
 {
 public:
-	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component);
+	virtual void Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component);
 };
 template <> struct RendererSelector<Track> { typedef TrackRenderer type; };
+
 }
 
 #endif // !__MULTITRACKS_ENTITYRENDERER_H__

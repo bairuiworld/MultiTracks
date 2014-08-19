@@ -19,17 +19,26 @@ class Entity
 public:
 	template <class T>
 	Entity(T* component);
+	template <class T>
+	Entity(const T* component);
 
 	void SetRenderer(std::shared_ptr<EntityRenderer> renderer) { mRenderer = renderer; }
 	void Draw(Gdiplus::Graphics* g, MapViewport* viewport);
 
 private:
-	Component* mComponent;
+	const Component* mComponent;
 	std::shared_ptr<EntityRenderer> mRenderer;
 };
 
 template <class T>
 Entity::Entity(T* component) :
+mComponent(component)
+{
+	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
+}
+
+template <class T>
+Entity::Entity(const T* component) :
 mComponent(component)
 {
 	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;

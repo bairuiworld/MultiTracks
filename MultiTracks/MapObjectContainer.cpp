@@ -7,8 +7,15 @@ namespace mt
 
 MapObjectContainer::~MapObjectContainer()
 {
+	Clear();
+}
+
+void MapObjectContainer::Clear()
+{
 	for(Section* section : mSections)
 		delete section;
+	mSections.clear();
+	mLocations.clear();
 }
 
 void MapObjectContainer::Add(Section* section)

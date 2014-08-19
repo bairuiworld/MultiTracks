@@ -10,6 +10,7 @@ class Component
 {
 public:
 	Properties& GetProperties() { return mProperties; }
+	const Properties& GetProperties() const { return mProperties; }
 
 protected:
 	Properties mProperties;

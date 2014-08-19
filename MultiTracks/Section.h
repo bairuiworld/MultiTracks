@@ -17,8 +17,7 @@ public:
 	using LocationList = std::vector<Location>;
 
 public:
-	Section();
-	Section(MapObjectContainer* container);
+	Section(MapObjectContainer* container = nullptr);
 	Section(const Section& s);
 	~Section();
 
@@ -46,7 +45,7 @@ public:
 
 	double GetLength() const;
 
-	void LoadXML(tinyxml2::XMLElement* element);
+	static Section* LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* container = nullptr);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc) const;
 
 	/*public Area getBoundingRect()

@@ -43,12 +43,12 @@ bool Location::operator !=(const Location& rhs) const
 	return !(*this == rhs);
 }
 
-Location* Location::LoadXML(tinyxml2::XMLElement* element)
+Location Location::LoadXML(tinyxml2::XMLElement* element)
 {
-	Location* loc = new Location;
-	element->QueryDoubleAttribute("lat", &loc->mLatitude);
-	element->QueryDoubleAttribute("lon", &loc->mLongitude);
-	element->QueryDoubleAttribute("ele", &loc->mElevation);
+	Location loc;
+	element->QueryDoubleAttribute("lat", &loc.mLatitude);
+	element->QueryDoubleAttribute("lon", &loc.mLongitude);
+	element->QueryDoubleAttribute("ele", &loc.mElevation);
 	return loc;
 }
 

@@ -5,11 +5,6 @@
 namespace mt
 {
 
-Track::Track() : mName("Unnamed track"), mParent(nullptr)
-{
-
-}
-
 Track::Track(Track* parent) : mName("Unnamed track"), mParent(parent)
 {
 
@@ -72,24 +67,25 @@ double Track::GetLength() const
 	return len;
 }
 
-Track* Track::LoadXML(tinyxml2::XMLElement* element)
+Track* Track::LoadXML(tinyxml2::XMLElement* element, Track* parent)
 {
-	Track* track = new Track();
+	Track* track = new Track(parent);
 	track->mName = element->Attribute("name");
 
-	/*Attribute color = trackElement.getAttribute(COLOR);
-	if(color != null) try { track.getProperties().set(COLOR, new Color(color.getIntValue())); } catch(DataConversionException e) {}
-	Attribute lineWidth = trackElement.getAttribute(LINEWIDTH);
-	if(lineWidth != null) try { track.getProperties().set(LINEWIDTH, lineWidth.getIntValue()); } catch(DataConversionException e) {}
-	*/
+	int color;
+	if(element->QueryIntAttribute("color", &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		track->GetProperties().Set("color", color);
+	float linewidth;
+	if(element->QueryFloatAttribute("linewidth", &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		track->GetProperties().Set("linewidth", linewidth);
+
 		
 	tinyxml2::XMLElement* e = element->FirstChildElement("section");
 	while(e)
 	{
-		Section* s = new Section;
-		s->LoadXML(e);
+		Section* s = Section::LoadXML(e, track);
 		track->mSections.push_back(s);
-		e = e->NextSiblingElement();
+		e = e->NextSiblingElement("section");
 	}
 				
 	e = element->FirstChildElement("spots");
@@ -98,18 +94,17 @@ Track* Track::LoadXML(tinyxml2::XMLElement* element)
 		e = e->FirstChildElement("l");
 		while(e)
 		{
-			Location* l = Location::LoadXML(e);
-			track->mLocations.push_back(l);
-			e = e->NextSiblingElement();
+			track->mLocations.push_back(Location::LoadXML(e));
+			e = e->NextSiblingElement("l");
 		}
 	}
 		
 	e = element->FirstChildElement("alternatives");
 	while(e)
 	{
-		Track* alternative = Track::LoadXML(e);
+		Track* alternative = Track::LoadXML(e, track);
 		track->mAlternatives.push_back(alternative);
-		e = e->NextSiblingElement();
+		e = e->NextSiblingElement("alternatives");
 	}
 
 	return track;
@@ -119,17 +114,11 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 {
 	tinyxml2::XMLElement* track = mParent == nullptr ? doc->NewElement("track") : doc->NewElement("alternative");
 	track->SetAttribute("name", mName.c_str());
-	/*if(mProperties.exists(COLOR))
-	{
-		Color color = mProperties.get(COLOR);
-		track.setAttribute(COLOR, Integer.toString(color.getRGB()));
-	}
-		
-	if(mProperties.exists(LINEWIDTH))
-	{
-		int lineWidth = mProperties.get(LINEWIDTH);
-		track.setAttribute(LINEWIDTH, Integer.toString(lineWidth));
-	}*/
+	
+	if(mProperties.Exists("color"))
+		track->SetAttribute("color", mProperties.Get<int>("color"));
+	if(mProperties.Exists("linewidth"))
+		track->SetAttribute("linewidth", mProperties.Get<float>("linewidth"));
 
 	if(mSections.size() != 0)
 	{
@@ -140,8 +129,8 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 	if(mLocations.size() != 0)
 	{
 		tinyxml2::XMLElement* spotsElement = doc->NewElement("spots");
-		for(Location* l : mLocations)
-			spotsElement->InsertEndChild(l->SaveXML(doc));
+		for(const Location& l : mLocations)
+			spotsElement->InsertEndChild(l.SaveXML(doc));
 		track->InsertEndChild(spotsElement);
 	}
 		

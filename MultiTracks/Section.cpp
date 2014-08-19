@@ -5,14 +5,10 @@
 
 namespace mt {
 
-Section::Section() : mContainer(nullptr)
-{
-
-}
-
 Section::Section(MapObjectContainer* container) : mContainer(container)
 {
-	mProperties.SetParent(&container->GetProperties());
+	if(container)
+		mProperties.SetParent(&container->GetProperties());
 }
 
 Section::Section(const Section& section) : mContainer(section.mContainer)
@@ -148,16 +144,16 @@ double Section::GetLength() const
 	return len;
 }
 
-void Section::LoadXML(tinyxml2::XMLElement* element)
+Section* Section::LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* container)
 {
+	Section* section = new Section(container);
 	tinyxml2::XMLElement* location = element->FirstChildElement("l");
 	while(location != nullptr)
 	{
-		Location loc;
-		loc.LoadXML(location);
-		mLocations.push_back(loc);
-		location = location->NextSiblingElement();
+		section->mLocations.push_back(Location::LoadXML(location));
+		location = location->NextSiblingElement("l");
 	}
+	return section;
 }
 
 tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc) const

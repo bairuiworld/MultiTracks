@@ -1,4 +1,5 @@
 #include "Track.h"
+#include "Section.h"
 #include "Project.h"
 
 namespace mt
@@ -40,6 +41,7 @@ void Project::Clear()
 		for(Track* track : it.second)
 			delete track;
 	mTracks.clear();
+	mDatabase.Clear();
 	mName = "Unnamed project";
 }
 
@@ -54,38 +56,49 @@ bool Project::LoadXML(std::string file)
 void Project::LoadXML(tinyxml2::XMLDocument* doc)
 {
 	Clear();
-	tinyxml2::XMLElement* project = doc->FirstChildElement("project");
+	tinyxml2::XMLHandle handle(doc);
+	tinyxml2::XMLElement* project = handle.FirstChildElement("multitracks").FirstChildElement("project").ToElement();
 	if(project == nullptr) return;
 	mName = project->Attribute("name");
 
-	tinyxml2::XMLElement* e = project->FirstChildElement("sectiondatabase");
-	if(e != nullptr) LoadSectionDatabaseXML(e);
+	tinyxml2::XMLElement* e = project->FirstChildElement("database");
+	if(e != nullptr) LoadDatabaseXML(e);
 
 	e = project->FirstChildElement("trackgroup");
 	while(e)
 	{
 		LoadTrackGroupXML(e);
-		e->NextSiblingElement();
+		e = e->NextSiblingElement("trackgroup");
 	}
 
 	e = project->FirstChildElement("map");
 	if(e != nullptr) LoadMapXML(e);
 }
 
-void Project::LoadSectionDatabaseXML(tinyxml2::XMLElement* db)
+void Project::LoadDatabaseXML(tinyxml2::XMLElement* db)
 {
-	// TODO load attributes
+	int color;
+	if(db->QueryIntAttribute("color", &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		mDatabase.GetProperties().Set("color", color);
+
+	float linewidth;
+	if(db->QueryFloatAttribute("linewidth", &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		mDatabase.GetProperties().Set("linewidth", linewidth);
+
 	tinyxml2::XMLElement* e = db->FirstChildElement("section");
 	while(e)
 	{
-		// TODO
-		e = e->NextSiblingElement();
+		Section* section = Section::LoadXML(e, &mDatabase);
+		mDatabase.Add(section);
+		e = e->NextSiblingElement("section");
 	}
 }
 
 void Project::LoadTrackGroupXML(tinyxml2::XMLElement* group)
 {
-	std::string groupName = group->Attribute("name");
+	const char* nameAtt = group->Attribute("name");
+	if(!nameAtt) return;
+	std::string groupName = nameAtt;
 	mTracks[groupName] = TrackList();
 	TrackList& list = mTracks[groupName];
 
@@ -94,13 +107,13 @@ void Project::LoadTrackGroupXML(tinyxml2::XMLElement* group)
 	{
 		Track* track = Track::LoadXML(e);
 		list.push_back(track);
-		e = e->NextSiblingElement();
+		e = e->NextSiblingElement("track");
 	}
 }
 
 void Project::LoadMapXML(tinyxml2::XMLElement* map)
 {
-
+	// todo
 }
 
 }

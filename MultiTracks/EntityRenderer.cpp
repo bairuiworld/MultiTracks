@@ -9,9 +9,9 @@
 namespace mt
 {
 
-void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)
+void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component)
 {
-	Section* section = static_cast<Section*>(component);
+	const Section* section = static_cast<const Section*>(component);
 	Vector2d last;
 	bool haslast = false;
 	
@@ -35,12 +35,19 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 	g->DrawPath(&pen, &path);
 }
 
-void TrackRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)
+void TrackRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component)
 {
-	Track* track = static_cast<Track*>(component);
+	const Track* track = static_cast<const Track*>(component);
+	std::shared_ptr<MapObjectContainerRenderer> containerRenderer = DefaultRenderer<MapObjectContainer>::value;
+	containerRenderer->Draw(g, viewport, track);
+}
+
+void MapObjectContainerRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component)
+{
+	const MapObjectContainer* container = static_cast<const MapObjectContainer*>(component);
 	std::shared_ptr<SectionRenderer> sectionRenderer = DefaultRenderer<Section>::value;
-	
-	Track::SectionList sections = track->GetSections();
+
+	Track::SectionList sections = container->GetSections();
 	for(Section* section : sections)
 		sectionRenderer->Draw(g, viewport, section);
 }

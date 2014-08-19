@@ -13,8 +13,7 @@ namespace mt
 class Track : public MapObjectContainer
 {
 public:
-	Track();
-	Track(Track* parent);
+	Track(Track* parent = nullptr);
 	virtual ~Track();
 
 	void SetName(std::string name) { mName = name; }
@@ -30,7 +29,7 @@ public:
 
 	double GetLength() const;
 
-	static Track* LoadXML(tinyxml2::XMLElement* element);
+	static Track* LoadXML(tinyxml2::XMLElement* element, Track* parent = nullptr);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);
 
 private:
