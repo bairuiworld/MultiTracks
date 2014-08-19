@@ -46,13 +46,8 @@ void Project::Clear()
 bool Project::LoadXML(std::string file)
 {
 	tinyxml2::XMLDocument doc;
-	FILE* hFile;
-	hFile = fopen(file.c_str(), "rb");
-	if(hFile == nullptr) return false;
-	mFile = file;
-	doc.LoadFile(hFile);
+	doc.LoadFile(file.c_str());
 	LoadXML(&doc);
-	fclose(hFile);
 	return true;
 }
 

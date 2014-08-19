@@ -3,6 +3,7 @@
 #include "Location.h"
 #include "Section.h"
 #include "Track.h"
+#include "GPX.h"
 #include "MapObjectContainer.h"
 #include "MapSource.h"
 #include "DownloadManager.h"
@@ -90,17 +91,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		mt::Section s;
 		s.Add(mt::Location(0, 0));
 		s.Add(mt::Location(10, 20));
-		mt::Track track;
-		track.Add(&s);
-		track.GetProperties().Set("color", Gdiplus::Color::Red);
-		renderer->AddComponent(&track);
+		mt::Track* track = mt::GPX::Load("a.gpx");
+		track->GetProperties().Set<int>("color", Gdiplus::Color(255,0,0).GetValue())
+			.Set<float>("linewidth", 10);
+		renderer->AddComponent(track);
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 
 		app.Run();
-		renderer->Save(L"a.png", mt::ImageFormat::png);
+		
+
+		delete track;
 
 		/*int count = 0;
 

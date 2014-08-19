@@ -19,16 +19,20 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Componen
 	Gdiplus::Pen pen(Gdiplus::Color(prop.Get<int>("color", Gdiplus::Color::Black)),
 									prop.Get<float>("linewidth", 1));
 	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));
+	pen.SetLineJoin(Gdiplus::LineJoin::LineJoinRound);
+
+	Gdiplus::GraphicsPath path;
 
 	const Section::LocationList& locations = section->GetLocations();
 	for(const Location& location : locations)
 	{
 		Vector2d point = viewport->LocationToPixel(location);
 		if(haslast)
-			g->DrawLine(&pen, (float)last.GetX(), (float)last.GetY(), (float)point.GetX(), (float)point.GetY());
+			path.AddLine((float)last.GetX(), (float)last.GetY(), (float)point.GetX(), (float)point.GetY());
 		last = point;
 		haslast = true;
 	}
+	g->DrawPath(&pen, &path);
 }
 
 void TrackRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, Component* component)

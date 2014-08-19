@@ -15,7 +15,7 @@ class Track : public MapObjectContainer
 public:
 	Track();
 	Track(Track* parent);
-	~Track();
+	virtual ~Track();
 
 	void SetName(std::string name) { mName = name; }
 	std::string GetName() const { return mName; }
