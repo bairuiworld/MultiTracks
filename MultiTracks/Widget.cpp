@@ -16,7 +16,6 @@ mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMo
 Widget::Widget(const char* className, int style) :
 mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
 {
-	if(!(style & WS_OVERLAPPEDWINDOW)) style |= WS_POPUP;
 	mhWnd = CreateWindowEx(0, className, "", style | WS_VISIBLE,
 						   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 						   HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);

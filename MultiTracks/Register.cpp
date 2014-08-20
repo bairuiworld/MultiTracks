@@ -11,7 +11,7 @@ Register::Register(const char* className)
 	if(!GetClassInfoEx(GetModuleHandle(nullptr), className, &wcex))
 	{
 		wcex.cbSize = sizeof(WNDCLASSEX);
-		wcex.style = 0;
+		wcex.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 		wcex.lpfnWndProc = Widget::GlobalWndProc;
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = 0;
