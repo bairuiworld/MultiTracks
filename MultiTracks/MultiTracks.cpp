@@ -19,10 +19,12 @@
 #include <curl/curl.h>
 #include <fstream>
 #include <windows.h>
+#include <CommCtrl.h>
 
 #include "Application.h"
 #include "Window.h"
 #include "Layout.h"
+#include "TreeView.h"
 
 #include <il/il.h>
 #include <il/ilu.h>
@@ -81,6 +83,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+	InitCommonControls();
 
 	//
 	{ // Force Gdi+ object cleanup before shutting down
@@ -93,22 +96,70 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		p.LoadXML("projet.txt");
 		renderer->AddComponent(&p.GetDatabase());
 		win.SetLayout(new ww::FillLayout);
-		win.Add(renderer);
+		//win.Add(renderer);
+
+		/*TV_INSERTSTRUCT tviis;
+		HTREEITEM hitem;
+
+		InitCommonControls();
+
+		HWND hTreeView = CreateWindowEx(0, WC_TREEVIEW, "",
+								   WS_CHILD | WS_VISIBLE  | TVS_HASLINES | TVS_LINESATROOT
+								   | TVS_HASBUTTONS | TVS_SHOWSELALWAYS
+								   , 0, 0, 200, 200, win.GetHandle(), NULL, GetModuleHandle(0), NULL);
+
+		//TreeView_SetImageList(hTreeView, himgList, TVSIL_NORMAL);
+
+		tviis.hInsertAfter = TVI_LAST;
+		ZeroMemory(&(tviis.item), sizeof(TV_ITEM));
+		tviis.item.mask = TVIF_TEXT | 	TVIF_PARAM;
+		tviis.hParent = TVI_ROOT;
+		tviis.item.iImage = 0;
+		tviis.item.iSelectedImage = 1;
+		tviis.item.lParam = 1;
+		tviis.item.pszText = "Option 1";
+		hitem = TreeView_InsertItem(hTreeView, &tviis);
+
+		tviis.hParent = hitem;
+		tviis.item.iImage = 2;
+		tviis.item.iSelectedImage = 2;
+		tviis.item.lParam = 3;
+		tviis.item.pszText = "Sous Option A";
+		TreeView_InsertItem(hTreeView, &tviis);
+
+		tviis.item.iImage = 3;
+		tviis.item.iSelectedImage = 3;
+		tviis.item.lParam = 4;
+		tviis.item.pszText = "Sous Option B";
+		TreeView_InsertItem(hTreeView, &tviis);
+
+		tviis.hParent = TVI_ROOT;
+		tviis.item.iImage = 0;
+		tviis.item.iSelectedImage = 1;
+		tviis.item.lParam = 2;
+		tviis.item.pszText = "Option 2";
+		hitem = TreeView_InsertItem(hTreeView, &tviis);
+
+		tviis.hParent = hitem;
+		tviis.item.iImage = 3;
+		tviis.item.iSelectedImage = 3;
+		tviis.item.lParam = 5;
+		tviis.item.pszText = "Sous Option C";
+		TreeView_InsertItem(hTreeView, &tviis);
+
+		tviis.item.iSelectedImage = 2;
+		tviis.item.iImage = 2;
+		tviis.item.lParam = 6;
+		tviis.item.pszText = "Sous Option D";
+		TreeView_InsertItem(hTreeView, &tviis);*/
+
+		ww::TreeView* tv = new ww::TreeView;
+		tv->AddNode(new ww::TreeNode("test"));
+		win.Add(tv);
+
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
-
 		app.Run();
-
-		/*int count = 0;
-
-		mt::Map map(&mt::MapSource::IGN);
-		mt::MapRenderer renderer(&map);
-		mt::MapViewport* view = map.GetViewport();
-		view->SetZoom(4);
-		view->SetViewDimension(2000, 2000);
-		map.SignalNewTile += [&count]() { count++; std::cout << count << std::endl; };
-		renderer.Save(L"b.png", mt::ImageFormat::png);
-		std::cout << "done" << std::endl;*/
 	}
 
 	// Cleanup

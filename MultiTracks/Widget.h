@@ -15,8 +15,7 @@ class Layout;
 class Widget
 {
 public:
-	Widget();
-	Widget(const char* className, int style);
+	Widget(const std::string& className, int style = 0);
 	virtual ~Widget();
 
 	using WidgetList = std::vector<Widget*>;
@@ -38,8 +37,8 @@ public:
 	void Invalidate();
 
 protected:
-	void SetParent(Widget* parent);
-	
+	virtual void Create(Widget* parent);
+
 	virtual void OnClose() {}
 	virtual void OnResize(int width, int height) {}
 	virtual void OnPaint(Gdiplus::Graphics* g) {}
@@ -50,7 +49,7 @@ protected:
 	virtual void OnMouseDrag(MouseEvent ev) {}
 	virtual void OnMouseWheel(MouseEvent ev) {}
 
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	friend class Register;
 	static LRESULT CALLBACK GlobalWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -61,7 +60,9 @@ protected:
 
 protected:
 	Widget* mParent;
+	std::string mClassName;
 	HWND mhWnd;
+	int mStyle;
 	WNDPROC mDefaultProc;
 	Layout* mLayout;
 	WidgetList mChildren;

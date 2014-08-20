@@ -21,9 +21,6 @@ public:
 
 	virtual void OnClose();
 	virtual void OnResize(int width, int height);
-
-protected:
-	static LRESULT CALLBACK GlobalWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 }

@@ -7,21 +7,10 @@
 namespace ww
 {
 
-Widget::Widget() : 
-mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
+Widget::Widget(const std::string& className, int style) :
+mParent(nullptr), mClassName(className), mhWnd(nullptr), mStyle(style), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
 {
-
-}
-
-Widget::Widget(const char* className, int style) :
-mParent(nullptr), mhWnd(nullptr), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
-{
-	mhWnd = CreateWindowEx(0, className, "", style | WS_VISIBLE,
-						   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-						   HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
-	if(!mhWnd) return;
-
-	SubClass();
+	
 }
 
 Widget::~Widget()
@@ -29,16 +18,28 @@ Widget::~Widget()
 	for(Widget* widget : mChildren)
 		delete widget;
 	delete mLayout;
+	DestroyWindow(mhWnd);
+}
+
+void Widget::Create(Widget* parent)
+{
+	if(parent) mStyle |= WS_CHILD;
+	mhWnd = CreateWindowEx(0, mClassName.c_str(), "", mStyle | WS_VISIBLE,
+						   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+						   parent ? parent->GetHandle() : HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
+	if(!mhWnd) return;
+	mParent = parent;
+	SubClass();
+
+	for(Widget* child : mChildren)
+		child->Create(this);
 }
 
 void Widget::Add(Widget* widget)
 {
-	Widget* parent = widget->GetParent();
-	if(parent == this) return;
-	if(parent != nullptr)
-		parent->Remove(widget);
+	if(widget->GetParent() != nullptr) return;
 	mChildren.push_back(widget);
-	widget->SetParent(this);
+	widget->Create(this);
 	if(mLayout)
 		mLayout->Apply(this);
 }
@@ -48,7 +49,7 @@ void Widget::Remove(Widget* widget)
 	WidgetList::const_iterator it = std::find(mChildren.begin(), mChildren.end(), widget);
 	if(it == mChildren.end()) return;
 	mChildren.erase(it);
-	widget->SetParent(nullptr);
+	widget->mParent = nullptr;
 }
 
 RECT Widget::GetBounds() const
@@ -61,24 +62,6 @@ RECT Widget::GetBounds() const
 void Widget::SetBounds(const RECT& rc)
 {
 	MoveWindow(mhWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, true);
-}
-
-void Widget::SetParent(Widget* parent)
-{
-	int style = GetWindowLong(mhWnd, GWL_STYLE);
-	if(parent)
-	{
-		style &= ~WS_POPUP;
-		style |= WS_CHILD;
-		SetWindowLong(mhWnd, GWL_STYLE, style);
-		::SetParent(mhWnd, parent->mhWnd);
-	}
-	else
-	{
-		SetWindowLong(mhWnd, GWL_STYLE, style & ~WS_CHILD);
-		::SetParent(mhWnd, HWND_DESKTOP);
-	}
-	mParent = parent;
 }
 
 void Widget::SetLayout(Layout* layout)
@@ -117,6 +100,7 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		break;
 
 	case WM_PAINT:
+		if(mDefaultProc == nullptr)
 		{
 			PAINTSTRUCT ps;
 			HDC hDC;
@@ -125,10 +109,9 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			Gdiplus::Graphics g(hDC);
 			OnPaint(&g);
 			if(wParam == 0) EndPaint(hWnd, &ps);
+			return 0;
 		} break;
 
-	case WM_ERASEBKGND:
-		return 0; // ???
 
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:

@@ -8,6 +8,7 @@ const char* Window::ClassName = "wwWindow";
 
 Window::Window(const char* title) : Register(ClassName), Widget(ClassName, WS_OVERLAPPEDWINDOW)
 {
+	Create(nullptr);
 	SetWindowText(mhWnd, title);
 }
 
@@ -34,11 +35,6 @@ void Window::OnClose()
 void Window::OnResize(int width, int height)
 {
 
-}
-
-LRESULT CALLBACK Window::GlobalWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 }

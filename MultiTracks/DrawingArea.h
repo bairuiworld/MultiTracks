@@ -13,6 +13,9 @@ public:
 	static const char* ClassName;
 
 	DrawingArea();
+
+protected:
+	virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 
 }
