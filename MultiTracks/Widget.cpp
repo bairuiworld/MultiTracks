@@ -87,7 +87,7 @@ void Widget::SubClass()
 
 Widget* Widget::FromHandle(HWND hWnd)
 {
-	return reinterpret_cast<Widget*>(::GetWindowLongPtr(hWnd, GWL_USERDATA));
+	return reinterpret_cast<Widget*>(GetWindowLongPtr(hWnd, GWL_USERDATA));
 }
 
 LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

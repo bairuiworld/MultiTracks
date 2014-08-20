@@ -42,11 +42,11 @@ void TreeNode::AddNodeToTreeView(TreeNode* node)
 	node->mHandle = TreeView_InsertItem(mTreeView->GetHandle(), &is);
 
 	for(TreeNode* child : node->mChildren)
-		AddNodeToTreeView(child);
+		node->AddNodeToTreeView(child);
 }
 
 TreeView::TreeView() :
-Widget(WC_TREEVIEW, WS_BORDER | TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS)
+Widget(WC_TREEVIEW, TVS_HASLINES | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS)
 {
 	mRootNode.mTreeView = this;
 }
