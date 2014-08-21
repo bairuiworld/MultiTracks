@@ -1,8 +1,11 @@
 #ifndef __WW_TREEVIEW_H__
 #define __WW_TREEVIEW_H__
 
+#include <Windows.h>
+#include <CommCtrl.h>
 #include <string>
 #include "Widget.h"
+#include "SimpleSignal.h"
 
 namespace ww
 {
@@ -20,8 +23,10 @@ public:
 
 	TreeView* GetTreeView() const { return mTreeView; }
 	HTREEITEM GetHandle() const { return mHandle; }
+	static TreeNode* FromHandle(HWND hTreeView, HTREEITEM item);
 
 	bool AddNode(TreeNode* node);
+
 
 protected:
 	void AddNodeToTreeView(TreeNode* node);
@@ -43,9 +48,15 @@ public:
 
 protected:
 	virtual void Create(Widget* parent);
+	virtual void OnNotify(LPNMHDR lpnmhdr);
+
+	virtual void OnSelChanged(TreeNode* newNode, TreeNode* oldNode) {}
 
 protected:
 	TreeNode mRootNode;
+
+public:
+	sig::Signal<void(TreeNode*, TreeNode*)> SignalSelChanged;
 };
 
 }

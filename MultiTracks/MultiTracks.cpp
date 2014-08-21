@@ -4,6 +4,7 @@
 #include "Section.h"
 #include "Track.h"
 #include "Project.h"
+#include "ProjectManager.h"
 #include "GPX.h"
 #include "MapObjectContainer.h"
 #include "MapSource.h"
@@ -92,19 +93,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		mt::Map map(&mt::MapSource::IGN);
 		map.GetViewport()->SetZoom(4);
 		mt::WindowMapRenderer* renderer = new mt::WindowMapRenderer(&map);
-		mt::Project p;
-		p.LoadXML("projet.txt");
-		renderer->AddComponent(&p.GetDatabase());
 		win.SetLayout(new ww::FillLayout);
 		win.Add(renderer);
 
 		ww::TreeView* tv = new ww::TreeView;
-		ww::TreeNode* tn = new ww::TreeNode("projet");
-		ww::TreeNode* group = new ww::TreeNode("group");
-		tn->AddNode(group);
-		tv->AddNode(tn);
-		group->AddNode(new ww::TreeNode("track1"));
-		group->AddNode(new ww::TreeNode("track2"));
+		mt::ProjectManager pm(tv);
+		pm.renderer = renderer;
+		pm.LoadProject("projet.txt");
 		renderer->Add(tv);
 		tv->SetBounds({0, 0, 200, 200});
 

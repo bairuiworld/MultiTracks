@@ -17,6 +17,16 @@ TreeNode::~TreeNode()
 		delete child;
 }
 
+TreeNode* TreeNode::FromHandle(HWND hTreeView, HTREEITEM item)
+{
+	TVITEMEX tvi;
+	ZeroMemory(&tvi, sizeof(TVITEMEX));
+	tvi.mask = TVIF_PARAM;
+	tvi.hItem = item;
+	TreeView_GetItem(hTreeView, &tvi);
+	return reinterpret_cast<TreeNode*>(tvi.lParam);
+}
+
 bool TreeNode::AddNode(TreeNode* node)
 {
 	if(node->mParent != nullptr) return false;
@@ -37,7 +47,7 @@ void TreeNode::AddNodeToTreeView(TreeNode* node)
 	is.hInsertAfter = TVI_LAST;
 	is.item.mask = TVIF_TEXT | TVIF_PARAM;
 	is.item.pszText = const_cast<LPSTR>(node->mText.c_str());
-	is.item.lParam = reinterpret_cast<LPARAM>(this);
+	is.item.lParam = reinterpret_cast<LPARAM>(node);
 
 	node->mHandle = TreeView_InsertItem(mTreeView->GetHandle(), &is);
 
@@ -61,6 +71,21 @@ void TreeView::Create(Widget* parent)
 bool TreeView::AddNode(TreeNode* node)
 {
 	return mRootNode.AddNode(node);
+}
+
+void TreeView::OnNotify(LPNMHDR lpnmhdr)
+{
+	switch(lpnmhdr->code)
+	{
+	case TVN_SELCHANGED:
+	{
+		LPNMTREEVIEW lpnmtv = reinterpret_cast<LPNMTREEVIEW>(lpnmhdr);
+		TreeNode* newNode = reinterpret_cast<TreeNode*>(lpnmtv->itemNew.lParam);
+		TreeNode* oldNode = reinterpret_cast<TreeNode*>(lpnmtv->itemNew.lParam);
+		SignalSelChanged.emit(newNode, oldNode);
+		OnSelChanged(newNode, oldNode);
+	} break;
+	}
 }
 
 }

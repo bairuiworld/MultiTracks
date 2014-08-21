@@ -48,6 +48,7 @@ protected:
 	virtual void OnMouseMove(MouseEvent ev) {}
 	virtual void OnMouseDrag(MouseEvent ev) {}
 	virtual void OnMouseWheel(MouseEvent ev) {}
+	virtual void OnNotify(LPNMHDR lpnmhdr) {}
 
 	virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

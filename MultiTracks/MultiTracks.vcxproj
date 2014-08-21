@@ -96,6 +96,7 @@
     <ClCompile Include="MapViewport.cpp" />
     <ClCompile Include="MultiTracks.cpp" />
     <ClCompile Include="Project.cpp" />
+    <ClCompile Include="ProjectManager.cpp" />
     <ClCompile Include="Register.cpp" />
     <ClCompile Include="Section.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="MapViewport.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="Project.h" />
+    <ClInclude Include="ProjectManager.h" />
     <ClInclude Include="Properties.h" />
     <ClInclude Include="Register.h" />
     <ClInclude Include="Section.h" />

@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-
+#include "MapObjectContainer.h"
 #include "tinyxml2.h"
 
 namespace mt
@@ -16,6 +16,7 @@ class Project
 public:
 	using TrackList = std::vector<Track*>;
 	using TrackMap = std::map<std::string, TrackList>;
+	using GroupList = std::vector<std::string>;
 
 public:
 	Project();
@@ -26,7 +27,7 @@ public:
 
 	void AddTrack(Track* track, std::string group);
 	const TrackList& GetTracks(std::string group) const;
-	std::vector<std::string> GetGroups() const;
+	GroupList GetGroups() const;
 	const MapObjectContainer& GetDatabase() const { return mDatabase; }
 
 	void Clear();

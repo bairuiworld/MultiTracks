@@ -115,83 +115,92 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
 	case WM_MBUTTONDOWN:
-		{
-			mIsMouseDown = true;
-			SetCapture(hWnd);
-			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-			MouseEvent ev(this, mMouseLastPos, 1, wParam,
+	{
+		mIsMouseDown = true;
+		SetCapture(hWnd);
+		mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+		MouseEvent ev(this, mMouseLastPos, 1, wParam,
 					  msg == WM_LBUTTONDOWN ? MouseButton::Left :
 					  msg == WM_RBUTTONDOWN ? MouseButton::Right :
 					  msg == WM_MBUTTONDOWN ? MouseButton::Middle :
 					  MouseButton::None);
-			SignalMouseDown.emit(ev);
-			OnMouseDown(ev);
-		} break;
+		SignalMouseDown.emit(ev);
+		OnMouseDown(ev);
+	} break;
 
 	case WM_LBUTTONUP:
 	case WM_RBUTTONUP:
 	case WM_MBUTTONUP:
-		{
-			mIsMouseDown = false;
-			ReleaseCapture();
-			mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-			MouseEvent ev(this, mMouseLastPos, 1, wParam,
-						  msg == WM_LBUTTONUP ? MouseButton::Left :
-						  msg == WM_RBUTTONUP ? MouseButton::Right :
-						  msg == WM_MBUTTONUP ? MouseButton::Middle :
-						  MouseButton::None);
-			SignalMouseUp.emit(ev);
-			OnMouseUp(ev);
-		} break;
+	{
+		mIsMouseDown = false;
+		ReleaseCapture();
+		mMouseLastPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+		MouseEvent ev(this, mMouseLastPos, 1, wParam,
+					  msg == WM_LBUTTONUP ? MouseButton::Left :
+					  msg == WM_RBUTTONUP ? MouseButton::Right :
+					  msg == WM_MBUTTONUP ? MouseButton::Middle :
+					  MouseButton::None);
+		SignalMouseUp.emit(ev);
+		OnMouseUp(ev);
+	} break;
 
 	case WM_LBUTTONDBLCLK:
 	case WM_MBUTTONDBLCLK:
 	case WM_RBUTTONDBLCLK:
-		{
-			MouseEvent ev(this, POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}, 2, wParam,
-						  msg == WM_LBUTTONDBLCLK ? MouseButton::Left :
-						  msg == WM_MBUTTONDBLCLK ? MouseButton::Right :
-						  msg == WM_RBUTTONDBLCLK ? MouseButton::Middle :
-						  MouseButton::None);
-			SignalMouseDoubleClick.emit(ev);
-			OnMouseDoubleClick(ev);
-		} break;
+	{
+		MouseEvent ev(this, POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}, 2, wParam,
+					  msg == WM_LBUTTONDBLCLK ? MouseButton::Left :
+					  msg == WM_MBUTTONDBLCLK ? MouseButton::Right :
+					  msg == WM_RBUTTONDBLCLK ? MouseButton::Middle :
+					  MouseButton::None);
+		SignalMouseDoubleClick.emit(ev);
+		OnMouseDoubleClick(ev);
+	} break;
 
 	case WM_MOUSEMOVE:
+	{
+		POINT mouseNewPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+		MouseEvent ev(this, mouseNewPos, 0, wParam, MouseButton::None, mMouseLastPos);
+		mMouseLastPos = mouseNewPos;
+		if(mIsMouseDown)
 		{
-			POINT mouseNewPos = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-			MouseEvent ev(this, mouseNewPos, 0, wParam, MouseButton::None, mMouseLastPos);
-			mMouseLastPos = mouseNewPos;
-			if(mIsMouseDown)
-			{
-				SignalMouseDrag.emit(ev);
-				OnMouseDrag(ev);
-			}
-			else
-			{
-				SignalMouseMove.emit(ev);
-				OnMouseMove(ev);
-			}
-		} break;
+			SignalMouseDrag.emit(ev);
+			OnMouseDrag(ev);
+		}
+		else
+		{
+			SignalMouseMove.emit(ev);
+			OnMouseMove(ev);
+		}
+	} break;
 
 	case WM_MOUSEWHEEL:
-		{
-			POINT pt = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
-			ScreenToClient(mhWnd, &pt);
-			MouseEvent ev(this, pt, 0, GET_KEYSTATE_WPARAM(wParam), MouseButton::None, mMouseLastPos, GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
-			SignalMouseWheel.emit(ev);
-			OnMouseWheel(ev);
-		} break;
+	{
+		POINT pt = POINT{GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
+		ScreenToClient(mhWnd, &pt);
+		MouseEvent ev(this, pt, 0, GET_KEYSTATE_WPARAM(wParam), MouseButton::None, mMouseLastPos, GET_WHEEL_DELTA_WPARAM(wParam)/WHEEL_DELTA);
+		SignalMouseWheel.emit(ev);
+		OnMouseWheel(ev);
+	} break;
 
 	case WM_SIZE:
-		{
-			int width = LOWORD(lParam);
-			int height = HIWORD(lParam);
-			SignalResize.emit(width, height);
-			if(mLayout)
-				mLayout->Apply(this);
-			OnResize(width, height);
-		} break;
+	{
+		int width = LOWORD(lParam);
+		int height = HIWORD(lParam);
+		SignalResize.emit(width, height);
+		if(mLayout)
+			mLayout->Apply(this);
+		OnResize(width, height);
+	} break;
+
+	case WM_NOTIFY:
+	{
+		LPNMHDR lpnmhdr = reinterpret_cast<LPNMHDR>(lParam);
+		Widget* child = Widget::FromHandle(lpnmhdr->hwndFrom);
+		if(child != nullptr)
+			child->OnNotify(lpnmhdr);
+	} break;
+
 	}
 	return CallDefaultProc(hWnd, msg, wParam, lParam);
 }

@@ -49,6 +49,7 @@ bool Project::LoadXML(std::string file)
 {
 	tinyxml2::XMLDocument doc;
 	doc.LoadFile(file.c_str());
+	if(doc.Error()) return false;
 	LoadXML(&doc);
 	return true;
 }
