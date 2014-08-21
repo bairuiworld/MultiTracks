@@ -43,7 +43,7 @@ public:
 	virtual ~WindowMapRenderer() = default;
 
 protected:
-	virtual void OnPaint(Gdiplus::Graphics* g);
+	virtual void OnPaint(Gdiplus::Graphics* g, const RECT& clip);
 	virtual void OnResize(int width, int height);
 	virtual void OnMouseDown(ww::MouseEvent ev);
 	virtual void OnMouseDrag(ww::MouseEvent ev);

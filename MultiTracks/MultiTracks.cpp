@@ -105,8 +105,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		tv->AddNode(tn);
 		group->AddNode(new ww::TreeNode("track1"));
 		group->AddNode(new ww::TreeNode("track2"));
-		win.Add(tv);
-
+		renderer->Add(tv);
+		tv->SetBounds({0, 0, 200, 200});
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 		app.Run();

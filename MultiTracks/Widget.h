@@ -41,7 +41,7 @@ protected:
 
 	virtual void OnClose() {}
 	virtual void OnResize(int width, int height) {}
-	virtual void OnPaint(Gdiplus::Graphics* g) {}
+	virtual void OnPaint(Gdiplus::Graphics* g, const RECT& clip) {}
 	virtual void OnMouseDown(MouseEvent ev) {}
 	virtual void OnMouseUp(MouseEvent ev) {}
 	virtual void OnMouseDoubleClick(MouseEvent ev) {}

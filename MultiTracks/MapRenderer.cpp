@@ -118,7 +118,7 @@ MapRenderer(map)
 	};
 }
 
-void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g)
+void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g, const RECT& clip)
 {
 	Draw(g);
 }

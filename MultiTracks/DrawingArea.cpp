@@ -6,18 +6,15 @@ namespace ww
 const char* DrawingArea::ClassName = "wwDrawingArea";
 
 DrawingArea::DrawingArea() :
-	Register(ClassName), Widget(ClassName)
+Register(ClassName), Widget(ClassName, WS_CLIPCHILDREN)
 {
 
 }
 
 LRESULT CALLBACK DrawingArea::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	switch(msg)
-	{
-	case WM_ERASEBKGND: return 0;
-	default: return Widget::WndProc(hWnd, msg, wParam, lParam);
-	}
+	if(msg == WM_ERASEBKGND) return 1;
+	return Widget::WndProc(hWnd, msg, wParam, lParam);
 }
 
 }

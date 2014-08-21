@@ -107,9 +107,8 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 			if(wParam == 0) hDC = BeginPaint(hWnd, &ps);
 			else hDC = (HDC)wParam;
 			Gdiplus::Graphics g(hDC);
-			OnPaint(&g);
+			OnPaint(&g, ps.rcPaint);
 			if(wParam == 0) EndPaint(hWnd, &ps);
-			return 0;
 		} break;
 
 
