@@ -17,6 +17,7 @@ public:
 	Location();
 	Location(double latitude, double longitude, double elevation = 0);
 	Location(const Location& location);
+	Location(Location&& location);
 
 	void operator =(const Location& rhs);
 

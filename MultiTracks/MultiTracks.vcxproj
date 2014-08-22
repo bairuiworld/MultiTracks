@@ -86,6 +86,7 @@
     <ClCompile Include="DrawingArea.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityRenderer.cpp" />
+    <ClCompile Include="EntitySelector.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="GPX.cpp" />
     <ClCompile Include="Layout.cpp" />
@@ -114,6 +115,7 @@
     <ClInclude Include="DrawingArea.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityRenderer.h" />
+    <ClInclude Include="EntitySelector.h" />
     <ClInclude Include="GPX.h" />
     <ClInclude Include="Layout.h" />
     <ClInclude Include="Location.h" />

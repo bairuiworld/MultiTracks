@@ -10,6 +10,7 @@ const double Location::mEarthRadius = 6371; // km
 Location::Location() { Set(0, 0); }
 Location::Location(double latitude, double longitude, double elevation) { Set(latitude, longitude, elevation); }
 Location::Location(const Location& location) { Set(location.mLatitude, location.mLongitude, location.mElevation); }
+Location::Location(Location&& location) { Set(location.mLatitude, location.mLongitude, location.mElevation); }
 
 void Location::operator =(const Location& rhs)
 {

@@ -15,7 +15,7 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Co
 	Vector2d last;
 	bool haslast = false;
 	
-	Properties prop = component->GetProperties();
+	const Properties& prop = component->GetProperties();
 	Gdiplus::Pen pen(Gdiplus::Color(prop.Get<int>("color", Gdiplus::Color::Black)),
 									prop.Get<float>("linewidth", 1));
 	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));

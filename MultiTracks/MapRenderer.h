@@ -43,11 +43,14 @@ public:
 	virtual ~WindowMapRenderer() = default;
 
 protected:
+	void InvalidateEntities();
+
 	virtual void OnPaint(Gdiplus::Graphics* g, const RECT& clip);
 	virtual void OnResize(int width, int height);
 	virtual void OnMouseDown(ww::MouseEvent ev);
 	virtual void OnMouseDrag(ww::MouseEvent ev);
 	virtual void OnMouseWheel(ww::MouseEvent ev);
+	virtual void OnMouseMove(ww::MouseEvent ev);
 };
 
 template <class T>

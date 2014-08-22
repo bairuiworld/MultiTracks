@@ -6,6 +6,7 @@
 #include <memory>
 #include "Component.h"
 #include "EntityRenderer.h"
+#include "EntitySelector.h"
 
 #include <iostream>
 
@@ -24,10 +25,12 @@ public:
 
 	void SetRenderer(std::shared_ptr<EntityRenderer> renderer) { mRenderer = renderer; }
 	void Draw(Gdiplus::Graphics* g, MapViewport* viewport);
+	std::shared_ptr<EntitySelector> GetSelector() { return mSelector; }
 
 private:
 	const Component* mComponent;
 	std::shared_ptr<EntityRenderer> mRenderer;
+	std::shared_ptr<EntitySelector> mSelector;
 };
 
 template <class T>
@@ -35,6 +38,7 @@ Entity::Entity(T* component) :
 mComponent(component)
 {
 	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
+	mSelector = std::is_same<Track, T>::value ? std::make_shared<TrackSelector>(component) : nullptr;
 }
 
 template <class T>
@@ -42,6 +46,7 @@ Entity::Entity(const T* component) :
 mComponent(component)
 {
 	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
+	mSelector = std::is_same<Track, T>::value ? std::make_shared<TrackSelector>(component) : nullptr;
 }
 
 }

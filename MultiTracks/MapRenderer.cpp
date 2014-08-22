@@ -2,6 +2,8 @@
 #include "MapViewport.h"
 #include "Entity.h"
 #include "EntityRenderer.h"
+#include "EntitySelector.h"
+#include "Section.h"
 #include "Widget.h"
 #include "MapRenderer.h"
 
@@ -118,6 +120,13 @@ MapRenderer(map)
 	};
 }
 
+void WindowMapRenderer::InvalidateEntities()
+{
+	for(Entity* entity : mEntities)
+		if(entity->GetSelector())
+			entity->GetSelector()->Invalidate();
+}
+
 void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g, const RECT& clip)
 {
 	Draw(g);
@@ -133,6 +142,7 @@ void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)
 	mMap->GetViewport()->MoveOrigin(static_cast<float>(ev.GetPrevPoint().x - ev.GetPoint().x), static_cast<float>(ev.GetPrevPoint().y - ev.GetPoint().y));
 	if(mParent)
 		mParent->Invalidate();
+	InvalidateEntities();
 }
 
 void WindowMapRenderer::OnMouseWheel(ww::MouseEvent ev)
@@ -142,11 +152,24 @@ void WindowMapRenderer::OnMouseWheel(ww::MouseEvent ev)
 	view->SetZoom(view->GetZoom() + ev.GetWheelRotation(), Vector2d(pt.x, pt.y));
 	if(mParent)
 		mParent->Invalidate();
+	InvalidateEntities();
 }
 
 void WindowMapRenderer::OnResize(int width, int height)
 {
 	mMap->GetViewport()->SetViewDimension(width, height);
+}
+
+void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
+{
+	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section);
+	cs.Select(mEntities.begin(), mEntities.end());
+	if(cs.GetSelected() == Selectable::Section && cs.GetDistance() < 10)
+	{
+		static_cast<Section*>(cs.GetComponent())->GetProperties().Set("color", (int)Gdiplus::Color::Red);
+		if(mParent)
+			mParent->Invalidate();
+	}
 }
 
 }
