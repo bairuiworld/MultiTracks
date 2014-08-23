@@ -25,6 +25,7 @@ void ComponentSelector::SetSelected(Component* component, int selected, double d
 void SectionSelector::Select(ComponentSelector* selector)
 {
 	if(!mValid)	Compile(selector);
+	if(!mBoundingBox.IsInside(selector->GetPoint())) return;
 	if(selector->GetSelectable() & Selectable::Section)
 		SelectSection(selector);
 	if(selector->GetSelectable() & Selectable::SectionEnd)
@@ -53,8 +54,13 @@ void SectionSelector::SelectSectionEnd(ComponentSelector* selector)
 void SectionSelector::Compile(ComponentSelector* selector)
 {
 	mCompiledLocations.clear();
+	mBoundingBox.Clear();
 	for(const Location& loc : mSection->GetLocations())
-		mCompiledLocations.push_back(selector->GetViewport()->LocationToPixel(loc));
+	{
+		Vector2d v = selector->GetViewport()->LocationToPixel(loc);
+		mCompiledLocations.push_back(v);
+		mBoundingBox.Add(v);
+	}
 	mValid = true;
 }
 

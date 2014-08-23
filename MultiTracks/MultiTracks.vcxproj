@@ -110,6 +110,7 @@
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
     <ClInclude Include="Application.h" />
+    <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DownloadManager.h" />
     <ClInclude Include="DrawingArea.h" />

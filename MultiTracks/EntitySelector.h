@@ -6,7 +6,7 @@
 #undef max
 #include <vector>
 #include "Vector.h"
-#include <iostream>
+#include "BoundingBox.h"
 
 namespace mt
 {
@@ -92,7 +92,7 @@ class Section;
 class SectionSelector : public EntitySelector
 {
 public:
-	SectionSelector(Section* section) : mSection(section) {}
+	SectionSelector(Section* section) : mSection(section), mBoundingBox(10) {}
 
 	virtual void Select(ComponentSelector* selector);
 
@@ -106,6 +106,7 @@ protected:
 private:
 	Section* mSection;
 	std::vector<Vector2d> mCompiledLocations;
+	BoundingBox<double> mBoundingBox;
 };
 
 class MapObjectSelector : public EntitySelector
