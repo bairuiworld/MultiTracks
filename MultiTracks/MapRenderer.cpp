@@ -4,6 +4,7 @@
 #include "EntityRenderer.h"
 #include "EntitySelector.h"
 #include "Section.h"
+#include "Location.h"
 #include "Widget.h"
 #include "MapRenderer.h"
 
@@ -162,7 +163,7 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
-	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section, 10);
+	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section | Selectable::SectionEnd, 10);
 	cs.Select(mEntities.begin(), mEntities.end());
 
 	if(cs.GetSelected() == Selectable::None && mHoverComponent)
@@ -173,12 +174,18 @@ void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 		if(mParent)
 			mParent->Invalidate();
 	}
-	else if(cs.GetSelected() == Selectable::Section)
+	else if(cs.GetSelected() == Selectable::Section && cs.GetComponent() != mHoverComponent)
 	{
 		if(mHoverComponent)
 			mHoverComponent->GetProperties().Pop();
 		mHoverComponent = cs.GetComponent();
 		mHoverComponent->GetProperties().Push().Set("color", (int)Gdiplus::Color::Red);
+		if(mParent)
+			mParent->Invalidate();
+	}
+	else if(cs.GetSelected() == Selectable::SectionEnd)
+	{
+		AddComponent(reinterpret_cast<Location*>(cs.GetComponent()));
 		if(mParent)
 			mParent->Invalidate();
 	}

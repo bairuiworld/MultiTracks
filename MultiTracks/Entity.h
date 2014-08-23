@@ -19,8 +19,6 @@ class Entity
 {
 public:
 	template <class T>
-	Entity(T* component);
-	template <class T>
 	Entity(const T* component);
 
 	void SetRenderer(std::shared_ptr<EntityRenderer> renderer) { mRenderer = renderer; }
@@ -34,19 +32,12 @@ private:
 };
 
 template <class T>
-Entity::Entity(T* component) :
-mComponent(component)
-{
-	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
-	mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
-}
-
-template <class T>
 Entity::Entity(const T* component) :
 mComponent(component)
 {
-	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
-	mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
+	mRenderer = DefaultRenderer<T>::value;
+	//mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
+	mSelector = SelectorBuilder<T>::Make(component);
 }
 
 }

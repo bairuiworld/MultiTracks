@@ -5,6 +5,7 @@
 #undef min
 #undef max
 #include <vector>
+#include <memory>
 #include "Vector.h"
 #include "BoundingBox.h"
 
@@ -24,6 +25,9 @@ static const int Location = 1 << 2;
 }
 
 class EntitySelector;
+template <class T> struct SelectorBuilder { static std::shared_ptr<EntitySelector> Make(const Component*) { return nullptr; } };
+
+class EntitySelector;
 class ComponentSelector
 {
 public:
@@ -39,7 +43,7 @@ public:
 	const MapViewport* GetViewport() const { return mViewport; }
 	int GetSelectable() const { return mSelectable; }
 	double GetDistance() const { return mDistance; }
-	bool Validate(double distance) { return distance < mThreshold && distance < mDistance; }
+	bool Validate(double distance) { return distance <= mThreshold && distance <= mDistance; }
 	Component* GetComponent() const { return mComponent; }
 	int GetSelected() const { return mSelected; }
 
@@ -101,12 +105,19 @@ protected:
 	virtual void Compile(ComponentSelector* selector);
 
 	void SelectSection(ComponentSelector* selector);
-	void SelectSectionEnd(ComponentSelector* selector);
+	bool SelectSectionEnd(ComponentSelector* selector);
 
 private:
 	Section* mSection;
 	std::vector<Vector2d> mCompiledLocations;
 	BoundingBox<double> mBoundingBox;
+};
+template <> struct SelectorBuilder<Section>
+{
+	static std::shared_ptr<SectionSelector> Make(Section* section)
+	{
+		return std::make_shared<SectionSelector>(section);
+	}
 };
 
 class MapObjectSelector : public EntitySelector
@@ -124,6 +135,13 @@ protected:
 
 private:
 	CompiledSectionList mCompiledSections;
+};
+template <> struct SelectorBuilder<MapObjectContainer>
+{
+	static std::shared_ptr<MapObjectSelector> Make(const MapObjectContainer* container)
+	{
+		return std::make_shared<MapObjectSelector>(container);
+	}
 };
 
 }

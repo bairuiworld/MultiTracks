@@ -75,6 +75,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 #endif
+	//std::cout << *(S<double>::value) << " " << *S<int>::value << std::endl;
 	// Init
 	mt::DownloadManager::Init();
 	curl_global_init(CURL_GLOBAL_ALL);

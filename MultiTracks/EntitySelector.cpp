@@ -26,10 +26,11 @@ void SectionSelector::Select(ComponentSelector* selector)
 {
 	if(!mValid)	Compile(selector);
 	if(!mBoundingBox.IsInside(selector->GetPoint())) return;
+	if(selector->GetSelectable() & Selectable::SectionEnd)
+		if(SelectSectionEnd(selector))
+			return;
 	if(selector->GetSelectable() & Selectable::Section)
 		SelectSection(selector);
-	if(selector->GetSelectable() & Selectable::SectionEnd)
-		SelectSectionEnd(selector);
 }
 
 void SectionSelector::SelectSection(ComponentSelector* selector)
@@ -46,9 +47,26 @@ void SectionSelector::SelectSection(ComponentSelector* selector)
 	}
 }
 
-void SectionSelector::SelectSectionEnd(ComponentSelector* selector)
+bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
 {
-	// todo
+	bool found = false;
+	const Vector2d& first = mCompiledLocations.front();
+	double d = first.GetDistance(selector->GetPoint());
+	if(selector->Validate(d))
+	{
+		selector->SetSelected(const_cast<Location*>(mSection->GetFirstLocation()), Selectable::SectionEnd, d, first);
+		found = true;
+	}
+
+	if(mCompiledLocations.size() < 1) return found;
+	const Vector2d& last = mCompiledLocations.back();
+	d = last.GetDistance(selector->GetPoint());
+	if(selector->Validate(d))
+	{
+		selector->SetSelected(const_cast<Location*>(mSection->GetLastLocation()), Selectable::SectionEnd, d, last);
+		found = true;
+	}
+	return found;
 }
 
 void SectionSelector::Compile(ComponentSelector* selector)
