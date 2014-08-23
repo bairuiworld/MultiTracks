@@ -9,7 +9,7 @@ namespace mt
 {
 
 Map::Map(MapSource* mapSource) :
-	mMapSource(mapSource), mCacheSize(100)
+	mMapSource(mapSource), mCacheSize(500)
 {
 	mMapViewport = new MapViewport(mMapSource);
 }

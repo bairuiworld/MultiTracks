@@ -38,7 +38,7 @@ Entity::Entity(T* component) :
 mComponent(component)
 {
 	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
-	mSelector = std::is_same<Track, T>::value ? std::make_shared<TrackSelector>(component) : nullptr;
+	mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
 }
 
 template <class T>
@@ -46,7 +46,7 @@ Entity::Entity(const T* component) :
 mComponent(component)
 {
 	mRenderer = RendererExists<T>::value ? DefaultRenderer<T>::value : nullptr;
-	mSelector = std::is_same<Track, T>::value ? std::make_shared<TrackSelector>(component) : nullptr;
+	mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
 }
 
 }

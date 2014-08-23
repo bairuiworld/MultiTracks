@@ -111,7 +111,7 @@ void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
 }
 
 WindowMapRenderer::WindowMapRenderer(Map* map) :
-MapRenderer(map)
+MapRenderer(map), mHoverComponent(nullptr)
 {
 	mMap->SignalNewTile += [this]()
 	{ 
@@ -162,11 +162,23 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
-	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section);
+	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section, 10);
 	cs.Select(mEntities.begin(), mEntities.end());
-	if(cs.GetSelected() == Selectable::Section && cs.GetDistance() < 10)
+
+	if(cs.GetSelected() == Selectable::None && mHoverComponent)
 	{
-		static_cast<Section*>(cs.GetComponent())->GetProperties().Set("color", (int)Gdiplus::Color::Red);
+		if(mHoverComponent)
+			mHoverComponent->GetProperties().Pop();
+		mHoverComponent = nullptr;
+		if(mParent)
+			mParent->Invalidate();
+	}
+	else if(cs.GetSelected() == Selectable::Section)
+	{
+		if(mHoverComponent)
+			mHoverComponent->GetProperties().Pop();
+		mHoverComponent = cs.GetComponent();
+		mHoverComponent->GetProperties().Push().Set("color", (int)Gdiplus::Color::Red);
 		if(mParent)
 			mParent->Invalidate();
 	}

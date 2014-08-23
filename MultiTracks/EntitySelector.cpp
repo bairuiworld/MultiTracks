@@ -7,8 +7,9 @@
 namespace mt
 {
 
-ComponentSelector::ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable) :
-mPoint(point), mViewport(viewport), mSelectable(selectable), mComponent(nullptr), mDistance(std::numeric_limits<double>::max())
+ComponentSelector::ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable, double threshold) :
+mPoint(point), mViewport(viewport), mSelectable(selectable), mComponent(nullptr), mSelected(Selectable::None),
+mDistance(std::numeric_limits<double>::max()), mThreshold(threshold)
 {
 
 }
@@ -38,7 +39,7 @@ void SectionSelector::SelectSection(ComponentSelector* selector)
 		if(last == nullptr) { last = &p; continue; }
 		Vector2d nearest;
 		double distanceSeg = DistanceToSegment(selector->GetPoint(), *last, p, &nearest);
-		if(distanceSeg < selector->GetDistance())
+		if(selector->Validate(distanceSeg))
 			selector->SetSelected(mSection, Selectable::Section, distanceSeg, nearest);
 		last = &p;
 	}
@@ -54,30 +55,32 @@ void SectionSelector::Compile(ComponentSelector* selector)
 	mCompiledLocations.clear();
 	for(const Location& loc : mSection->GetLocations())
 		mCompiledLocations.push_back(selector->GetViewport()->LocationToPixel(loc));
+	mValid = true;
 }
 
-TrackSelector::TrackSelector(const Track* track)
+MapObjectSelector::MapObjectSelector(const MapObjectContainer* container)
 {
-	for(Section* section : track->GetSections())
+	for(Section* section : container->GetSections())
 		mCompiledSections.push_back(new SectionSelector(section));
 }
 
-TrackSelector::~TrackSelector()
+MapObjectSelector::~MapObjectSelector()
 {
 	for(SectionSelector* selector : mCompiledSections)
 		delete selector;
 }
 
-void TrackSelector::Select(ComponentSelector* selector)
+void MapObjectSelector::Select(ComponentSelector* selector)
 {
 	if(!mValid) Compile(selector);
 	selector->Select(mCompiledSections.begin(), mCompiledSections.end());
 }
 
-void TrackSelector::Compile(ComponentSelector* selector)
+void MapObjectSelector::Compile(ComponentSelector* selector)
 {
 	for(SectionSelector* secsel : mCompiledSections)
 		secsel->Compile(selector);
+	mValid = true;
 }
 
 }

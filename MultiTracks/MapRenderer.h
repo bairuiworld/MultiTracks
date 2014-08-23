@@ -51,6 +51,9 @@ protected:
 	virtual void OnMouseDrag(ww::MouseEvent ev);
 	virtual void OnMouseWheel(ww::MouseEvent ev);
 	virtual void OnMouseMove(ww::MouseEvent ev);
+
+protected:
+	Component* mHoverComponent;
 };
 
 template <class T>

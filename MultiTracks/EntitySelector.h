@@ -17,6 +17,7 @@ class Entity;
 
 namespace Selectable
 {
+static const int None = 0;
 static const int Section = 1 << 0;
 static const int SectionEnd = 1 << 1;
 static const int Location = 1 << 2;
@@ -26,7 +27,7 @@ class EntitySelector;
 class ComponentSelector
 {
 public:
-	ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable);
+	ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable, double threshold);
 
 	template <class Itr>
 	typename std::enable_if<std::is_same<Entity*, typename Itr::value_type>::value>::type Select(Itr begin, Itr end);
@@ -38,6 +39,7 @@ public:
 	const MapViewport* GetViewport() const { return mViewport; }
 	int GetSelectable() const { return mSelectable; }
 	double GetDistance() const { return mDistance; }
+	bool Validate(double distance) { return distance < mThreshold && distance < mDistance; }
 	Component* GetComponent() const { return mComponent; }
 	int GetSelected() const { return mSelected; }
 
@@ -47,6 +49,7 @@ private:
 	const Vector2d& mPoint;
 	const MapViewport* mViewport;
 	int mSelectable;
+	double mThreshold;
 	Component* mComponent;
 	int mSelected;
 	double mDistance;
@@ -94,7 +97,7 @@ public:
 	virtual void Select(ComponentSelector* selector);
 
 protected:
-	friend class TrackSelector;
+	friend class MapObjectSelector;
 	virtual void Compile(ComponentSelector* selector);
 
 	void SelectSection(ComponentSelector* selector);
@@ -105,13 +108,13 @@ private:
 	std::vector<Vector2d> mCompiledLocations;
 };
 
-class TrackSelector : public EntitySelector
+class MapObjectSelector : public EntitySelector
 {
 public:
 	using CompiledSectionList = std::vector<SectionSelector*>;
 
-	TrackSelector(const Track* track);
-	virtual ~TrackSelector();
+	MapObjectSelector(const MapObjectContainer* container);
+	virtual ~MapObjectSelector();
 
 	virtual void Select(ComponentSelector* selector);
 

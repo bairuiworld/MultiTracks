@@ -6,6 +6,8 @@
 #include <string>
 #include <typeindex>
 
+#include <iostream>
+
 namespace mt {
 
 class Properties
@@ -40,22 +42,24 @@ public:
 
 	void SetParent(Properties* parent) { mParent = parent; }
 
-	void Push()
+	Properties& Push()
 	{
-		if(mChild) mChild->Push();
+		if(mChild) return mChild->Push();
 		else mChild = new Properties();
+		return *mChild;
 	}
 
-	void Pop()
+	Properties& Pop()
 	{
-		if(!mChild) return;
+		if(!mChild) return *this;
 		if(mChild->mChild == nullptr)
 		{
 			delete mChild;
 			mChild = nullptr;
+			return *this;
 		}
 		else
-			mChild->Pop();
+			return mChild->Pop();
 	}
 
 	bool Exists(std::string key) const

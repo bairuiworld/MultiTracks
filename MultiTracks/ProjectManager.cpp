@@ -60,6 +60,12 @@ void ProjectManager::OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode)
 		const Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node)->GetObject();
 		renderer->AddComponent(track);
 	} break;
+
+	case ProjectNodeType::Database:
+	{
+		const MapObjectContainer* container = reinterpret_cast<ProjectTreeNode<MapObjectContainer>*>(node)->GetObject();
+		renderer->AddComponent(container);
+	} break;
 	}
 }
 
