@@ -56,7 +56,7 @@ void TreeNode::AddNodeToTreeView(TreeNode* node)
 }
 
 TreeView::TreeView() :
-Widget(WC_TREEVIEW, TVS_FULLROWSELECT | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS)
+Widget(WC_TREEVIEW, "", TVS_FULLROWSELECT | TVS_LINESATROOT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS)
 {
 	mRootNode.mTreeView = this;
 }

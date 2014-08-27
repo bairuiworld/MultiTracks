@@ -7,8 +7,8 @@
 namespace ww
 {
 
-Widget::Widget(const std::string& className, int style) :
-mParent(nullptr), mClassName(className), mhWnd(nullptr), mStyle(style), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
+Widget::Widget(const char* className, const char* text, int style) :
+mParent(nullptr), mClassName(className), mText(text), mhWnd(nullptr), mStyle(style), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
 {
 	
 }
@@ -24,12 +24,13 @@ Widget::~Widget()
 void Widget::Create(Widget* parent)
 {
 	if(parent) mStyle |= WS_CHILD;
-	mhWnd = CreateWindowEx(0, mClassName.c_str(), "", mStyle | WS_VISIBLE,
+	mhWnd = CreateWindowEx(0, mClassName, mText, mStyle | WS_VISIBLE,
 						   CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 						   parent ? parent->GetHandle() : HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
 	if(!mhWnd) return;
 	mParent = parent;
-	SubClass();
+	if(strncmp(mClassName, "BUTTON", 6))
+		SubClass();
 
 	for(Widget* child : mChildren)
 		child->Create(this);
@@ -191,6 +192,17 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		if(mLayout)
 			mLayout->Apply(this);
 		OnResize(width, height);
+	} break;
+
+	case WM_COMMAND:
+	{
+		HWND hCtrl = reinterpret_cast<HWND>(lParam);
+		if(hCtrl != nullptr)
+		{
+			Widget* child = Widget::FromHandle(hCtrl);
+			if(child != nullptr)				
+				child->OnCommand(HIWORD(wParam));
+		}
 	} break;
 
 	case WM_NOTIFY:

@@ -15,7 +15,7 @@ class Layout;
 class Widget
 {
 public:
-	Widget(const std::string& className, int style = 0);
+	Widget(const char* className, const char* text = "", int style = 0);
 	virtual ~Widget();
 
 	using WidgetList = std::vector<Widget*>;
@@ -26,6 +26,8 @@ public:
 
 	Layout* GetLayout() const { return mLayout; }
 	void SetLayout(Layout* layout);
+
+	void SetText(const char* text);
 
 	RECT GetBounds() const;
 	void SetBounds(const RECT& rc);
@@ -49,6 +51,7 @@ protected:
 	virtual void OnMouseDrag(MouseEvent ev) {}
 	virtual void OnMouseWheel(MouseEvent ev) {}
 	virtual void OnNotify(LPNMHDR lpnmhdr) {}
+	virtual void OnCommand(int code) {}
 
 	virtual LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -61,7 +64,8 @@ protected:
 
 protected:
 	Widget* mParent;
-	std::string mClassName;
+	const char* mClassName;
+	const char* mText;
 	HWND mhWnd;
 	int mStyle;
 	WNDPROC mDefaultProc;

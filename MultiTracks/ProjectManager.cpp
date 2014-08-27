@@ -7,8 +7,8 @@
 namespace mt
 {
 
-ProjectManager::ProjectManager(ww::TreeView* projectTree) :
-mProject(nullptr), mProjectTree(projectTree)
+ProjectManager::ProjectManager(mt::WindowMapRenderer* renderer, ww::TreeView* projectTree) :
+mProject(nullptr), mRenderer(renderer), mProjectTree(projectTree)
 {
 	mProjectTree->SignalSelChanged += sig::slot(this, &ProjectManager::OnSelChanged);
 }
@@ -58,13 +58,13 @@ void ProjectManager::OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode)
 	case ProjectNodeType::Track:
 	{
 		const Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node)->GetObject();
-		renderer->AddComponent(track);
+		mRenderer->AddComponent(track);
 	} break;
 
 	case ProjectNodeType::Database:
 	{
 		const MapObjectContainer* container = reinterpret_cast<ProjectTreeNode<MapObjectContainer>*>(node)->GetObject();
-		renderer->AddComponent(container);
+		mRenderer->AddComponent(container);
 	} break;
 	}
 }

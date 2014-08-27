@@ -24,6 +24,7 @@
 
 #include "Application.h"
 #include "Window.h"
+#include "Button.h"
 #include "Layout.h"
 #include "TreeView.h"
 
@@ -98,11 +99,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		win.Add(renderer);
 
 		ww::TreeView* tv = new ww::TreeView;
-		mt::ProjectManager pm(tv);
-		pm.renderer = renderer;
+		mt::ProjectManager pm(renderer, tv);
 		pm.LoadProject("projet.txt");
 		renderer->Add(tv);
 		tv->SetBounds({0, 0, 200, 200});
+
+		ww::Button* b = new ww::Button("Importer...");
+		renderer->Add(b);
+		b->SetBounds({210, 0, 150+210, 25});
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 		app.Run();

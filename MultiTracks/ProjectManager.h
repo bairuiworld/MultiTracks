@@ -34,12 +34,12 @@ private:
 };
 
 class Project;
-class MapRenderer;
+class WindowMapRenderer;
 
 class ProjectManager
 {
 public:
-	ProjectManager(ww::TreeView* projectTree);
+	ProjectManager(mt::WindowMapRenderer* renderer, ww::TreeView* projectTree);
 	~ProjectManager();
 
 	bool LoadProject(std::string filename);
@@ -50,9 +50,8 @@ private:
 
 private:
 	Project* mProject;
+	mt::WindowMapRenderer* mRenderer;
 	ww::TreeView* mProjectTree;
-public:
-	MapRenderer* renderer;
 };
 
 }
