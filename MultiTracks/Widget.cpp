@@ -8,7 +8,7 @@ namespace ww
 {
 
 Widget::Widget(const char* className, const char* text, int style) :
-mParent(nullptr), mClassName(className), mText(text), mhWnd(nullptr), mStyle(style), mDefaultProc(nullptr), mLayout(nullptr), mIsMouseDown(false)
+mParent(nullptr), mClassName(className), mText(text), mhWnd(nullptr), mStyle(style), mLayout(nullptr), mIsMouseDown(false)
 {
 	
 }
@@ -29,8 +29,7 @@ void Widget::Create(Widget* parent)
 						   parent ? parent->GetHandle() : HWND_DESKTOP, nullptr, GetModuleHandle(nullptr), (void*)this);
 	if(!mhWnd) return;
 	mParent = parent;
-	if(strncmp(mClassName, "BUTTON", 6))
-		SubClass();
+	SetWindowLongPtr(mhWnd, GWL_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
 	for(Widget* child : mChildren)
 		child->Create(this);
@@ -78,14 +77,6 @@ void Widget::Invalidate()
 	InvalidateRect(mhWnd, nullptr, false);
 }
 
-void Widget::SubClass()
-{
-	mDefaultProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(mhWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(GlobalWndProc)));
-	if(mDefaultProc == GlobalWndProc)
-		mDefaultProc = nullptr;
-	SetWindowLongPtr(mhWnd, GWL_USERDATA, reinterpret_cast<LONG_PTR>(this));
-}
-
 Widget* Widget::FromHandle(HWND hWnd)
 {
 	return reinterpret_cast<Widget*>(GetWindowLongPtr(hWnd, GWL_USERDATA));
@@ -101,7 +92,6 @@ LRESULT CALLBACK Widget::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPar
 		break;
 
 	case WM_PAINT:
-		if(mDefaultProc == nullptr)
 		{
 			PAINTSTRUCT ps;
 			HDC hDC;
@@ -226,8 +216,7 @@ LRESULT CALLBACK Widget::GlobalWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 LRESULT CALLBACK Widget::CallDefaultProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if(mDefaultProc != nullptr)	return CallWindowProc(mDefaultProc, hWnd, msg, wParam, lParam);
-	else return DefWindowProc(hWnd, msg, wParam, lParam);
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 }

@@ -4,7 +4,7 @@ namespace ww
 {
 
 Button::Button(const char* text) :
-Widget("BUTTON", text, BS_DEFPUSHBUTTON)
+Widget("BUTTON", text, BS_PUSHBUTTON)
 {
 
 }

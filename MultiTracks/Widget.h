@@ -68,7 +68,6 @@ protected:
 	const char* mText;
 	HWND mhWnd;
 	int mStyle;
-	WNDPROC mDefaultProc;
 	Layout* mLayout;
 	WidgetList mChildren;
 

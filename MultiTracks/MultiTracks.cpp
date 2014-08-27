@@ -107,6 +107,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		ww::Button* b = new ww::Button("Importer...");
 		renderer->Add(b);
 		b->SetBounds({210, 0, 150+210, 25});
+		b->SignalClicked += []() { std::cout << "click ahahahahahh" << std::endl; };
 
 		win.SignalClose += []() { std::cout << "closing..." << std::endl; };
 		app.Run();
