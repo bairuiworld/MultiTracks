@@ -111,6 +111,7 @@
     <ClCompile Include="MapObjectContainer.cpp" />
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="TreeView.cpp" />
+    <ClCompile Include="ViewManager.cpp" />
     <ClCompile Include="Widget.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Track.h" />
     <ClInclude Include="TreeView.h" />
     <ClInclude Include="Vector.h" />
+    <ClInclude Include="ViewManager.h" />
     <ClInclude Include="Widget.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
