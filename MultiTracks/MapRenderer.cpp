@@ -112,7 +112,7 @@ void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
 }
 
 WindowMapRenderer::WindowMapRenderer(Map* map) :
-MapRenderer(map), mHoverComponent(nullptr)
+MapRenderer(map), mSelector(map->GetViewport(), 5), mHoverComponent(nullptr)
 {
 	mMap->SignalNewTile += [this]()
 	{ 
@@ -136,6 +136,11 @@ void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g, const RECT& clip)
 void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 {
 	SetFocus(mhWnd);
+}
+
+void WindowMapRenderer::OnMouseClick(ww::MouseEvent ev)
+{
+
 }
 
 void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)
@@ -163,29 +168,31 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
-	ComponentSelector cs(Vector2d(ev.GetPoint().x, ev.GetPoint().y), mMap->GetViewport(), Selectable::Section | Selectable::SectionEnd, 10);
-	cs.Select(mEntities.begin(), mEntities.end());
+	mSelector.SetPoint(Vector2d(ev.GetPoint().x, ev.GetPoint().y));
+	/**/mSelector.SetSelectable(Selectable::Section | Selectable::SectionEnd);
+	mSelector.Select(mEntities.begin(), mEntities.end());
 
-	if(cs.GetSelected() == Selectable::None && mHoverComponent)
+	if(mSelector.GetSelected() == Selectable::None && mHoverComponent)
 	{
-		if(mHoverComponent)
-			mHoverComponent->GetProperties().Pop();
+		mHoverComponent->GetProperties().Pop();
 		mHoverComponent = nullptr;
 		if(mParent)
 			mParent->Invalidate();
 	}
-	else if(cs.GetSelected() == Selectable::Section && cs.GetComponent() != mHoverComponent)
+	else if(mSelector.GetSelected() == Selectable::Section && mSelector.GetComponent() != mHoverComponent)
 	{
 		if(mHoverComponent)
 			mHoverComponent->GetProperties().Pop();
-		mHoverComponent = cs.GetComponent();
+		mHoverComponent = mSelector.GetComponent();
 		mHoverComponent->GetProperties().Push().Set("color", (int)Gdiplus::Color::Red);
 		if(mParent)
 			mParent->Invalidate();
 	}
-	else if(cs.GetSelected() == Selectable::SectionEnd)
+	else if(mSelector.GetSelected() == Selectable::SectionEnd)
 	{
-		AddComponent(reinterpret_cast<Location*>(cs.GetComponent()));
+		Component* c = mSelector.GetComponent();
+		c->GetProperties().Push();
+		AddComponent(reinterpret_cast<Location*>(c));
 		if(mParent)
 			mParent->Invalidate();
 	}

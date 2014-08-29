@@ -5,6 +5,9 @@
 #include "MapViewport.h"
 #include "ViewManager.h"
 
+#include <iostream>
+#include "ProjectManager.h"
+
 namespace mt
 {
 
@@ -21,6 +24,13 @@ ViewManager::ViewManager()
 	mProjectTree = new ww::TreeView;
 	mMapRenderer->Add(mProjectTree);
 	mProjectTree->SetBounds({0, 0, 200, 200});
+
+	ProjectManager* pm = new ProjectManager(mMapRenderer, mProjectTree);
+	pm->LoadProject("projet.txt");
+
+	mProjectTree->SignalItemDoubleClick += [](ww::TreeNode* node) {
+		std::cout << "ok" << std::endl;
+	};
 }
 
 ViewManager::~ViewManager()

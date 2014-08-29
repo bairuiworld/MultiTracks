@@ -53,11 +53,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>C:\Users\Eisenheim\Projets\cpp\ww\ww;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tinyxml2d.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib;DevIL.lib;ILU.lib;ILUT.lib;comctl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>tinyxml2d.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib;DevIL.lib;ILU.lib;ILUT.lib;comctl32.lib;libww.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Eisenheim\Projets\cpp\ww\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>MultiTracks.exe.manifest</AdditionalManifestFiles>
@@ -73,13 +75,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>C:\Users\Eisenheim\Projets\cpp\ww\ww;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>tinyxml2.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib;DevIL.lib;ILU.lib;ILUT.lib;comctl32.lib</AdditionalDependencies>
+      <AdditionalDependencies>tinyxml2.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib;DevIL.lib;ILU.lib;ILUT.lib;comctl32.lib;libww.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Eisenheim\Projets\cpp\ww\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>MultiTracks.exe.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -87,16 +91,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Algorithm.cpp" />
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="Button.cpp" />
     <ClCompile Include="DownloadManager.cpp" />
-    <ClCompile Include="DrawingArea.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityRenderer.cpp" />
     <ClCompile Include="EntitySelector.cpp" />
-    <ClCompile Include="Event.cpp" />
     <ClCompile Include="GPX.cpp" />
-    <ClCompile Include="Layout.cpp" />
     <ClCompile Include="Location.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapRenderer.cpp" />
@@ -105,50 +104,37 @@
     <ClCompile Include="MultiTracks.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="ProjectManager.cpp" />
-    <ClCompile Include="Register.cpp" />
     <ClCompile Include="Section.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="MapObjectContainer.cpp" />
     <ClCompile Include="Track.cpp" />
-    <ClCompile Include="TreeView.cpp" />
     <ClCompile Include="ViewManager.cpp" />
-    <ClCompile Include="Widget.cpp" />
-    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
-    <ClInclude Include="Application.h" />
     <ClInclude Include="BoundingBox.h" />
-    <ClInclude Include="Button.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DownloadManager.h" />
-    <ClInclude Include="DrawingArea.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityRenderer.h" />
     <ClInclude Include="EntitySelector.h" />
     <ClInclude Include="GPX.h" />
-    <ClInclude Include="Layout.h" />
     <ClInclude Include="Location.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapRenderer.h" />
     <ClInclude Include="MapSource.h" />
     <ClInclude Include="MapViewport.h" />
-    <ClInclude Include="Event.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="ProjectManager.h" />
     <ClInclude Include="Properties.h" />
-    <ClInclude Include="Register.h" />
     <ClInclude Include="Section.h" />
     <ClInclude Include="SimpleSignal.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="MapObjectContainer.h" />
     <ClInclude Include="Track.h" />
-    <ClInclude Include="TreeView.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="ViewManager.h" />
-    <ClInclude Include="Widget.h" />
-    <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

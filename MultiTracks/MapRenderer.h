@@ -51,8 +51,10 @@ protected:
 	virtual void OnMouseDrag(ww::MouseEvent ev);
 	virtual void OnMouseWheel(ww::MouseEvent ev);
 	virtual void OnMouseMove(ww::MouseEvent ev);
+	virtual void OnMouseClick(ww::MouseEvent ev);
 
 protected:
+	ComponentSelector mSelector;
 	Component* mHoverComponent;
 };
 

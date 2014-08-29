@@ -31,7 +31,7 @@ class EntitySelector;
 class ComponentSelector
 {
 public:
-	ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable, double threshold);
+	ComponentSelector(const MapViewport* viewport, double threshold);
 
 	template <class Itr>
 	typename std::enable_if<std::is_same<Entity*, typename Itr::value_type>::value>::type Select(Itr begin, Itr end);
@@ -40,8 +40,13 @@ public:
 	void Select(const ComponentSelector& selector);
 
 	const Vector2d& GetPoint() const { return mPoint; }
+	void SetPoint(const Vector2d& point) { mPoint = point; }
+
 	const MapViewport* GetViewport() const { return mViewport; }
+	
 	int GetSelectable() const { return mSelectable; }
+	void SetSelectable(int selectable) { mSelectable = selectable; }
+
 	double GetDistance() const { return mDistance; }
 	bool Validate(double distance) { return distance <= mThreshold && distance <= mDistance; }
 	Component* GetComponent() const { return mComponent; }
@@ -50,7 +55,7 @@ public:
 	void SetSelected(Component* component, int selected, double distance, const Vector2d& nearest);
 
 private:
-	const Vector2d& mPoint;
+	Vector2d mPoint;
 	const MapViewport* mViewport;
 	int mSelectable;
 	double mThreshold;

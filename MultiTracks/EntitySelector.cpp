@@ -7,8 +7,8 @@
 namespace mt
 {
 
-ComponentSelector::ComponentSelector(const Vector2d& point, const MapViewport* viewport, int selectable, double threshold) :
-mPoint(point), mViewport(viewport), mSelectable(selectable), mComponent(nullptr), mSelected(Selectable::None),
+ComponentSelector::ComponentSelector(const MapViewport* viewport, double threshold) :
+mViewport(viewport), mSelectable(0), mComponent(nullptr), mSelected(Selectable::None),
 mDistance(std::numeric_limits<double>::max()), mThreshold(threshold)
 {
 
