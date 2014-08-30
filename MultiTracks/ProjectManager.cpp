@@ -11,6 +11,7 @@ ProjectManager::ProjectManager(mt::WindowMapRenderer* renderer, ww::TreeView* pr
 mProject(nullptr), mRenderer(renderer), mProjectTree(projectTree)
 {
 	mProjectTree->SignalSelChanged += sig::slot(this, &ProjectManager::OnSelChanged);
+	mProjectTree->SignalItemClick += sig::slot(this, &ProjectManager::OnTreeClick);
 }
 
 ProjectManager::~ProjectManager()
@@ -34,7 +35,7 @@ bool ProjectManager::LoadProject(std::string filename)
 
 	for(std::string group : mProject->GetGroups())
 	{
-		ww::TreeNode* groupNode = new ProjectTreeNodeBase(group.c_str(), ProjectNodeType::Group);
+		ww::TreeNode* groupNode = new ProjectTreeNodeBase(group, ProjectNodeType::Group);
 		for(Track* track : mProject->GetTracks(group))
 			groupNode->AddNode(new ProjectTreeNode<Track>(track->GetName(), track));
 		projectNode->AddNode(groupNode);
@@ -67,6 +68,24 @@ void ProjectManager::OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode)
 		mRenderer->AddComponent(container);
 	} break;
 	}
+}
+
+void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
+{
+	if(ev.GetButton() != ww::MouseButton::Right) return;
+	if(ev.GetClicks() != 1) return;
+	ProjectTreeNodeBase* node = reinterpret_cast<ProjectTreeNodeBase*>(node_);
+	if(node->GetType() == ProjectNodeType::Group)
+	{
+		ww::PopupMenu menu;
+		menu.AddItem("Importer une trace...", std::bind(&ProjectManager::ImportTrack, this, node->GetText()));
+		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+	}
+}
+
+void ProjectManager::ImportTrack(std::string group)
+{
+	std::cout << group << std::endl;
 }
 
 }

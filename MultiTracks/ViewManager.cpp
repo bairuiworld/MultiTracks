@@ -28,7 +28,7 @@ ViewManager::ViewManager()
 	ProjectManager* pm = new ProjectManager(mMapRenderer, mProjectTree);
 	pm->LoadProject("projet.txt");
 
-	mProjectTree->SignalItemDoubleClick += [](ww::TreeNode* node) {
+	mProjectTree->SignalItemClick += [](ww::TreeNode* node, ww::MouseEvent ev) {
 		std::cout << "ok" << std::endl;
 	};
 }
