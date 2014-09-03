@@ -17,7 +17,7 @@ Project::~Project()
 
 void Project::AddTrack(Track* track, std::string group)
 {
-	if(mTracks.find(group) != mTracks.end())
+	if(mTracks.find(group) == mTracks.end())
 		mTracks[group] = TrackList();
 	mTracks[group].push_back(track);
 }
@@ -47,6 +47,7 @@ void Project::Clear()
 
 bool Project::LoadXML(std::string file)
 {
+	mFile = file;
 	tinyxml2::XMLDocument doc;
 	doc.LoadFile(file.c_str());
 	if(doc.Error()) return false;
@@ -115,6 +116,58 @@ void Project::LoadTrackGroupXML(tinyxml2::XMLElement* group)
 void Project::LoadMapXML(tinyxml2::XMLElement* map)
 {
 	// todo
+}
+
+void Project::Save()
+{
+	Save(mFile);
+}
+
+void Project::Save(std::string file)
+{
+	tinyxml2::XMLDocument doc;
+	
+	tinyxml2::XMLElement* root = doc.NewElement("multitracks");
+	doc.InsertEndChild(root);
+	tinyxml2::XMLElement* project = doc.NewElement("project");
+	project->SetAttribute("name", mName.c_str());
+	root->InsertEndChild(project);
+
+	tinyxml2::XMLElement* sectionDatabase = doc.NewElement("database");
+	SaveDatabase(&doc, sectionDatabase);
+	SaveTrackGroups(&doc, project);
+
+	doc.SaveFile(file.c_str());
+}
+
+void Project::SaveDatabase(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* db)
+{
+	if(mDatabase.GetProperties().Exists("color"))
+	{
+		int color = mDatabase.GetProperties().Get<int>("color");
+		db->SetAttribute("color", color);
+	}
+
+	if(mDatabase.GetProperties().Exists("linewidth"))
+	{
+		float lineWidth = mDatabase.GetProperties().Get<float>("linewidth");
+		db->SetAttribute("linewidth", lineWidth);
+	}
+
+	for(Section* s : mDatabase.GetSections())
+		db->InsertEndChild(s->SaveXML(doc));
+}
+
+void Project::SaveTrackGroups(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* project)
+{
+	for(auto entry : mTracks)
+	{
+		tinyxml2::XMLElement* group = doc->NewElement("trackgroup");
+		project->InsertEndChild(group);
+		group->SetAttribute("name", entry.first.c_str());
+		for(Track* t : entry.second)
+			group->InsertEndChild(t->SaveXML(doc));
+	}
 }
 
 }

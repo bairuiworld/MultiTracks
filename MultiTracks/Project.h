@@ -35,10 +35,16 @@ public:
 	bool LoadXML(std::string file);
 	void LoadXML(tinyxml2::XMLDocument* doc);
 
+	void Save();
+	void Save(std::string file);
+
 private:
 	void LoadDatabaseXML(tinyxml2::XMLElement* db);
 	void LoadTrackGroupXML(tinyxml2::XMLElement* group);
 	void LoadMapXML(tinyxml2::XMLElement* map);
+
+	void SaveDatabase(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* db);
+	void SaveTrackGroups(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* project);
 
 private:
 	std::string mFile;

@@ -99,6 +99,7 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 		if(track)
 		{
 			mProject->AddTrack(track, groupNode->GetText());
+			mProject->Save();
 			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName(), track);
 			groupNode->AddNode(trackNode);
 			trackNode->Select();
