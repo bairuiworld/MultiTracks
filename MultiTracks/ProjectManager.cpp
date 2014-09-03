@@ -1,5 +1,7 @@
+#include "FileDialog.h"
 #include "Project.h"
 #include "Track.h"
+#include "GPX.h"
 #include "ProjectManager.h"
 
 #include "MapRenderer.h"
@@ -30,6 +32,12 @@ bool ProjectManager::LoadProject(std::string filename)
 		return false;
 	}
 
+	LoadProjectTree();
+	return true;
+}
+
+void ProjectManager::LoadProjectTree()
+{
 	ww::TreeNode* projectNode = new ProjectTreeNodeBase(mProject->GetName(), ProjectNodeType::Project);
 	projectNode->AddNode(new ProjectTreeNode<MapObjectContainer>("Base de sections", &mProject->GetDatabase()));
 
@@ -41,12 +49,11 @@ bool ProjectManager::LoadProject(std::string filename)
 		projectNode->AddNode(groupNode);
 	}
 	mProjectTree->AddNode(projectNode);
-	return true;
 }
 
 void ProjectManager::UnloadProject()
 {
-	// clear tree
+	mProjectTree->RemoveAllNodes();
 	delete mProject;
 	mProject = nullptr;
 }
@@ -78,14 +85,26 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 	if(node->GetType() == ProjectNodeType::Group)
 	{
 		ww::PopupMenu menu;
-		menu.AddItem("Importer une trace...", std::bind(&ProjectManager::ImportTrack, this, node->GetText()));
+		menu.AddItem("Importer une trace...", std::bind(&ProjectManager::ImportTrack, this, node));
 		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 	}
 }
 
-void ProjectManager::ImportTrack(std::string group)
+void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 {
-	std::cout << group << std::endl;
+	ww::FileDialog opendialog("Trace GPS (*.gpx)\0*.gpx\0", GetParent(mProjectTree->GetHandle()));
+	if(opendialog.Open())
+	{
+		Track* track = GPX::Load(opendialog.GetFileName().c_str());
+		if(track)
+		{
+			mProject->AddTrack(track, groupNode->GetText());
+			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName(), track);
+			groupNode->AddNode(trackNode);
+			trackNode->Select();
+			trackNode->EnsureVisible();
+		}
+	}
 }
 
 }

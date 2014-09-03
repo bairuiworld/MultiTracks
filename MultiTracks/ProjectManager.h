@@ -50,7 +50,8 @@ private:
 	void OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode);
 	void OnTreeClick(ww::TreeNode* node, ww::MouseEvent ev);
 
-	void ImportTrack(std::string group);
+	void LoadProjectTree();
+	void ImportTrack(ProjectTreeNodeBase* groupNode);
 
 private:
 	Project* mProject;
