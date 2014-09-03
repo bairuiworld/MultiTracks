@@ -9,6 +9,7 @@ namespace mt
 class Component
 {
 public:
+	virtual ~Component() = default;
 	Properties& GetProperties() { return mProperties; }
 	const Properties& GetProperties() const { return mProperties; }
 

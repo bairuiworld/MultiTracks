@@ -27,6 +27,7 @@ public:
 
 	template <class T>
 	void AddComponent(T* component);
+	void RemoveComponent(Component* component);
 
 protected:
 	void InternalDraw(Gdiplus::Graphics* g) const;

@@ -3,6 +3,7 @@
 
 #include "TreeView.h"
 #include "Menu.h"
+#include "SimpleSignal.h"
 
 namespace mt
 {
@@ -26,12 +27,12 @@ template <class T>
 class ProjectTreeNode : public ProjectTreeNodeBase
 {
 public:
-	ProjectTreeNode(std::string text, const T* object) : ProjectTreeNodeBase(text, ProjectNodeTypeSelector<T>::type), mObject(object) {}
+	ProjectTreeNode(std::string text, T* object) : ProjectTreeNodeBase(text, ProjectNodeTypeSelector<T>::type), mObject(object) {}
 
-	const T* GetObject() const { return mObject; }
+	T* GetObject() const { return mObject; }
 
 private:
-	const T* mObject;
+	T* mObject;
 };
 
 class Project;
@@ -57,6 +58,9 @@ private:
 	Project* mProject;
 	mt::WindowMapRenderer* mRenderer;
 	ww::TreeView* mProjectTree;
+
+public:
+	sig::Signal<void(Track*)> SignalSelectTrack;
 };
 
 }

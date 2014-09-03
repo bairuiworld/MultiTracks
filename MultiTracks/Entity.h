@@ -21,6 +21,8 @@ public:
 	template <class T>
 	Entity(const T* component);
 
+	const Component* GetComponent() const { return mComponent; }
+
 	void SetRenderer(std::shared_ptr<EntityRenderer> renderer) { mRenderer = renderer; }
 	void Draw(Gdiplus::Graphics* g, MapViewport* viewport);
 	std::shared_ptr<EntitySelector> GetSelector() { return mSelector; }
@@ -35,8 +37,8 @@ template <class T>
 Entity::Entity(const T* component) :
 mComponent(component)
 {
+	mComponent = component;
 	mRenderer = DefaultRenderer<T>::value;
-	//mSelector = std::is_base_of<MapObjectContainer, T>::value ? std::make_shared<MapObjectSelector>(component) : nullptr;
 	mSelector = SelectorBuilder<T>::Make(component);
 }
 

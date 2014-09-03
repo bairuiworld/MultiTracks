@@ -111,6 +111,15 @@ void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
 	Draw()->Save(filename, &clsid, NULL);
 }
 
+void MapRenderer::RemoveComponent(Component* component)
+{
+	auto it = std::find_if(mEntities.begin(), mEntities.end(), [component](Entity* e) {
+		return e->GetComponent() == component;
+	});
+	if(it != mEntities.end())
+		mEntities.erase(it);
+}
+
 WindowMapRenderer::WindowMapRenderer(Map* map) :
 MapRenderer(map), mSelector(map->GetViewport(), 5), mHoverComponent(nullptr)
 {

@@ -28,7 +28,7 @@ public:
 	void AddTrack(Track* track, std::string group);
 	const TrackList& GetTracks(std::string group) const;
 	GroupList GetGroups() const;
-	const MapObjectContainer& GetDatabase() const { return mDatabase; }
+	MapObjectContainer& GetDatabase() { return mDatabase; }
 
 	void Clear();
 

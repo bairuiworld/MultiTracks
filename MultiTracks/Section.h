@@ -19,7 +19,7 @@ public:
 public:
 	Section(MapObjectContainer* container = nullptr);
 	Section(const Section& s);
-	~Section();
+	virtual ~Section();
 
 	void Add(const Location& location);
 	template <class LocItr>	void Add(LocItr begin, LocItr end)

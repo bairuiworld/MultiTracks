@@ -3,6 +3,7 @@
 #include "Map.h"
 #include "MapSource.h"
 #include "MapViewport.h"
+#include "Track.h"
 #include "ViewManager.h"
 
 #include <iostream>
@@ -11,7 +12,8 @@
 namespace mt
 {
 
-ViewManager::ViewManager()
+ViewManager::ViewManager() :
+mDisplayedTrack(nullptr)
 {
 	mWindow = new ww::Window("MultiTracks");
 	mWindow->SetLayout(new ww::FillLayout);
@@ -27,12 +29,22 @@ ViewManager::ViewManager()
 
 	ProjectManager* pm = new ProjectManager(mMapRenderer, mProjectTree);
 	pm->LoadProject("projet.txt");
+	pm->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
 }
 
 ViewManager::~ViewManager()
 {
 	delete mWindow;
 	delete mMap;
+}
+
+void ViewManager::OnTrackSelect(Track* track)
+{
+	if(mDisplayedTrack)
+		mMapRenderer->RemoveComponent(mDisplayedTrack);
+	mDisplayedTrack = track;
+	mMapRenderer->AddComponent(mDisplayedTrack);
+	mMapRenderer->Invalidate();
 }
 
 }

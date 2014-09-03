@@ -9,6 +9,7 @@ namespace mt
 
 class Map;
 class WindowMapRenderer;
+class Track;
 
 class ViewManager
 {
@@ -17,10 +18,15 @@ public:
 	~ViewManager();
 
 private:
+	void OnTrackSelect(Track* track);
+
+private:
 	ww::Window* mWindow;
 	Map* mMap;
 	WindowMapRenderer* mMapRenderer;
 	ww::TreeView* mProjectTree;
+
+	Track* mDisplayedTrack;
 };
 
 }

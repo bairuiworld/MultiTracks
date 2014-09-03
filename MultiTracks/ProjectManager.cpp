@@ -65,8 +65,8 @@ void ProjectManager::OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode)
 	{
 	case ProjectNodeType::Track:
 	{
-		const Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node)->GetObject();
-		mRenderer->AddComponent(track);
+		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node)->GetObject();
+		SignalSelectTrack.emit(track);
 	} break;
 
 	case ProjectNodeType::Database:
@@ -103,6 +103,7 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName(), track);
 			groupNode->AddNode(trackNode);
 			trackNode->Select();
+			SignalSelectTrack.emit(track);
 			trackNode->EnsureVisible();
 		}
 	}
