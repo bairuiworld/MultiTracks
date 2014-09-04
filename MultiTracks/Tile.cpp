@@ -11,14 +11,14 @@ namespace mt
 std::mutex Tile::devil_mutex;
 
 Tile::Tile(const Vector3i& coord, MapSource* mapSource) :
-mCoordinates(coord), mMapSource(mapSource), mImage(nullptr), mLoaded(false), mDispose(false)
+mCoordinates(coord), mMapSource(mapSource), mImage(nullptr), mLoaded(false)
 {
 
 }
 
 Tile::~Tile()
 {
-	if(!mTask->Cancel())
+	if(mTask && !mTask->Cancel())
 		mTask->GetFuture().wait();
 	delete mImage;
 }
@@ -87,8 +87,6 @@ void Tile::DownloadTask()
 	std::lock_guard<std::mutex> lock(loaded_mutex);
 	mLoaded = true;
 	SignalReady.emit(this);
-	if(mDispose)
-		delete this;
 }
 
 }

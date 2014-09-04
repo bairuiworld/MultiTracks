@@ -121,9 +121,12 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 void ProjectManager::ExportTrackOnMap(Track* track)
 {
 	MapViewport* vp = mRenderer->GetMap()->GetViewport();
+	MapViewport save(*vp);
 	Area area = track->GetBoundingBox();
 	vp->SetView(area);
 	mRenderer->Save(L"a.jpg", ImageFormat::jpeg);
+	vp->SetOrigin(save.GetOrigin());
+	vp->SetViewDimension(save.GetWidth(), save.GetHeight());
 }
 
 }

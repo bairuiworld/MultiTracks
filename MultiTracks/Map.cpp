@@ -88,51 +88,22 @@ void Map::SyncDraw(Gdiplus::Graphics* g)
 	int yTileCount = southEastTile.GetY() - northWestTile.GetY() + 1;
 	int tileCount = xTileCount*yTileCount;
 
-	std::mutex count_lock;
-	std::condition_variable cv;
-	int tileLeft = 0;
-
+	int k = 0;
 	for(int i = 0; i<xTileCount; i++)
 	{
 		for(int j = 0; j<yTileCount; j++)
 		{
+			k++;
+			std::cout << k << "/" << tileCount << std::endl;
 			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
-			Tile* tile = GetTile(coord, false);
-			if(!tile->IsLoaded())
-			{
-				{
-					std::lock_guard<std::mutex> lock(count_lock);
-					tileLeft++;
-				}
-				tile->Download(true);
-
-				tile->SignalReady += [this, &count_lock, &tileLeft, &cv, &origin, g, i, j](Tile* tile) {
-					std::lock_guard<std::mutex> lock(count_lock);
-					/*Gdiplus::Image* im = tile->GetImage();
-					if(im)
-						g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());*/
-					tileLeft--;
-					tile->Dispose();
-					if(tileLeft <= 0)
-						cv.notify_all();
-				};
-			}
-			else
-			{
-				Gdiplus::Image* im = tile->GetImage();
-				if(im)
-				{
-					//std::lock_guard<std::mutex> lock(count_lock);
-					g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
-				}
-			}
+			Tile* tile = new Tile(coord, mMapSource);
+			tile->Download(false);
+			Gdiplus::Image* im = tile->GetImage();
+			if(im)
+				g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
+			delete tile;
 		}
 	}
-
-	std::unique_lock<std::mutex> lock(count_lock);
-	if(tileLeft <= 0) return;
-	while(tileLeft > 0)
-		cv.wait(lock);
 }
 
 }
