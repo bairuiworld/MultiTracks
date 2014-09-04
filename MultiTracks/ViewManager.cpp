@@ -27,15 +27,16 @@ mDisplayedTrack(nullptr)
 	mMapRenderer->Add(mProjectTree);
 	mProjectTree->SetBounds({0, 0, 200, 200});
 
-	ProjectManager* pm = new ProjectManager(mMapRenderer, mProjectTree);
-	pm->LoadProject("projet.txt");
-	pm->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
+	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
+	mProjectManager->LoadProject("projet.txt");
+	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
 }
 
 ViewManager::~ViewManager()
 {
 	delete mWindow;
 	delete mMap;
+	delete mProjectManager;
 }
 
 void ViewManager::OnTrackSelect(Track* track)

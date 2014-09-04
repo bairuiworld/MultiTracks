@@ -31,7 +31,7 @@ public:
 	Tile* GetTile(const Vector3i& coord, bool download = true);
 
 	void Draw(Gdiplus::Graphics* g);
-	void PreloadTiles();
+	void SyncDraw(Gdiplus::Graphics* g);
 
 	sig::Signal<void()> SignalNewTile;
 

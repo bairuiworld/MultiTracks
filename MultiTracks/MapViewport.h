@@ -2,6 +2,7 @@
 #define __MULTITRACKS_MAPVIEWPORT_H__
 
 #include "Vector.h"
+#include "Area.h"
 
 namespace mt
 {
@@ -13,10 +14,13 @@ class MapViewport
 {
 public:
 	MapViewport(MapSource* mapSource, int zoom = 0, const Vector2d& origin = Vector2d(0, 0));
+	MapViewport(const MapViewport& vp);
 
 	void SetViewDimension(int width, int height);
 	int GetWidth() const { return mViewDimension.GetX(); }
 	int GetHeight() const { return mViewDimension.GetY(); }
+
+	void SetView(const Area& view);
 
 	Vector2d GetOrigin() const { return mOrigin; }
 	void SetOrigin(const Vector2d& origin);

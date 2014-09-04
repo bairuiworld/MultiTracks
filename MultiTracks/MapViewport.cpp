@@ -14,10 +14,25 @@ MapViewport::MapViewport(MapSource* mapSource, int zoom, const Vector2d& origin)
 	SetZoom(zoom);
 }
 
+MapViewport::MapViewport(const MapViewport& vp) :
+mMapSource(vp.mMapSource), mZoom(vp.mZoom), mMapSize(vp.mMapSize), mOrigin(vp.mOrigin), mViewDimension(vp.mViewDimension)
+{
+
+}
+
 void MapViewport::SetViewDimension(int width, int height)
 {
 	mViewDimension.Set({width, height});
 	CheckOrigin();
+}
+
+void MapViewport::SetView(const Area& view)
+{
+	mViewDimension.Set({0, 0});
+	mOrigin.Set({0, 0});
+	SetOrigin(LocationToPixel(view.GetNorthWest()));
+	Vector2d br = LocationToPixel(view.GetSouthEast());
+	SetViewDimension(std::ceil(br.GetX()), std::ceil(br.GetY()));
 }
 
 void MapViewport::SetOrigin(const Vector2d& origin)

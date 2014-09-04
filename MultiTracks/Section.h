@@ -10,6 +10,7 @@ namespace mt {
 
 class MapObjectContainer;
 class Location;
+class Area;
 
 class Section : public Component
 {
@@ -48,16 +49,7 @@ public:
 	static Section* LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* container = nullptr);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc) const;
 
-	/*public Area getBoundingRect()
-	{
-		Area area = null;
-		for(Location l : mLocations)
-		{
-			if(area == null) area = new Area(l);
-			else area.include(l);
-		}
-		return area;
-	}*/
+	Area GetBoundingBox() const;
 
 private:
 	LocationList mLocations;

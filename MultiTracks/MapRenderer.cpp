@@ -28,8 +28,7 @@ std::shared_ptr<Gdiplus::Bitmap> MapRenderer::Draw() const
 	MapViewport* view = mMap->GetViewport();
 	std::shared_ptr<Gdiplus::Bitmap> bitmap = std::make_shared<Gdiplus::Bitmap>(view->GetWidth(), view->GetHeight());
 	Gdiplus::Graphics* g = Gdiplus::Graphics::FromImage(bitmap.get());
-	mMap->PreloadTiles();
-	InternalDraw(g);
+	InternalDraw(g, true);
 	delete g;
 	return bitmap;
 }
@@ -43,7 +42,7 @@ void MapRenderer::Draw(Gdiplus::Graphics* g) const
 	SelectObject(hMemDC, hMemBitmap);
 
 	Gdiplus::Graphics gMem(hMemDC);
-	InternalDraw(&gMem);
+	InternalDraw(&gMem, false);
 
 	BitBlt(hDC, 0, 0, view->GetWidth(), view->GetHeight(), hMemDC, 0, 0, SRCCOPY);
 	g->ReleaseHDC(hDC);
@@ -52,11 +51,12 @@ void MapRenderer::Draw(Gdiplus::Graphics* g) const
 	DeleteDC(hMemDC);
 }
 
-void MapRenderer::InternalDraw(Gdiplus::Graphics* g) const
+void MapRenderer::InternalDraw(Gdiplus::Graphics* g, bool synchonous) const
 {
 	g->SetSmoothingMode(Gdiplus::SmoothingMode::SmoothingModeHighQuality);
 	Gdiplus::GraphicsState state = g->Save();
-	mMap->Draw(g);
+	if(synchonous) mMap->SyncDraw(g);
+	else mMap->Draw(g);
 	g->Restore(state);
 
 	for(Entity* entity : mEntities)

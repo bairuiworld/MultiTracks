@@ -5,6 +5,11 @@
 #include <numeric>
 #include "Vector.h"
 
+#pragma push_macro("max")
+#pragma push_macro("min")
+#undef min
+#undef max
+
 namespace mt
 {
 
@@ -16,6 +21,14 @@ public:
 
 	void Add(const Vector<T, 2>& v);
 	void Add(T x, T y);
+
+	T GetTop() const { return mTop; }
+	T GetLeft() const { return mLeft; }
+	T GetBottom() const { return mBottom; }
+	T GetRight() const { return mRight; }
+
+	Vector<T, 2> GetTopLeft() const;
+	Vector<T, 2> GetBottomRight() const;
 
 	bool IsInside(const Vector<T, 2>& v);
 	bool IsInside(T x, T y);
@@ -43,10 +56,22 @@ void BoundingBox<T>::Add(const Vector<T, 2>& v)
 template <class T>
 void BoundingBox<T>::Add(T x, T y)
 {
-	mTop = std::min(mTop, y);
-	mLeft = std::min(mLeft, x);
-	mBottom = std::max(mBottom, y);
-	mRight = std::max(mRight, x);
+	mTop = std::min(mTop, y - mPadding);
+	mLeft = std::min(mLeft, x - mPadding);
+	mBottom = std::max(mBottom, y + mPadding);
+	mRight = std::max(mRight, x + mPadding);
+}
+
+template <class T>
+Vector<T, 2> BoundingBox<T>::GetTopLeft() const
+{
+	return Vector<T, 2>(mLeft, mTop);
+}
+
+template <class T>
+Vector<T, 2> BoundingBox<T>::GetBottomRight() const
+{
+	return Vector<T, 2>(mRight, mBottom);
 }
 
 template <class T>
@@ -58,12 +83,17 @@ bool BoundingBox<T>::IsInside(const Vector<T, 2>& v)
 template <class T>
 bool BoundingBox<T>::IsInside(T x, T y)
 {
-	return x >= mLeft - mPadding && x <= mRight + mPadding && y >= mTop - mPadding && y <= mBottom + mPadding;
+	return x >= mLeft && x <= mRight && y >= mTop && y <= mBottom;
 }
 
 template <class T>
 void BoundingBox<T>::SetPadding(T padding)
 {
+	T delta = padding - mPadding;
+	mTop -= delta;
+	mLeft -= delta;
+	mBottom += delta;
+	mRight += delta;
 	mPadding = padding;
 }
 
@@ -77,5 +107,8 @@ void BoundingBox<T>::Clear()
 }
 
 }
+
+#pragma pop_macro("min")
+#pragma pop_macro("max")
 
 #endif // !__MULTITRACKS_BOUNDINGBOX_H__

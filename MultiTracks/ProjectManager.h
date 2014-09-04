@@ -47,6 +47,8 @@ public:
 	bool LoadProject(std::string filename);
 	void UnloadProject();
 
+	void ExportTrackOnMap(Track* track);
+
 private:
 	void OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode);
 	void OnTreeClick(ww::TreeNode* node, ww::MouseEvent ev);

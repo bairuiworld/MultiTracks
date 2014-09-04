@@ -30,6 +30,8 @@ public:
 	
 	sig::Signal<void(Tile*)> SignalReady;
 
+	void Dispose() { mDispose = true; }
+
 private:
 	void DownloadTask();
 	static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
@@ -42,6 +44,7 @@ private:
 	std::shared_ptr<TaskResult<void>> mTask;
 	std::mutex loaded_mutex;
 	static std::mutex devil_mutex;
+	bool mDispose;
 };
 
 }

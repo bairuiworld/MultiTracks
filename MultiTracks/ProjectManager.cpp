@@ -5,6 +5,8 @@
 #include "ProjectManager.h"
 
 #include "MapRenderer.h"
+#include "Map.h"
+#include "MapViewport.h"
 
 namespace mt
 {
@@ -88,6 +90,13 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 		menu.AddItem("Importer une trace...", std::bind(&ProjectManager::ImportTrack, this, node));
 		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 	}
+	else if(node->GetType() == ProjectNodeType::Track)
+	{
+		ww::PopupMenu menu;
+		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
+		menu.AddItem("Expoter sur une carte...", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+	}
 }
 
 void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
@@ -107,6 +116,14 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 			trackNode->EnsureVisible();
 		}
 	}
+}
+
+void ProjectManager::ExportTrackOnMap(Track* track)
+{
+	MapViewport* vp = mRenderer->GetMap()->GetViewport();
+	Area area = track->GetBoundingBox();
+	vp->SetView(area);
+	mRenderer->Save(L"a.jpg", ImageFormat::jpeg);
 }
 
 }

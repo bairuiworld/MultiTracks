@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "Area.h"
 #include "tinyxml2.h"
 #include "MapObjectContainer.h"
 #include "Component.h"
@@ -28,6 +29,8 @@ public:
 	std::vector<double> GetElevationProfile() const;
 
 	double GetLength() const;
+
+	Area GetBoundingBox() const;
 
 	static Track* LoadXML(tinyxml2::XMLElement* element, Track* parent = nullptr);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);

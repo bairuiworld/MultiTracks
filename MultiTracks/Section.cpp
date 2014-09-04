@@ -1,6 +1,7 @@
 #include <iterator>
 #include "Location.h"
 #include "MapObjectContainer.h"
+#include "Area.h"
 #include "Section.h"
 
 namespace mt {
@@ -142,6 +143,14 @@ double Section::GetLength() const
 		prev = &l;
 	}
 	return len;
+}
+
+Area Section::GetBoundingBox() const
+{
+	Area area;
+	for(const Location& l : mLocations)
+		area.Include(l);
+	return area;
 }
 
 Section* Section::LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* container)

@@ -27,8 +27,8 @@ Tile* Map::GetTile(const Vector3i& coord, bool download)
 	if(it == mCache.end())
 	{
 		Tile* tile = new Tile(coord, mMapSource);
-		if(download)
-			tile->Download(true);
+		if(!download) return tile;
+		tile->Download(true);
 		if(mCache.size() >= mCacheSize)
 		{
 			Tile* lessUsed = mCacheUsage.back();
@@ -79,7 +79,7 @@ void Map::Draw(Gdiplus::Graphics* g)
 	}
 }
 
-void Map::PreloadTiles()
+void Map::SyncDraw(Gdiplus::Graphics* g)
 {
 	Vector3i northWestTile = mMapViewport->GetNorthWestTileCoordinate();
 	Vector3i southEastTile = mMapViewport->GetSouthEastTileCoordinate();
@@ -97,7 +97,7 @@ void Map::PreloadTiles()
 		for(int j = 0; j<yTileCount; j++)
 		{
 			Vector3i coord(northWestTile.GetX() + i, northWestTile.GetY() + j, mMapViewport->GetZoom());
-			Tile* tile = GetTile(coord);
+			Tile* tile = GetTile(coord, false);
 			if(!tile->IsLoaded())
 			{
 				{
@@ -106,15 +106,25 @@ void Map::PreloadTiles()
 				}
 				tile->Download(true);
 
-				tile->SignalReady += [this, &count_lock, &tileLeft, &cv](Tile* tile) {
+				tile->SignalReady += [this, &count_lock, &tileLeft, &cv, &origin, g, i, j](Tile* tile) {
 					std::lock_guard<std::mutex> lock(count_lock);
+					/*Gdiplus::Image* im = tile->GetImage();
+					if(im)
+						g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());*/
 					tileLeft--;
+					tile->Dispose();
 					if(tileLeft <= 0)
 						cv.notify_all();
-
-					std::lock_guard<std::mutex> siglock(signal_mutex);
-					SignalNewTile.emit();
 				};
+			}
+			else
+			{
+				Gdiplus::Image* im = tile->GetImage();
+				if(im)
+				{
+					//std::lock_guard<std::mutex> lock(count_lock);
+					g->DrawImage(im, origin.GetX() + i*mMapSource->GetTileSize(), origin.GetY() + j*mMapSource->GetTileSize());
+				}
 			}
 		}
 	}

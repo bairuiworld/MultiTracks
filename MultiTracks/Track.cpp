@@ -67,6 +67,14 @@ double Track::GetLength() const
 	return len;
 }
 
+Area Track::GetBoundingBox() const
+{
+	Area area;
+	for(Section* s : mSections)
+		area.Include(s->GetBoundingBox());
+	return area;
+}
+
 Track* Track::LoadXML(tinyxml2::XMLElement* element, Track* parent)
 {
 	Track* track = new Track(parent);

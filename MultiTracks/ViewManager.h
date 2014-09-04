@@ -10,6 +10,7 @@ namespace mt
 class Map;
 class WindowMapRenderer;
 class Track;
+class ProjectManager;
 
 class ViewManager
 {
@@ -25,6 +26,7 @@ private:
 	Map* mMap;
 	WindowMapRenderer* mMapRenderer;
 	ww::TreeView* mProjectTree;
+	ProjectManager* mProjectManager;
 
 	Track* mDisplayedTrack;
 };

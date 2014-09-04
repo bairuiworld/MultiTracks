@@ -21,6 +21,8 @@ public:
 	MapRenderer(Map* map);
 	virtual ~MapRenderer();
 
+	Map* GetMap() { return mMap; }
+
 	std::shared_ptr<Gdiplus::Bitmap> Draw() const;
 	void Draw(Gdiplus::Graphics* g) const;
 	void Save(const wchar_t* filename, ImageFormat imformat = ImageFormat::jpeg) const;
@@ -30,7 +32,7 @@ public:
 	void RemoveComponent(Component* component);
 
 protected:
-	void InternalDraw(Gdiplus::Graphics* g) const;
+	void InternalDraw(Gdiplus::Graphics* g, bool synchronous) const;
 
 protected:
 	Map* mMap;
