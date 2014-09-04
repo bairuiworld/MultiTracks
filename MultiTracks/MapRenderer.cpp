@@ -94,7 +94,7 @@ int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
 	return -1;  // Failure
 }
 
-void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
+void MapRenderer::Save(std::string filename, ImageFormat imformat) const
 {
 	const wchar_t* format = nullptr;
 	switch(imformat)
@@ -105,10 +105,10 @@ void MapRenderer::Save(const wchar_t* filename, ImageFormat imformat) const
 	case ImageFormat::gif:  format = L"image/gif"; break;
 	case ImageFormat::tiff:  format = L"image/tiff"; break;
 	}
-
+	std::wstring wfilename(filename.begin(), filename.end());
 	CLSID clsid;
 	GetEncoderClsid(format, &clsid);
-	Draw()->Save(filename, &clsid, NULL);
+	Draw()->Save(wfilename.c_str(), &clsid, NULL);
 }
 
 void MapRenderer::RemoveComponent(Component* component)

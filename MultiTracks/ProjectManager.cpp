@@ -101,7 +101,7 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 
 void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 {
-	ww::FileDialog opendialog("Trace GPS (*.gpx)\0*.gpx\0", GetParent(mProjectTree->GetHandle()));
+	ww::FileDialog opendialog("Trace GPS (*.gpx)\0*.gpx\0", "gpx", GetParent(mProjectTree->GetHandle()));
 	if(opendialog.Open())
 	{
 		Track* track = GPX::Load(opendialog.GetFileName().c_str());
@@ -120,11 +120,14 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 
 void ProjectManager::ExportTrackOnMap(Track* track)
 {
+	ww::FileDialog savedlg("JPEG image (*.jpg)\0*.jpg\0", "jpg", GetParent(mProjectTree->GetHandle()));
+	if(!savedlg.Save()) return;
 	MapViewport* vp = mRenderer->GetMap()->GetViewport();
 	MapViewport save(*vp);
 	Area area = track->GetBoundingBox();
 	vp->SetView(area);
-	mRenderer->Save(L"a.jpg", ImageFormat::jpeg);
+	std::cout << savedlg.GetFileName() << std::endl;
+	mRenderer->Save(savedlg.GetFileName(), ImageFormat::jpeg);
 	vp->SetOrigin(save.GetOrigin());
 	vp->SetViewDimension(save.GetWidth(), save.GetHeight());
 }

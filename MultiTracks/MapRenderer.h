@@ -25,7 +25,7 @@ public:
 
 	std::shared_ptr<Gdiplus::Bitmap> Draw() const;
 	void Draw(Gdiplus::Graphics* g) const;
-	void Save(const wchar_t* filename, ImageFormat imformat = ImageFormat::jpeg) const;
+	void Save(std::string filename, ImageFormat imformat = ImageFormat::jpeg) const;
 
 	template <class T>
 	void AddComponent(T* component);
