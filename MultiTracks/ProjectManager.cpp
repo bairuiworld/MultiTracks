@@ -87,14 +87,16 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 	if(node->GetType() == ProjectNodeType::Group)
 	{
 		ww::PopupMenu menu;
-		menu.AddItem("Importer une trace...", std::bind(&ProjectManager::ImportTrack, this, node));
+		menu.AddItem("Importer une trace", std::bind(&ProjectManager::ImportTrack, this, node));
 		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 	}
 	else if(node->GetType() == ProjectNodeType::Track)
 	{
 		ww::PopupMenu menu;
 		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
-		menu.AddItem("Expoter sur une carte...", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+		//menu.AddItem("Changer la couleur", )
+		menu.AddItem("Expoter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+		menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
 		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 	}
 }
@@ -107,6 +109,7 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 		Track* track = GPX::Load(opendialog.GetFileName().c_str());
 		if(track)
 		{
+			track->GetProperties().Set("color", (int)Gdiplus::Color::Blue).Set("linewidth", 4.f);
 			mProject->AddTrack(track, groupNode->GetText());
 			mProject->Save();
 			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName(), track);
@@ -130,6 +133,13 @@ void ProjectManager::ExportTrackOnMap(Track* track)
 	mRenderer->Save(savedlg.GetFileName(), ImageFormat::jpeg);
 	vp->SetOrigin(save.GetOrigin());
 	vp->SetViewDimension(save.GetWidth(), save.GetHeight());
+}
+
+void ProjectManager::CenterTrack(Track* track)
+{
+	Area area = track->GetBoundingBox();
+	mRenderer->GetMap()->GetViewport()->FitToArea(area);
+	mRenderer->Invalidate();
 }
 
 }

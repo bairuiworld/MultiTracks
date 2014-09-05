@@ -35,6 +35,10 @@ public:
 
 	double GetDistance(const Vector<T, N>& rhs) const;
 
+	Vector<T, N> operator +(const Vector<T, N>& rhs) const;
+	void operator +=(const Vector<T, N>& rhs);
+	Vector<T, N> operator *(T value) const;
+
 	void operator +=(std::initializer_list<T> l);
 
 	bool operator ==(const Vector<T, N>& rhs) const;
@@ -162,6 +166,30 @@ double Vector<T, N>::GetDistance(const Vector<T, N>& rhs) const
 	for(int i(0); i<N; i++)
 		d += SQ(mValues[i] - rhs.mValues[i]);
 	return std::sqrt(d);
+}
+
+template <class T, int N>
+Vector<T, N> Vector<T, N>::operator +(const Vector<T, N>& rhs) const
+{
+	Vector<T, N> v(*this);
+	v += rhs;
+	return v;
+}
+
+template <class T, int N>
+void Vector<T, N>::operator +=(const Vector<T, N>& rhs)
+{
+	for(int i = 0; i<N; i++)
+		mValues[i] += rhs.mValues[i];
+}
+
+template <class T, int N>
+Vector<T, N> Vector<T, N>::operator *(T value) const
+{
+	Vector<T, N> v;
+	for(int i = 0; i<N; i++)
+		v.mValues[i] = value*mValues[i];
+	return v;
 }
 
 template <class T, int N>

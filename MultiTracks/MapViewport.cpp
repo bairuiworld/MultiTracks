@@ -32,7 +32,27 @@ void MapViewport::SetView(const Area& view)
 	mOrigin.Set({0, 0});
 	SetOrigin(LocationToPixel(view.GetNorthWest()));
 	Vector2d br = LocationToPixel(view.GetSouthEast());
-	SetViewDimension(std::ceil(br.GetX()), std::ceil(br.GetY()));
+	SetViewDimension(static_cast<int>(std::ceil(br.GetX())), static_cast<int>(std::ceil(br.GetY())));
+}
+
+void MapViewport::FitToArea(const Area& area)
+{
+	for(int z = 18; z>0; z--)
+	{
+		double ratio = static_cast<int>(std::pow(2, z)*mMapSource->GetTileSize())/(2*M_PI);
+		int mapSize = static_cast<int>(std::pow(2, z)*mMapSource->GetTileSize());
+		Vector2d nw(ratio*toRadians(area.GetNorthWest().GetLongitude()) + mapSize/2,
+					mapSize/2 - ratio*std::log(std::tan(M_PI/4 + toRadians(area.GetNorthWest().GetLatitude())/2)));
+		Vector2d se(ratio*toRadians(area.GetSouthEast().GetLongitude()) + mapSize/2,
+					mapSize/2 - ratio*std::log(std::tan(M_PI/4 + toRadians(area.GetSouthEast().GetLatitude())/2)));
+		if(se.GetX() - nw.GetX() <= mViewDimension.GetX() && se.GetY() - nw.GetY() <= mViewDimension.GetY())
+		{
+			SetZoom(z, {0, 0});
+			mOrigin = (se + nw)*.5;
+			mOrigin += {-(double)mViewDimension.GetX()/2, -(double)mViewDimension.GetY()/2};
+			return;
+		}
+	}
 }
 
 void MapViewport::SetOrigin(const Vector2d& origin)

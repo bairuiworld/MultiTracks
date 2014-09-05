@@ -55,6 +55,7 @@ private:
 
 	void LoadProjectTree();
 	void ImportTrack(ProjectTreeNodeBase* groupNode);
+	void CenterTrack(Track* track);
 
 private:
 	Project* mProject;

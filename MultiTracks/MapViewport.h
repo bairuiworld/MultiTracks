@@ -21,6 +21,7 @@ public:
 	int GetHeight() const { return mViewDimension.GetY(); }
 
 	void SetView(const Area& view);
+	void FitToArea(const Area& view);
 
 	Vector2d GetOrigin() const { return mOrigin; }
 	void SetOrigin(const Vector2d& origin);
