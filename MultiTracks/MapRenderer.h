@@ -43,7 +43,7 @@ class WindowMapRenderer : public MapRenderer, public ww::DrawingArea
 {
 public:
 	WindowMapRenderer(Map* map);
-	virtual ~WindowMapRenderer() = default;
+	virtual ~WindowMapRenderer();
 
 protected:
 	void InvalidateEntities();
@@ -57,6 +57,7 @@ protected:
 	virtual void OnMouseClick(ww::MouseEvent ev);
 
 protected:
+	int mNewTileId;
 	ComponentSelector mSelector;
 	Component* mHoverComponent;
 };

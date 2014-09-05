@@ -33,7 +33,15 @@ Track* GPX::Load(const char* filename)
 			Location loc(lat, lon);
 			tinyxml2::XMLElement* eleElt = wayPoint->FirstChildElement("ele");
 			if(eleElt != nullptr)
-				loc.SetElevation(std::stod(eleElt->GetText()));
+			{
+				const char* txt = eleElt->GetText();
+				try
+				{
+					double d = std::stod(txt);
+					loc.SetElevation(d);
+				}
+				catch(...) {}
+			}
 			section->Add(loc);
 			wayPoint = wayPoint->NextSiblingElement();
 		}

@@ -123,11 +123,16 @@ void MapRenderer::RemoveComponent(Component* component)
 WindowMapRenderer::WindowMapRenderer(Map* map) :
 MapRenderer(map), mSelector(map->GetViewport(), 5), mHoverComponent(nullptr)
 {
-	mMap->SignalNewTile += [this]()
+	mNewTileId = mMap->SignalNewTile += [this]()
 	{ 
 		if(mParent)
 			mParent->Invalidate();
 	};
+}
+
+WindowMapRenderer::~WindowMapRenderer()
+{
+	mMap->SignalNewTile -= mNewTileId;
 }
 
 void WindowMapRenderer::InvalidateEntities()
