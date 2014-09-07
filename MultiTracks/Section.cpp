@@ -101,9 +101,12 @@ double Section::GetPositiveElevation() const
 	for(++it; it != mLocations.end(); it++)
 	{
 		double e = (*it).GetElevation();
-		if(e > elev)
-			d += e - elev;
-		elev = e;
+		if(std::abs(e - elev) > 10)
+		{
+			if(e > elev)
+				d += e - elev;
+			elev = e;
+		}
 	}
 	return d;
 }
@@ -117,9 +120,12 @@ double Section::GetNegativeElevation() const
 	for(++it; it != mLocations.end(); it++)
 	{
 		double e = (*it).GetElevation();
-		if(e < elev)
-			d += elev - e;
-		elev = e;
+		if(std::abs(e - elev) > 10)
+		{
+			if(e < elev)
+				d += elev - e;
+			elev = e;
+		}
 	}
 	return d;
 }

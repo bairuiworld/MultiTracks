@@ -20,7 +20,7 @@ public:
 	int GetWidth() const { return mViewDimension.GetX(); }
 	int GetHeight() const { return mViewDimension.GetY(); }
 
-	void SetView(const Area& view);
+	void SetView(const Area& view, int padding = 0);
 	void FitToArea(const Area& view);
 
 	Vector2d GetOrigin() const { return mOrigin; }

@@ -26,13 +26,14 @@ void MapViewport::SetViewDimension(int width, int height)
 	CheckOrigin();
 }
 
-void MapViewport::SetView(const Area& view)
+void MapViewport::SetView(const Area& view, int padding)
 {
 	mViewDimension.Set({0, 0});
 	mOrigin.Set({0, 0});
 	SetOrigin(LocationToPixel(view.GetNorthWest()));
+	mOrigin += {-(double)padding, -(double)padding};
 	Vector2d br = LocationToPixel(view.GetSouthEast());
-	SetViewDimension(static_cast<int>(std::ceil(br.GetX())), static_cast<int>(std::ceil(br.GetY())));
+	SetViewDimension(static_cast<int>(std::ceil(br.GetX())) + 2*padding, static_cast<int>(std::ceil(br.GetY())) + 2*padding);
 }
 
 void MapViewport::FitToArea(const Area& area)

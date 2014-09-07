@@ -109,6 +109,9 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 		Track* track = GPX::Load(opendialog.GetFileName().c_str());
 		if(track)
 		{
+			std::cout << "Distance: " << track->GetLength() << " km" << std::endl;
+			std::cout << "D+ : " << track->GetPositiveElevation() << " m" << std::endl;
+			std::cout << "D- : " << track->GetNegativeElevation() << " m" << std::endl;
 			track->GetProperties().Set("color", (int)Gdiplus::Color::Blue).Set("linewidth", 4.f);
 			mProject->AddTrack(track, groupNode->GetText());
 			mProject->Save();
@@ -128,7 +131,7 @@ void ProjectManager::ExportTrackOnMap(Track* track)
 	MapViewport* vp = mRenderer->GetMap()->GetViewport();
 	MapViewport save(*vp);
 	Area area = track->GetBoundingBox();
-	vp->SetView(area);
+	vp->SetView(area, 20);
 	std::cout << savedlg.GetFileName() << std::endl;
 	mRenderer->Save(savedlg.GetFileName(), ImageFormat::jpeg);
 	vp->SetOrigin(save.GetOrigin());
