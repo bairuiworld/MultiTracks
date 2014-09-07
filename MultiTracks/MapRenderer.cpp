@@ -117,7 +117,10 @@ void MapRenderer::RemoveComponent(Component* component)
 		return e->GetComponent() == component;
 	});
 	if(it != mEntities.end())
+	{
+		delete *it;
 		mEntities.erase(it);
+	}
 }
 
 WindowMapRenderer::WindowMapRenderer(Map* map) :

@@ -25,7 +25,7 @@ mDisplayedTrack(nullptr)
 	
 	mProjectTree = new ww::TreeView;
 	mMapRenderer->Add(mProjectTree);
-	mProjectTree->SetBounds({0, 0, 200, 200});
+	mProjectTree->SetBounds({10, 10, 250, 350});
 
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
 	mProjectManager->LoadProject("projet.txt");

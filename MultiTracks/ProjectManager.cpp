@@ -16,6 +16,8 @@ mProject(nullptr), mRenderer(renderer), mProjectTree(projectTree)
 {
 	mProjectTree->SignalSelChanged += sig::slot(this, &ProjectManager::OnSelChanged);
 	mProjectTree->SignalItemClick += sig::slot(this, &ProjectManager::OnTreeClick);
+	mProjectTree->SignalBeginLabelEdit += sig::slot(this, &ProjectManager::OnBeginLabelEdit);
+	mProjectTree->SignalEndLabelEdit += sig::slot(this, &ProjectManager::OnEndLabelEdit);
 }
 
 ProjectManager::~ProjectManager()
@@ -99,6 +101,27 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 		menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
 		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 	}
+}
+
+void ProjectManager::OnBeginLabelEdit(ww::TreeNode* node_, std::string& text)
+{
+	ProjectTreeNodeBase* node = reinterpret_cast<ProjectTreeNodeBase*>(node_);
+	if(node->GetType() == ProjectNodeType::Track)
+	{
+		int pos = text.find_last_of('(');
+		text.erase(pos - 1, std::string::npos);
+	}
+}
+
+bool ProjectManager::OnEndLabelEdit(ww::TreeNode* node_, std::string& text)
+{
+	ProjectTreeNodeBase* node = reinterpret_cast<ProjectTreeNodeBase*>(node_);
+	if(node->GetType() == ProjectNodeType::Track)
+	{
+		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
+		text += " (" + std::to_string((int)std::round(track->GetLength())) + " km)";
+	}
+	return true;
 }
 
 void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)

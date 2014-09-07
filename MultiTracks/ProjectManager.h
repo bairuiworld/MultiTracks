@@ -52,6 +52,8 @@ public:
 private:
 	void OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode);
 	void OnTreeClick(ww::TreeNode* node, ww::MouseEvent ev);
+	void OnBeginLabelEdit(ww::TreeNode* node, std::string& text);
+	bool OnEndLabelEdit(ww::TreeNode* node, std::string& text);
 
 	void LoadProjectTree();
 	void ImportTrack(ProjectTreeNodeBase* groupNode);
