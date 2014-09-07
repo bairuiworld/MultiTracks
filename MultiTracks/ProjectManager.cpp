@@ -47,7 +47,7 @@ void ProjectManager::LoadProjectTree()
 	{
 		ww::TreeNode* groupNode = new ProjectTreeNodeBase(group, ProjectNodeType::Group);
 		for(Track* track : mProject->GetTracks(group))
-			groupNode->AddNode(new ProjectTreeNode<Track>(track->GetName(), track));
+			groupNode->AddNode(new ProjectTreeNode<Track>(track->GetName() + " (" + std::to_string((int)std::round(track->GetLength())) + " km)", track));
 		projectNode->AddNode(groupNode);
 	}
 	mProjectTree->AddNode(projectNode);
@@ -115,7 +115,7 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 			track->GetProperties().Set("color", (int)Gdiplus::Color::Blue).Set("linewidth", 4.f);
 			mProject->AddTrack(track, groupNode->GetText());
 			mProject->Save();
-			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName(), track);
+			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName() + " (" + std::to_string((int)std::round(track->GetLength())) + " km)", track);
 			groupNode->AddNode(trackNode);
 			trackNode->Select();
 			SignalSelectTrack.emit(track);
