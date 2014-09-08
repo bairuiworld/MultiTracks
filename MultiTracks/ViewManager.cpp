@@ -4,6 +4,7 @@
 #include "MapSource.h"
 #include "MapViewport.h"
 #include "Track.h"
+#include "EditMode.h"
 #include "ViewManager.h"
 
 #include <iostream>
@@ -13,7 +14,7 @@ namespace mt
 {
 
 ViewManager::ViewManager() :
-mDisplayedTrack(nullptr)
+mDisplayedTrack(nullptr), mEditMode(nullptr)
 {
 	mWindow = new ww::Window("MultiTracks");
 	mWindow->SetLayout(new ww::FillLayout);
@@ -30,10 +31,14 @@ mDisplayedTrack(nullptr)
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
 	mProjectManager->LoadProject("projet.txt");
 	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
+	mProjectManager->SignalEditTrack += sig::slot(this, &ViewManager::OnEditTrack);
+
+	mMapRenderer->SignalMapClick += sig::slot(this, &ViewManager::OnMapClick);
 }
 
 ViewManager::~ViewManager()
 {
+	delete mEditMode;
 	delete mWindow;
 	delete mMap;
 	delete mProjectManager;
@@ -46,6 +51,26 @@ void ViewManager::OnTrackSelect(Track* track)
 	mDisplayedTrack = track;
 	mMapRenderer->AddComponent(mDisplayedTrack);
 	mMapRenderer->Invalidate();
+}
+
+bool ViewManager::OnEditTrack(Track* track)
+{
+	delete mEditMode;
+	if(mDisplayedTrack == track)
+	{
+		mMapRenderer->RemoveComponent(mDisplayedTrack);
+		mDisplayedTrack = nullptr;
+	}
+	mEditMode = new TrackEditMode(mMapRenderer, track);
+	return true;
+}
+
+void ViewManager::OnMapClick(ww::MouseEvent ev, const Location& location)
+{
+	if(ev.GetButton() != ww::MouseButton::Left || ev.GetClicks() != 1) return;
+	if(mEditMode)
+		mEditMode->AppendLocation(location);
+
 }
 
 }

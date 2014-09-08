@@ -12,7 +12,7 @@ namespace mt
 {
 
 ProjectManager::ProjectManager(mt::WindowMapRenderer* renderer, ww::TreeView* projectTree) :
-mProject(nullptr), mRenderer(renderer), mProjectTree(projectTree)
+mProject(nullptr), mRenderer(renderer), mProjectTree(projectTree), mActiveNode(nullptr)
 {
 	mProjectTree->SignalSelChanged += sig::slot(this, &ProjectManager::OnSelChanged);
 	mProjectTree->SignalItemClick += sig::slot(this, &ProjectManager::OnTreeClick);
@@ -83,23 +83,34 @@ void ProjectManager::OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode)
 
 void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 {
-	if(ev.GetButton() != ww::MouseButton::Right) return;
-	if(ev.GetClicks() != 1) return;
 	ProjectTreeNodeBase* node = reinterpret_cast<ProjectTreeNodeBase*>(node_);
-	if(node->GetType() == ProjectNodeType::Group)
+	if(ev.GetButton() == ww::MouseButton::Right && ev.GetClicks() == 1)
 	{
-		ww::PopupMenu menu;
-		menu.AddItem("Importer une trace", std::bind(&ProjectManager::ImportTrack, this, node));
-		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+		if(node->GetType() == ProjectNodeType::Group)
+		{
+			ww::PopupMenu menu;
+			menu.AddItem("Importer une trace", std::bind(&ProjectManager::ImportTrack, this, node));
+			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+		}
+		else if(node->GetType() == ProjectNodeType::Track)
+		{
+			ww::PopupMenu menu;
+			Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
+			menu.AddItem("Expoter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+			menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
+			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+		}
 	}
-	else if(node->GetType() == ProjectNodeType::Track)
+	else if(ev.GetButton() == ww::MouseButton::Left && ev.GetClicks() == 2 && node->GetType() == ProjectNodeType::Track)
 	{
-		ww::PopupMenu menu;
 		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
-		//menu.AddItem("Changer la couleur", )
-		menu.AddItem("Expoter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
-		menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
-		menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+		if(SignalEditTrack.emit(track))
+		{
+			if(mActiveNode)
+				mActiveNode->SetState(ww::TreeNodeState::Bold, false);
+			mActiveNode = node;
+			mActiveNode->SetState(ww::TreeNodeState::Bold, true);
+		}
 	}
 }
 

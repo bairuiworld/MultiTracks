@@ -29,7 +29,7 @@ public:
 
 	template <class T>
 	void AddComponent(T* component);
-	void RemoveComponent(Component* component);
+	void RemoveComponent(const Component* component);
 
 protected:
 	void InternalDraw(Gdiplus::Graphics* g, bool synchronous) const;
@@ -60,6 +60,11 @@ protected:
 	int mNewTileId;
 	ComponentSelector mSelector;
 	Component* mHoverComponent;
+
+public:
+	sig::Signal<void(ww::MouseEvent, const Location&)> SignalMapClick;
+	sig::Signal<void(ww::MouseEvent, Section*)> SignalSectionClick;
+	sig::Signal<void(ww::MouseEvent, Section*, const Location&)> SignalSectionEndClick;
 };
 
 template <class T>

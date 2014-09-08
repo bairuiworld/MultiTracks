@@ -64,8 +64,11 @@ private:
 	mt::WindowMapRenderer* mRenderer;
 	ww::TreeView* mProjectTree;
 
+	ww::TreeNode* mActiveNode;
+
 public:
 	sig::Signal<void(Track*)> SignalSelectTrack;
+	sig::Signal<bool(Track*)> SignalEditTrack;
 };
 
 }

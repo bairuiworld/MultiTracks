@@ -111,7 +111,7 @@ void MapRenderer::Save(std::string filename, ImageFormat imformat) const
 	Draw()->Save(wfilename.c_str(), &clsid, NULL);
 }
 
-void MapRenderer::RemoveComponent(Component* component)
+void MapRenderer::RemoveComponent(const Component* component)
 {
 	auto it = std::find_if(mEntities.begin(), mEntities.end(), [component](Entity* e) {
 		return e->GetComponent() == component;
@@ -157,7 +157,11 @@ void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 
 void WindowMapRenderer::OnMouseClick(ww::MouseEvent ev)
 {
-
+	if(!mHoverComponent)
+	{
+		Vector2d pixel{(double)ev.GetPoint().x, (double)ev.GetPoint().y};
+		SignalMapClick.emit(ev, mMap->GetViewport()->PixelToLocation(pixel));
+	}
 }
 
 void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)

@@ -3,6 +3,7 @@
 
 #include "TreeView.h"
 #include "Window.h"
+#include "Location.h"
 
 namespace mt
 {
@@ -11,6 +12,7 @@ class Map;
 class WindowMapRenderer;
 class Track;
 class ProjectManager;
+class EditMode;
 
 class ViewManager
 {
@@ -20,6 +22,9 @@ public:
 
 private:
 	void OnTrackSelect(Track* track);
+	bool OnEditTrack(Track* track);
+
+	void OnMapClick(ww::MouseEvent ev, const Location& location);
 
 private:
 	ww::Window* mWindow;
@@ -29,6 +34,7 @@ private:
 	ProjectManager* mProjectManager;
 
 	Track* mDisplayedTrack;
+	EditMode* mEditMode;
 };
 
 }

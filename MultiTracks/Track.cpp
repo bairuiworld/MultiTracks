@@ -23,6 +23,21 @@ Track* Track::NewAlternative()
 	return alt;
 }
 
+const Location* Track::GetFirstLocation() const
+{
+	return mSections.front()->GetFirstLocation();
+}
+
+const Location* Track::GetLastLocation() const
+{
+	return mSections.back()->GetLastLocation();
+}
+
+Section* Track::GetLastSection()
+{
+	return mSections.back();
+}
+
 double Track::GetElevationDifference() const
 {
 	if(mSections.size() <= 1) return 0;

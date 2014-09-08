@@ -23,6 +23,10 @@ public:
 	Track* NewAlternative();
 	const std::vector<Track*>& GetAlternatives() const { return mAlternatives; }
 
+	const Location* GetFirstLocation() const;
+	const Location* GetLastLocation() const;
+	Section* GetLastSection();
+
 	double GetElevationDifference() const;
 	double GetPositiveElevation() const;
 	double GetNegativeElevation() const;
