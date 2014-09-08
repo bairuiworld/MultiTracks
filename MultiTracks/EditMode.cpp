@@ -20,9 +20,12 @@ EditMode(renderer), mTrack(track)
 	mTrack->GetProperties().Push()
 		.Set<int>("color", Gdiplus::Color::Magenta)
 		.Set("linewidth", 3.f);
-	const Location* end = mTrack->GetLastLocation();
 	mMapRenderer->AddComponent(mTrack);
-	mMapRenderer->AddComponent(end);
+	
+	const Location* end = mTrack->GetLastLocation();
+	if(end)
+		mMapRenderer->AddComponent(end);
+	
 	mMapRenderer->Invalidate();
 }
 
@@ -30,13 +33,15 @@ TrackEditMode::~TrackEditMode()
 {
 	mTrack->GetProperties().Pop();
 	mMapRenderer->RemoveComponent(mTrack);
-	mMapRenderer->RemoveComponent(mTrack->GetLastLocation());
+	const Location* end = mTrack->GetLastLocation();
+	if(end) mMapRenderer->RemoveComponent(end);
 	mMapRenderer->Invalidate();
 }
 
 void TrackEditMode::AppendLocation(const Location& location)
 {
-	mMapRenderer->RemoveComponent(mTrack->GetLastLocation());
+	const Location* end = mTrack->GetLastLocation();
+	if(end) mMapRenderer->RemoveComponent(end);
 	mTrack->GetLastSection()->Add(location);
 	mMapRenderer->AddComponent(mTrack->GetLastLocation());
 	mMapRenderer->Invalidate();

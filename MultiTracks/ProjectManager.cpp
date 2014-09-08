@@ -49,7 +49,7 @@ void ProjectManager::LoadProjectTree()
 	{
 		ww::TreeNode* groupNode = new ProjectTreeNodeBase(group, ProjectNodeType::Group);
 		for(Track* track : mProject->GetTracks(group))
-			groupNode->AddNode(new ProjectTreeNode<Track>(track->GetName() + " (" + std::to_string((int)std::round(track->GetLength())) + " km)", track));
+			groupNode->AddNode(new ProjectTreeNode<Track>(MakeTrackName(track), track));
 		projectNode->AddNode(groupNode);
 	}
 	mProjectTree->AddNode(projectNode);
@@ -89,6 +89,7 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 		if(node->GetType() == ProjectNodeType::Group)
 		{
 			ww::PopupMenu menu;
+			menu.AddItem("Ajouter une trace", std::bind(&ProjectManager::AddTrack, this, node));
 			menu.AddItem("Importer une trace", std::bind(&ProjectManager::ImportTrack, this, node));
 			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 		}
@@ -103,14 +104,7 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 	}
 	else if(ev.GetButton() == ww::MouseButton::Left && ev.GetClicks() == 2 && node->GetType() == ProjectNodeType::Track)
 	{
-		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
-		if(SignalEditTrack.emit(track))
-		{
-			if(mActiveNode)
-				mActiveNode->SetState(ww::TreeNodeState::Bold, false);
-			mActiveNode = node;
-			mActiveNode->SetState(ww::TreeNodeState::Bold, true);
-		}
+		EditTrack(reinterpret_cast<ProjectTreeNode<Track>*>(node_));
 	}
 }
 
@@ -135,6 +129,17 @@ bool ProjectManager::OnEndLabelEdit(ww::TreeNode* node_, std::string& text)
 	return true;
 }
 
+void ProjectManager::AddTrack(ProjectTreeNodeBase* groupNode)
+{
+	Track* track = new Track;
+	mProject->AddTrack(track, groupNode->GetText());
+	ProjectTreeNode<Track>* trackNode = new ProjectTreeNode<Track>(MakeTrackName(track), track);
+	groupNode->AddNode(trackNode);
+	trackNode->EnsureVisible();
+	trackNode->Edit();
+	EditTrack(trackNode);
+}
+
 void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 {
 	ww::FileDialog opendialog("Trace GPS (*.gpx)\0*.gpx\0", "gpx", GetParent(mProjectTree->GetHandle()));
@@ -149,7 +154,7 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 			track->GetProperties().Set("color", (int)Gdiplus::Color::Blue).Set("linewidth", 4.f);
 			mProject->AddTrack(track, groupNode->GetText());
 			mProject->Save();
-			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(track->GetName() + " (" + std::to_string((int)std::round(track->GetLength())) + " km)", track);
+			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(MakeTrackName(track), track);
 			groupNode->AddNode(trackNode);
 			trackNode->Select();
 			SignalSelectTrack.emit(track);
@@ -177,6 +182,34 @@ void ProjectManager::CenterTrack(Track* track)
 	Area area = track->GetBoundingBox();
 	mRenderer->GetMap()->GetViewport()->FitToArea(area);
 	mRenderer->Invalidate();
+}
+
+std::string ProjectManager::MakeTrackName(const Track* track) const
+{
+	return track->GetName() + " (" + std::to_string((int)std::round(track->GetLength())) + " km)";
+}
+
+void ProjectManager::EditCurrentTrack()
+{
+	ww::TreeNode* node = mProjectTree->GetSelectedNode();
+	EditTrack(reinterpret_cast<ProjectTreeNode<Track>*>(node));
+}
+
+void ProjectManager::EditTrack(ProjectTreeNode<Track>* trackNode)
+{
+	Track* track = trackNode->GetObject();
+	if(SignalEditTrack.emit(track))
+	{
+		if(mActiveNode)
+			mActiveNode->SetState(ww::TreeNodeState::Bold, false);
+		mActiveNode = trackNode;
+		mActiveNode->SetState(ww::TreeNodeState::Bold, true);
+	}
+}
+
+void ProjectManager::ReviewCurrentTrack()
+{
+
 }
 
 }

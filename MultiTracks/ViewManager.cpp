@@ -28,6 +28,21 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mMapRenderer->Add(mProjectTree);
 	mProjectTree->SetBounds({10, 10, 250, 350});
 
+	mEditButton = new ww::CheckBox("Edit", ww::CheckBoxStyle::PushLike);
+	mReviewButton = new ww::CheckBox("Review", ww::CheckBoxStyle::PushLike);
+	mMapRenderer->Add(mEditButton);
+	mMapRenderer->Add(mReviewButton);
+	mEditButton->Enable(false);
+	mReviewButton->Enable(false);
+	mEditButton->SetBounds({260, 10, 330, 70});
+	mReviewButton->SetBounds({340, 10, 410, 70});
+	mEditButton->SignalClicked += [this]() { 
+		if(mEditButton->IsChecked())
+			mProjectManager->EditCurrentTrack();
+		else
+			CloseEditMode();
+	};
+
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
 	mProjectManager->LoadProject("projet.txt");
 	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
@@ -46,6 +61,8 @@ ViewManager::~ViewManager()
 
 void ViewManager::OnTrackSelect(Track* track)
 {
+	mEditButton->Enable(true);
+	mReviewButton->Enable(true);
 	if(mDisplayedTrack)
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
 	mDisplayedTrack = track;
@@ -55,7 +72,7 @@ void ViewManager::OnTrackSelect(Track* track)
 
 bool ViewManager::OnEditTrack(Track* track)
 {
-	delete mEditMode;
+	CloseEditMode();
 	if(mDisplayedTrack == track)
 	{
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
@@ -63,6 +80,13 @@ bool ViewManager::OnEditTrack(Track* track)
 	}
 	mEditMode = new TrackEditMode(mMapRenderer, track);
 	return true;
+}
+
+void ViewManager::CloseEditMode()
+{
+	delete mEditMode;
+	mEditButton->SetCheck(true);
+	mReviewButton->SetCheck(false);
 }
 
 void ViewManager::OnMapClick(ww::MouseEvent ev, const Location& location)

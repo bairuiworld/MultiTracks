@@ -7,7 +7,7 @@ namespace mt
 
 Track::Track(Track* parent) : mName("Unnamed track"), mParent(parent)
 {
-
+	mSections.push_back(new Section(this));
 }
 
 Track::~Track()

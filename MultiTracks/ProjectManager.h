@@ -49,6 +49,9 @@ public:
 
 	void ExportTrackOnMap(Track* track);
 
+	void EditCurrentTrack();
+	void ReviewCurrentTrack();
+
 private:
 	void OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode);
 	void OnTreeClick(ww::TreeNode* node, ww::MouseEvent ev);
@@ -56,8 +59,11 @@ private:
 	bool OnEndLabelEdit(ww::TreeNode* node, std::string& text);
 
 	void LoadProjectTree();
+	void AddTrack(ProjectTreeNodeBase* groupNode);
 	void ImportTrack(ProjectTreeNodeBase* groupNode);
 	void CenterTrack(Track* track);
+	std::string MakeTrackName(const Track* track) const;
+	void EditTrack(ProjectTreeNode<Track>* trackNode);
 
 private:
 	Project* mProject;

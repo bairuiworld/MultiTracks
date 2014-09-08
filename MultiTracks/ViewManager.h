@@ -2,6 +2,7 @@
 #define __MULTITRACKS_VIEWMANAGER_H__
 
 #include "TreeView.h"
+#include "CheckBox.h"
 #include "Window.h"
 #include "Location.h"
 
@@ -23,6 +24,7 @@ public:
 private:
 	void OnTrackSelect(Track* track);
 	bool OnEditTrack(Track* track);
+	void CloseEditMode();
 
 	void OnMapClick(ww::MouseEvent ev, const Location& location);
 
@@ -32,6 +34,9 @@ private:
 	WindowMapRenderer* mMapRenderer;
 	ww::TreeView* mProjectTree;
 	ProjectManager* mProjectManager;
+
+	ww::CheckBox* mEditButton;
+	ww::CheckBox* mReviewButton;
 
 	Track* mDisplayedTrack;
 	EditMode* mEditMode;
