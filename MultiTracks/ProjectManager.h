@@ -52,6 +52,9 @@ public:
 	void EditCurrentTrack();
 	void ReviewCurrentTrack();
 
+	void SetActiveNode(ww::TreeNode* node);
+	Track* GetCurrentTrack() const;
+
 private:
 	void OnSelChanged(ww::TreeNode* newNode, ww::TreeNode* oldNode);
 	void OnTreeClick(ww::TreeNode* node, ww::MouseEvent ev);

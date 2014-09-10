@@ -5,6 +5,7 @@
 #include "EntitySelector.h"
 #include "Section.h"
 #include "Location.h"
+#include "WayPoint.h"
 #include "Widget.h"
 #include "MapRenderer.h"
 
@@ -189,9 +190,12 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
+	mSelector.Clear();
 	mSelector.SetPoint(Vector2d(ev.GetPoint().x, ev.GetPoint().y));
-	/**/mSelector.SetSelectable(Selectable::Section | Selectable::SectionEnd);
+	/**/mSelector.SetSelectable(Selectable::WayPoint);
 	mSelector.Select(mEntities.begin(), mEntities.end());
+
+	std::cout << mSelector.GetSelected() << std::endl;
 
 	if(mSelector.GetSelected() == Selectable::None && mHoverComponent)
 	{
@@ -214,6 +218,14 @@ void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 		Component* c = mSelector.GetComponent();
 		c->GetProperties().Push();
 		AddComponent(reinterpret_cast<Location*>(c));
+		if(mParent)
+			mParent->Invalidate();
+	}
+	else if(mSelector.GetSelected() == Selectable::WayPoint)
+	{
+		WayPoint* wp = reinterpret_cast<WayPoint*>(mSelector.GetComponent());
+		AddComponent(&wp->GetLocation());
+		//delete wp;
 		if(mParent)
 			mParent->Invalidate();
 	}

@@ -129,6 +129,25 @@ bool ProjectManager::OnEndLabelEdit(ww::TreeNode* node_, std::string& text)
 	return true;
 }
 
+void ProjectManager::SetActiveNode(ww::TreeNode* node)
+{
+	if(mActiveNode)
+		mActiveNode->SetState(ww::TreeNodeState::Bold, false);
+	mActiveNode = node;
+	if(mActiveNode)
+		mActiveNode->SetState(ww::TreeNodeState::Bold, true);
+}
+
+Track* ProjectManager::GetCurrentTrack() const
+{
+	ww::TreeNode* node = mProjectTree->GetSelectedNode();
+	if(!node) return nullptr;
+	ProjectTreeNodeBase* trackNode = reinterpret_cast<ProjectTreeNodeBase*>(node);
+	if(trackNode->GetType() == ProjectNodeType::Track)
+		return (reinterpret_cast<ProjectTreeNode<Track>*>(node))->GetObject();
+	return nullptr;
+}
+
 void ProjectManager::AddTrack(ProjectTreeNodeBase* groupNode)
 {
 	Track* track = new Track;
@@ -199,12 +218,7 @@ void ProjectManager::EditTrack(ProjectTreeNode<Track>* trackNode)
 {
 	Track* track = trackNode->GetObject();
 	if(SignalEditTrack.emit(track))
-	{
-		if(mActiveNode)
-			mActiveNode->SetState(ww::TreeNodeState::Bold, false);
-		mActiveNode = trackNode;
-		mActiveNode->SetState(ww::TreeNodeState::Bold, true);
-	}
+		SetActiveNode(trackNode);
 }
 
 void ProjectManager::ReviewCurrentTrack()

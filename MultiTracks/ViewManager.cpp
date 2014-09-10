@@ -37,10 +37,17 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mEditButton->SetBounds({260, 10, 330, 70});
 	mReviewButton->SetBounds({340, 10, 410, 70});
 	mEditButton->SignalClicked += [this]() { 
-		if(mEditButton->IsChecked())
-			mProjectManager->EditCurrentTrack();
-		else
-			CloseEditMode();
+		if(mEditButton->IsChecked()) mProjectManager->EditCurrentTrack();
+		else CloseEditMode();
+	};
+	mReviewButton->SignalClicked += [this]() {
+		if(mReviewButton->IsChecked())
+		{
+			Track* track = mProjectManager->GetCurrentTrack();
+			if(track)
+				OpenEditMode(new TrackReviewMode(mMapRenderer, track));
+		}
+		else CloseEditMode();
 	};
 
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
@@ -61,8 +68,11 @@ ViewManager::~ViewManager()
 
 void ViewManager::OnTrackSelect(Track* track)
 {
-	mEditButton->Enable(true);
-	mReviewButton->Enable(true);
+	if(!mEditButton->IsChecked() && !mReviewButton->IsChecked())
+	{
+		mEditButton->Enable(true);
+		mReviewButton->Enable(true);
+	}
 	if(mDisplayedTrack)
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
 	mDisplayedTrack = track;
@@ -72,21 +82,34 @@ void ViewManager::OnTrackSelect(Track* track)
 
 bool ViewManager::OnEditTrack(Track* track)
 {
-	CloseEditMode();
 	if(mDisplayedTrack == track)
 	{
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
 		mDisplayedTrack = nullptr;
 	}
-	mEditMode = new TrackEditMode(mMapRenderer, track);
+	OpenEditMode(new TrackEditMode(mMapRenderer, track));
 	return true;
+}
+
+void ViewManager::OpenEditMode(EditMode* editMode)
+{
+	mEditButton->SetCheck(true);
+	mEditButton->SetText("Quitter edit");
+	mReviewButton->SetCheck(false);
+	mReviewButton->Enable(false);
+	if(mEditMode)
+		CloseEditMode();
+	mEditMode = editMode;
 }
 
 void ViewManager::CloseEditMode()
 {
 	delete mEditMode;
-	mEditButton->SetCheck(true);
-	mReviewButton->SetCheck(false);
+	mEditMode = nullptr;
+	mEditButton->SetCheck(false);
+	mEditButton->SetText("Edit");
+	mReviewButton->Enable(true);
+	mProjectManager->SetActiveNode(nullptr);
 }
 
 void ViewManager::OnMapClick(ww::MouseEvent ev, const Location& location)

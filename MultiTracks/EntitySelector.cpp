@@ -1,5 +1,6 @@
 #include "Track.h"
 #include "Section.h"
+#include "WayPoint.h"
 #include "MapViewport.h"
 #include "Algorithm.h"
 #include "EntitySelector.h"
@@ -26,6 +27,12 @@ void SectionSelector::Select(ComponentSelector* selector)
 {
 	if(!mValid)	Compile(selector);
 	if(!mBoundingBox.IsInside(selector->GetPoint())) return;
+
+	if(selector->GetSelectable() & Selectable::WayPoint)
+	{
+		SelectWayPoint(selector);
+		return;
+	}
 	if(selector->GetSelectable() & Selectable::SectionEnd)
 		if(SelectSectionEnd(selector))
 			return;
@@ -33,8 +40,9 @@ void SectionSelector::Select(ComponentSelector* selector)
 		SelectSection(selector);
 }
 
-void SectionSelector::SelectSection(ComponentSelector* selector)
+bool SectionSelector::SelectSection(ComponentSelector* selector)
 {
+	bool found = false;
 	const Vector2d* last = nullptr;
 	for(const Vector2d& p : mCompiledLocations)
 	{
@@ -42,9 +50,13 @@ void SectionSelector::SelectSection(ComponentSelector* selector)
 		Vector2d nearest;
 		double distanceSeg = DistanceToSegment(selector->GetPoint(), *last, p, &nearest);
 		if(selector->Validate(distanceSeg))
+		{
+			found = true;
 			selector->SetSelected(mSection, Selectable::Section, distanceSeg, nearest);
+		}
 		last = &p;
 	}
+	return found;
 }
 
 bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
@@ -67,6 +79,22 @@ bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
 		found = true;
 	}
 	return found;
+}
+
+void SectionSelector::SelectWayPoint(ComponentSelector* selector)
+{
+	const Vector2d* last = nullptr;
+	Section::LocationList::const_iterator it = mSection->GetLocations().begin();
+	for(const Vector2d& p : mCompiledLocations)
+	{
+		if(last == nullptr) { last = &p; it++; continue; }
+		Vector2d nearest;
+		double distanceSeg = DistanceToSegment(selector->GetPoint(), *last, p, &nearest);
+		if(selector->Validate(distanceSeg))
+			selector->SetSelected(new WayPoint(mSection, it, selector->GetViewport()->PixelToLocation(nearest)), Selectable::WayPoint, distanceSeg, nearest);
+		last = &p;
+		it++;
+	}
 }
 
 void SectionSelector::Compile(ComponentSelector* selector)

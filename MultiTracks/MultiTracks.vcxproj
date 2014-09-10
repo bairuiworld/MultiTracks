@@ -83,7 +83,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>tinyxml2.lib;libcurl.lib;%(AdditionalDependencies);gdiplus.lib;DevIL.lib;ILU.lib;ILUT.lib;comctl32.lib;libww.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\Eisenheim\Projets\cpp\ww\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Eisenheim\Projets\cpp\ww\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>MultiTracks.exe.manifest %(AdditionalManifestFiles)</AdditionalManifestFiles>
@@ -111,6 +111,7 @@
     <ClCompile Include="MapObjectContainer.cpp" />
     <ClCompile Include="Track.cpp" />
     <ClCompile Include="ViewManager.cpp" />
+    <ClCompile Include="WayPoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Algorithm.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Track.h" />
     <ClInclude Include="Vector.h" />
     <ClInclude Include="ViewManager.h" />
+    <ClInclude Include="WayPoint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

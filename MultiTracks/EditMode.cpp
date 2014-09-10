@@ -47,4 +47,11 @@ void TrackEditMode::AppendLocation(const Location& location)
 	mMapRenderer->Invalidate();
 }
 
+
+TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
+EditMode(renderer), mTrack(track)
+{
+	renderer->GetSelector()->SetSelectable(Selectable::WayPoint);
+}
+
 }

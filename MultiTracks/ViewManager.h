@@ -24,6 +24,8 @@ public:
 private:
 	void OnTrackSelect(Track* track);
 	bool OnEditTrack(Track* track);
+
+	void OpenEditMode(EditMode* editMode);
 	void CloseEditMode();
 
 	void OnMapClick(ww::MouseEvent ev, const Location& location);

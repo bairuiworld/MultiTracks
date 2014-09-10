@@ -45,6 +45,8 @@ public:
 	WindowMapRenderer(Map* map);
 	virtual ~WindowMapRenderer();
 
+	ComponentSelector* GetSelector() { return &mSelector; }
+
 protected:
 	void InvalidateEntities();
 

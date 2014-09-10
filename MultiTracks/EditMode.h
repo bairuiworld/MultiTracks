@@ -12,7 +12,7 @@ public:
 	EditMode(WindowMapRenderer* renderer);
 	virtual ~EditMode() = default;
 
-	virtual void AppendLocation(const Location& location) = 0;
+	virtual void AppendLocation(const Location& location) {};
 
 protected:
 	WindowMapRenderer* mMapRenderer;
@@ -26,6 +26,16 @@ public:
 	virtual ~TrackEditMode();
 
 	virtual void AppendLocation(const Location& location);
+
+protected:
+	Track* mTrack;
+};
+
+class TrackReviewMode : public EditMode
+{
+public:
+	TrackReviewMode(WindowMapRenderer* renderer, Track* track);
+	virtual ~TrackReviewMode() = default;
 
 protected:
 	Track* mTrack;

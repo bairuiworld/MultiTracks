@@ -22,6 +22,7 @@ static const int None = 0;
 static const int Section = 1 << 0;
 static const int SectionEnd = 1 << 1;
 static const int Location = 1 << 2;
+static const int WayPoint = 1 << 3;
 }
 
 class EntitySelector;
@@ -53,6 +54,11 @@ public:
 	int GetSelected() const { return mSelected; }
 
 	void SetSelected(Component* component, int selected, double distance, const Vector2d& nearest);
+	void SetSelected(int selected) { mSelected = selected; }
+
+	const Vector2d& GetNearest() const { return mNearestPoint; }
+
+	void Clear() { mSelected = Selectable::None; mComponent = nullptr; mDistance = std::numeric_limits<double>::max(); }
 
 private:
 	Vector2d mPoint;
@@ -109,8 +115,9 @@ protected:
 	friend class MapObjectSelector;
 	virtual void Compile(ComponentSelector* selector);
 
-	void SelectSection(ComponentSelector* selector);
+	bool SelectSection(ComponentSelector* selector);
 	bool SelectSectionEnd(ComponentSelector* selector);
+	void SelectWayPoint(ComponentSelector* selector);
 
 private:
 	Section* mSection;
@@ -142,6 +149,13 @@ private:
 	CompiledSectionList mCompiledSections;
 };
 template <> struct SelectorBuilder<MapObjectContainer>
+{
+	static std::shared_ptr<MapObjectSelector> Make(const MapObjectContainer* container)
+	{
+		return std::make_shared<MapObjectSelector>(container);
+	}
+};
+template <> struct SelectorBuilder<Track>
 {
 	static std::shared_ptr<MapObjectSelector> Make(const MapObjectContainer* container)
 	{
