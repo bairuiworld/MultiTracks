@@ -39,6 +39,7 @@ public:
 
 protected:
 	Track* mTrack;
+	WayPointSelector* mWPSelector;
 };
 
 }

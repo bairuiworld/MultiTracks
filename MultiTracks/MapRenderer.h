@@ -45,7 +45,8 @@ public:
 	WindowMapRenderer(Map* map);
 	virtual ~WindowMapRenderer();
 
-	ComponentSelector* GetSelector() { return &mSelector; }
+	void AddSelector(Selector* selector);
+	void RemoveSelector(Selector* selector);
 
 protected:
 	void InvalidateEntities();
@@ -60,7 +61,7 @@ protected:
 
 protected:
 	int mNewTileId;
-	ComponentSelector mSelector;
+	std::vector<Selector*> mSelectors;
 	Component* mHoverComponent;
 
 public:

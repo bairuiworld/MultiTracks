@@ -2,6 +2,7 @@
 #include <gdiplus.h>
 #include "Track.h"
 #include "Section.h"
+#include "WayPoint.h"
 #include "MapRenderer.h"
 #include "EditMode.h"
 
@@ -51,7 +52,12 @@ void TrackEditMode::AppendLocation(const Location& location)
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
 EditMode(renderer), mTrack(track)
 {
-	renderer->GetSelector()->SetSelectable(Selectable::WayPoint);
+	mWPSelector = new WayPointSelector;
+	mWPSelector->Add({track});
+	mWPSelector->SignalSelection += [](WayPoint* wp) {
+		std::cout << wp->GetLocation().GetLatitude() << std::endl;
+	};
+	renderer->AddSelector(mWPSelector);
 }
 
 }

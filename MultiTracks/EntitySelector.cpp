@@ -8,6 +8,93 @@
 namespace mt
 {
 
+SelectionTracker::SelectionTracker(MapViewport* viewport, const Vector2d& point, double threshold) :
+mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeric_limits<double>::max()), mSelector(nullptr)
+{
+
+}
+
+bool SelectionTracker::Validate(double distance, Selector* selector)
+{
+	if(distance < mThreshold && distance < mDistance)
+	{
+		mSelector = selector;
+		mDistance = distance;
+		return true;
+	}
+	return false;
+}
+
+void SelectionTracker::EmitResult()
+{
+	if(mSelector)
+		mSelector->EmitResult();
+}
+
+void SectionSelectorBase::Compile(MapViewport* viewport)
+{
+	if(mValid) return;
+	for(SectionInfo& s : mSections)
+	{
+		s.pixels.clear();
+		s.bb.Clear();
+		for(const Location& loc : s.section->GetLocations())
+		{
+			Vector2d v = viewport->LocationToPixel(loc);
+			s.pixels.emplace_back(v);
+			s.bb.Add(v);
+		}
+	}
+	mValid = true;
+}
+
+WayPointSelector::WayPointSelector() :
+mWayPoint(nullptr)
+{
+
+}
+
+WayPointSelector::~WayPointSelector()
+{
+	delete mWayPoint;
+}
+
+void WayPointSelector::Select(SelectionTracker* tracker)
+{
+	Compile(tracker->GetViewport());
+	for(auto it : mSections)
+	{
+		SelectWayPoint(tracker, it.section, it.pixels);
+	}
+}
+
+void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, Section* section, const std::vector<Vector2d>& pixels)
+{
+	const Vector2d* last = nullptr;
+	Section::LocationList::const_iterator it = section->GetLocations().begin();
+	for(const Vector2d& p : pixels)
+	{
+		if(last == nullptr) { last = &p; it++; continue; }
+		Vector2d nearest;
+		double distanceSeg = DistanceToSegment(tracker->GetPoint(), *last, p, &nearest);
+		if(tracker->Validate(distanceSeg, this))
+		{
+			delete mWayPoint;
+			mWayPoint = new WayPoint(section, it, tracker->GetViewport()->PixelToLocation(nearest));
+		}
+		last = &p;
+		it++;
+	}
+}
+
+void WayPointSelector::EmitResult()
+{
+	if(mWayPoint)
+		SignalSelection.emit(mWayPoint);
+}
+
+/**/
+
 ComponentSelector::ComponentSelector(const MapViewport* viewport, double threshold) :
 mViewport(viewport), mSelectable(0), mComponent(nullptr), mSelected(Selectable::None),
 mDistance(std::numeric_limits<double>::max()), mThreshold(threshold)
@@ -22,7 +109,7 @@ void ComponentSelector::SetSelected(Component* component, int selected, double d
 	mDistance = distance;
 	mNearestPoint.Set(nearest);
 }
-
+/*
 void SectionSelector::Select(ComponentSelector* selector)
 {
 	if(!mValid)	Compile(selector);
@@ -134,5 +221,5 @@ void MapObjectSelector::Compile(ComponentSelector* selector)
 		secsel->Compile(selector);
 	mValid = true;
 }
-
+*/
 }

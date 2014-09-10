@@ -8,6 +8,8 @@
 #include <memory>
 #include "Vector.h"
 #include "BoundingBox.h"
+#include "SimpleSignal.h"
+#include "Track.h"
 
 namespace mt
 {
@@ -15,7 +17,113 @@ namespace mt
 class Component;
 class MapViewport;
 class Entity;
+class WayPoint;
 
+class Selector;
+class SelectionTracker
+{
+public:
+	SelectionTracker(MapViewport* viewport, const Vector2d& point, double threshold);
+
+	MapViewport* GetViewport() const { return mViewport; }
+	const Vector2d& GetPoint() const { return mPoint; }
+	bool Validate(double distance, Selector* selector);
+	void EmitResult();
+
+private:
+	MapViewport* mViewport;
+	Vector2d mPoint;
+	double mThreshold;
+	double mDistance;
+	Selector* mSelector;
+};
+
+class Selector
+{
+public:
+	virtual ~Selector() = default;
+
+	virtual void Select(SelectionTracker* tracker) = 0;
+	virtual void EmitResult() = 0;
+	virtual void Invalidate() {};
+};
+
+class SectionSelectorBase : public Selector
+{
+public:
+	SectionSelectorBase() : mValid(false) {}
+	virtual ~SectionSelectorBase() = default;
+
+	void Add(std::initializer_list<Section*> sections)
+	{
+		Add(sections.begin(), sections.end());
+	}
+
+	template <class Itr> void Add(Itr begin, Itr end)
+	{
+		for(Itr it = begin; it != end; it++)
+			mSections.emplace_back(*it);
+	}
+
+	void Add(std::initializer_list<Track*> tracks)
+	{
+		for(Track* track : tracks)
+			Add(track->GetSections().begin(), track->GetSections().end());
+	}
+
+	virtual void Invalidate() { mValid = false; }
+	void Compile(MapViewport* viewport);
+
+private:
+	struct SectionInfo
+	{
+		SectionInfo(Section* section_) : section(section_) {}
+		Section* section;
+		std::vector<Vector2d> pixels;
+		BoundingBox<double> bb;
+	};
+
+protected:
+	std::vector<SectionInfo> mSections;
+	bool mValid;
+};
+
+class WayPointSelector : public SectionSelectorBase
+{
+public:
+	WayPointSelector();
+	virtual ~WayPointSelector();
+
+	virtual void Select(SelectionTracker* tracker);
+	virtual void EmitResult();
+
+private:
+	void SelectWayPoint(SelectionTracker* tracker, Section* section, const std::vector<Vector2d>& pixels);
+
+private:
+	WayPoint* mWayPoint;
+
+public:
+	sig::Signal<void(WayPoint*)> SignalSelection;
+};
+
+class SectionSelector : public SectionSelectorBase
+{
+public:
+	virtual ~SectionSelector() = default;
+
+	virtual void Select(SelectionTracker* tracker);
+	virtual void EmitResult();
+
+private:
+	Section* mSection;
+	Vector2d mNearest;
+
+public:
+	sig::Signal<void(Section*, const Vector2d&)> SignalSelection;
+};
+
+/**/
 namespace Selectable
 {
 static const int None = 0;
@@ -104,7 +212,7 @@ protected:
 };
 
 class Section;
-class SectionSelector : public EntitySelector
+/*class SectionSelector : public EntitySelector
 {
 public:
 	SectionSelector(Section* section) : mSection(section), mBoundingBox(10) {}
@@ -162,7 +270,7 @@ template <> struct SelectorBuilder<Track>
 		return std::make_shared<MapObjectSelector>(container);
 	}
 };
-
+*/
 }
 
 #endif // !__MULTITRACKS_ENTITYSELECTOR_H__

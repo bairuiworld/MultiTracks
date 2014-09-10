@@ -125,7 +125,7 @@ void MapRenderer::RemoveComponent(const Component* component)
 }
 
 WindowMapRenderer::WindowMapRenderer(Map* map) :
-MapRenderer(map), mSelector(map->GetViewport(), 5), mHoverComponent(nullptr)
+MapRenderer(map), mHoverComponent(nullptr)
 {
 	mNewTileId = mMap->SignalNewTile += [this]()
 	{ 
@@ -137,6 +137,18 @@ MapRenderer(map), mSelector(map->GetViewport(), 5), mHoverComponent(nullptr)
 WindowMapRenderer::~WindowMapRenderer()
 {
 	mMap->SignalNewTile -= mNewTileId;
+}
+
+void WindowMapRenderer::AddSelector(Selector* selector)
+{
+	mSelectors.push_back(selector);
+}
+
+void WindowMapRenderer::RemoveSelector(Selector* selector)
+{
+	std::vector<Selector*>::const_iterator it = std::find(mSelectors.begin(), mSelectors.end(), selector);
+	if(it != mSelectors.end())
+		mSelectors.erase(it);
 }
 
 void WindowMapRenderer::InvalidateEntities()
@@ -190,45 +202,10 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
-	mSelector.Clear();
-	mSelector.SetPoint(Vector2d(ev.GetPoint().x, ev.GetPoint().y));
-	/**/mSelector.SetSelectable(Selectable::WayPoint);
-	mSelector.Select(mEntities.begin(), mEntities.end());
-
-	std::cout << mSelector.GetSelected() << std::endl;
-
-	if(mSelector.GetSelected() == Selectable::None && mHoverComponent)
-	{
-		mHoverComponent->GetProperties().Pop();
-		mHoverComponent = nullptr;
-		if(mParent)
-			mParent->Invalidate();
-	}
-	else if(mSelector.GetSelected() == Selectable::Section && mSelector.GetComponent() != mHoverComponent)
-	{
-		if(mHoverComponent)
-			mHoverComponent->GetProperties().Pop();
-		mHoverComponent = mSelector.GetComponent();
-		mHoverComponent->GetProperties().Push().Set("color", (int)Gdiplus::Color::Red);
-		if(mParent)
-			mParent->Invalidate();
-	}
-	else if(mSelector.GetSelected() == Selectable::SectionEnd)
-	{
-		Component* c = mSelector.GetComponent();
-		c->GetProperties().Push();
-		AddComponent(reinterpret_cast<Location*>(c));
-		if(mParent)
-			mParent->Invalidate();
-	}
-	else if(mSelector.GetSelected() == Selectable::WayPoint)
-	{
-		WayPoint* wp = reinterpret_cast<WayPoint*>(mSelector.GetComponent());
-		AddComponent(&wp->GetLocation());
-		//delete wp;
-		if(mParent)
-			mParent->Invalidate();
-	}
+	SelectionTracker tracker(mMap->GetViewport(), Vector2d(ev.GetPoint().x, ev.GetPoint().y), 5);
+	for(Selector* s : mSelectors)
+		s->Select(&tracker);
+	tracker.EmitResult();
 }
 
 }
