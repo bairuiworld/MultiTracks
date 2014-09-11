@@ -14,7 +14,7 @@ public:
 	WayPoint(Section* section, Section::LocationList::const_iterator& after, const Location& location);
 	WayPoint(Section* section, Section::LocationList::const_iterator& after);
 
-	const Location& GetLocation() const { return mLocation; }
+	Location* GetLocation() { return &mLocation; }
 	Section* GetSection() { return mSection; }
 	const Section::LocationList::const_iterator GetAfter() const { return mAfter; }
 	bool IsReal() { return mReal; }

@@ -54,10 +54,21 @@ EditMode(renderer), mTrack(track)
 {
 	mWPSelector = new WayPointSelector;
 	mWPSelector->Add({track});
-	mWPSelector->SignalSelection += [](WayPoint* wp) {
-		std::cout << wp->GetLocation().GetLatitude() << std::endl;
+	mWPSelector->SignalSelection += [this](WayPoint* wp) {
+		mMapRenderer->AddComponent(wp->GetLocation());
+		mMapRenderer->Invalidate();
 	};
-	renderer->AddSelector(mWPSelector);
+	mWPSelector->SignalDeselection += [this](WayPoint* wp) {
+		mMapRenderer->RemoveComponent(wp->GetLocation());
+		mMapRenderer->Invalidate();
+	};
+	mMapRenderer->AddSelector(mWPSelector);
+}
+
+TrackReviewMode::~TrackReviewMode()
+{
+	mMapRenderer->RemoveSelector(mWPSelector);
+	delete mWPSelector;
 }
 
 }

@@ -30,8 +30,8 @@ public:
 	Vector<T, 2> GetTopLeft() const;
 	Vector<T, 2> GetBottomRight() const;
 
-	bool IsInside(const Vector<T, 2>& v);
-	bool IsInside(T x, T y);
+	bool IsInside(const Vector<T, 2>& v) const;
+	bool IsInside(T x, T y) const;
 
 	void SetPadding(T padding);
 	void Clear();
@@ -75,13 +75,13 @@ Vector<T, 2> BoundingBox<T>::GetBottomRight() const
 }
 
 template <class T>
-bool BoundingBox<T>::IsInside(const Vector<T, 2>& v)
+bool BoundingBox<T>::IsInside(const Vector<T, 2>& v) const
 {
 	return IsInside(v.GetX(), v.GetY());
 }
 
 template <class T>
-bool BoundingBox<T>::IsInside(T x, T y)
+bool BoundingBox<T>::IsInside(T x, T y) const
 {
 	return x >= mLeft && x <= mRight && y >= mTop && y <= mBottom;
 }

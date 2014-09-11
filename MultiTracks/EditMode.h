@@ -35,7 +35,7 @@ class TrackReviewMode : public EditMode
 {
 public:
 	TrackReviewMode(WindowMapRenderer* renderer, Track* track);
-	virtual ~TrackReviewMode() = default;
+	virtual ~TrackReviewMode();
 
 protected:
 	Track* mTrack;

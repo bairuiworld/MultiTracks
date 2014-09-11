@@ -5,6 +5,7 @@
 #undef min
 #undef max
 #include <vector>
+#include <set>
 #include <memory>
 #include "Vector.h"
 #include "BoundingBox.h"
@@ -35,7 +36,8 @@ private:
 	Vector2d mPoint;
 	double mThreshold;
 	double mDistance;
-	Selector* mSelector;
+	Selector* mCurrentSelector;
+	std::set<Selector*> mSelectors;
 };
 
 class Selector
@@ -45,6 +47,7 @@ public:
 
 	virtual void Select(SelectionTracker* tracker) = 0;
 	virtual void EmitResult() = 0;
+	virtual void ClearResult() = 0;
 	virtual void Invalidate() {};
 };
 
@@ -74,7 +77,7 @@ public:
 	virtual void Invalidate() { mValid = false; }
 	void Compile(MapViewport* viewport);
 
-private:
+protected:
 	struct SectionInfo
 	{
 		SectionInfo(Section* section_) : section(section_) {}
@@ -96,15 +99,18 @@ public:
 
 	virtual void Select(SelectionTracker* tracker);
 	virtual void EmitResult();
+	virtual void ClearResult();
 
 private:
-	void SelectWayPoint(SelectionTracker* tracker, Section* section, const std::vector<Vector2d>& pixels);
+	void SelectWayPoint(SelectionTracker* tracker, const SectionInfo& si);
 
 private:
 	WayPoint* mWayPoint;
+	WayPoint* mLastWayPoint;
 
 public:
 	sig::Signal<void(WayPoint*)> SignalSelection;
+	sig::Signal<void(WayPoint*)> SignalDeselection;
 };
 
 class SectionSelector : public SectionSelectorBase

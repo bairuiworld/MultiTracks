@@ -153,9 +153,8 @@ void WindowMapRenderer::RemoveSelector(Selector* selector)
 
 void WindowMapRenderer::InvalidateEntities()
 {
-	for(Entity* entity : mEntities)
-		if(entity->GetSelector())
-			entity->GetSelector()->Invalidate();
+	for(Selector* s : mSelectors)
+		s->Invalidate();
 }
 
 void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g, const RECT& clip)

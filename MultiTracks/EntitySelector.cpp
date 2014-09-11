@@ -9,16 +9,17 @@ namespace mt
 {
 
 SelectionTracker::SelectionTracker(MapViewport* viewport, const Vector2d& point, double threshold) :
-mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeric_limits<double>::max()), mSelector(nullptr)
+mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeric_limits<double>::max()), mCurrentSelector(nullptr)
 {
 
 }
 
 bool SelectionTracker::Validate(double distance, Selector* selector)
 {
+	mSelectors.insert(selector);
 	if(distance < mThreshold && distance < mDistance)
 	{
-		mSelector = selector;
+		mCurrentSelector = selector;
 		mDistance = distance;
 		return true;
 	}
@@ -27,8 +28,13 @@ bool SelectionTracker::Validate(double distance, Selector* selector)
 
 void SelectionTracker::EmitResult()
 {
-	if(mSelector)
-		mSelector->EmitResult();
+	for(Selector* s : mSelectors)
+	{
+		if(mCurrentSelector == s)
+			s->EmitResult();
+		else
+			s->ClearResult();
+	}
 }
 
 void SectionSelectorBase::Compile(MapViewport* viewport)
@@ -49,7 +55,7 @@ void SectionSelectorBase::Compile(MapViewport* viewport)
 }
 
 WayPointSelector::WayPointSelector() :
-mWayPoint(nullptr)
+mWayPoint(nullptr), mLastWayPoint(nullptr)
 {
 
 }
@@ -57,22 +63,23 @@ mWayPoint(nullptr)
 WayPointSelector::~WayPointSelector()
 {
 	delete mWayPoint;
+	if(mLastWayPoint)
+		ClearResult();
 }
 
 void WayPointSelector::Select(SelectionTracker* tracker)
 {
 	Compile(tracker->GetViewport());
 	for(auto it : mSections)
-	{
-		SelectWayPoint(tracker, it.section, it.pixels);
-	}
+		SelectWayPoint(tracker, it);
 }
 
-void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, Section* section, const std::vector<Vector2d>& pixels)
+void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, const SectionInfo& si)
 {
+	if(!si.bb.IsInside(tracker->GetPoint())) return;
 	const Vector2d* last = nullptr;
-	Section::LocationList::const_iterator it = section->GetLocations().begin();
-	for(const Vector2d& p : pixels)
+	Section::LocationList::const_iterator it = si.section->GetLocations().begin();
+	for(const Vector2d& p : si.pixels)
 	{
 		if(last == nullptr) { last = &p; it++; continue; }
 		Vector2d nearest;
@@ -80,7 +87,7 @@ void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, Section* sectio
 		if(tracker->Validate(distanceSeg, this))
 		{
 			delete mWayPoint;
-			mWayPoint = new WayPoint(section, it, tracker->GetViewport()->PixelToLocation(nearest));
+			mWayPoint = new WayPoint(si.section, it, tracker->GetViewport()->PixelToLocation(nearest));
 		}
 		last = &p;
 		it++;
@@ -89,8 +96,19 @@ void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, Section* sectio
 
 void WayPointSelector::EmitResult()
 {
-	if(mWayPoint)
-		SignalSelection.emit(mWayPoint);
+	if(!mWayPoint) return;
+	ClearResult();
+	mLastWayPoint = mWayPoint;
+	mWayPoint = nullptr;
+	SignalSelection.emit(mLastWayPoint);
+}
+
+void WayPointSelector::ClearResult()
+{
+	if(!mLastWayPoint) return;
+	SignalDeselection.emit(mLastWayPoint);
+	delete mLastWayPoint;
+	mLastWayPoint = nullptr;
 }
 
 /**/
