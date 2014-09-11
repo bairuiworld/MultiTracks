@@ -62,12 +62,9 @@ protected:
 protected:
 	int mNewTileId;
 	std::vector<Selector*> mSelectors;
-	Component* mHoverComponent;
 
 public:
 	sig::Signal<void(ww::MouseEvent, const Location&)> SignalMapClick;
-	sig::Signal<void(ww::MouseEvent, Section*)> SignalSectionClick;
-	sig::Signal<void(ww::MouseEvent, Section*, const Location&)> SignalSectionEndClick;
 };
 
 template <class T>

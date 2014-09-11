@@ -1,11 +1,12 @@
 #include "Section.h"
 #include "Location.h"
+#include "WayPoint.h"
 #include "Track.h"
 
 namespace mt
 {
 
-Track::Track(Track* parent) : mName("Unnamed track"), mParent(parent)
+Track::Track(Track* parent) : mName("Unnamed track"), mReview(nullptr), mParent(parent)
 {
 	mSections.push_back(new Section(this));
 }
@@ -14,6 +15,7 @@ Track::~Track()
 {
 	for(Track* alt : mAlternatives)
 		delete alt;
+	delete mReview;
 }
 
 Track* Track::NewAlternative()
@@ -163,6 +165,39 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 			track->InsertEndChild(t->SaveXML(doc));
 	}
 	return track;
+}
+
+Track* Track::GetReview()
+{
+	if(!mReview)
+		mReview = new Track(this);
+	return mReview;
+}
+
+Section* Track::SubSection(WayPoint* wp1, WayPoint* wp2)
+{
+	Section* sub = new Section;
+	bool copy = false;
+	Section::LocationList::const_iterator it;
+	for(Section* section : mSections)
+	{
+		for(it = section->GetLocations().begin(); it != section->GetLocations().end(); it++)
+		{
+			if(it == wp1->GetAfter() || it == wp2->GetAfter())
+			{
+				if(it == wp1->GetAfter())
+					sub->Add(*wp1->GetLocation());
+				else
+					sub->Add(*wp2->GetLocation());
+				if(copy) return sub;
+				copy = true;
+			}
+
+			if(copy)
+				sub->Add(*it);
+		}
+	}
+	return sub;
 }
 
 }

@@ -17,7 +17,7 @@ mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeri
 bool SelectionTracker::Validate(double distance, Selector* selector)
 {
 	mSelectors.insert(selector);
-	if(distance < mThreshold && distance < mDistance)
+	if(distance <= mThreshold && distance <= mDistance)
 	{
 		mCurrentSelector = selector;
 		mDistance = distance;
@@ -111,59 +111,55 @@ void WayPointSelector::ClearResult()
 	mLastWayPoint = nullptr;
 }
 
-/**/
-
-ComponentSelector::ComponentSelector(const MapViewport* viewport, double threshold) :
-mViewport(viewport), mSelectable(0), mComponent(nullptr), mSelected(Selectable::None),
-mDistance(std::numeric_limits<double>::max()), mThreshold(threshold)
+SectionSelector::SectionSelector() :
+mSection(nullptr), mLastSection(nullptr)
 {
 
 }
 
-void ComponentSelector::SetSelected(Component* component, int selected, double distance, const Vector2d& nearest)
+void SectionSelector::Select(SelectionTracker* tracker)
 {
-	mComponent = component;
-	mSelected = selected;
-	mDistance = distance;
-	mNearestPoint.Set(nearest);
-}
-/*
-void SectionSelector::Select(ComponentSelector* selector)
-{
-	if(!mValid)	Compile(selector);
-	if(!mBoundingBox.IsInside(selector->GetPoint())) return;
-
-	if(selector->GetSelectable() & Selectable::WayPoint)
-	{
-		SelectWayPoint(selector);
-		return;
-	}
-	if(selector->GetSelectable() & Selectable::SectionEnd)
-		if(SelectSectionEnd(selector))
-			return;
-	if(selector->GetSelectable() & Selectable::Section)
-		SelectSection(selector);
+	Compile(tracker->GetViewport());
+	for(auto it : mSections)
+		SelectSection(tracker, it);
 }
 
-bool SectionSelector::SelectSection(ComponentSelector* selector)
+void SectionSelector::SelectSection(SelectionTracker* tracker, const SectionInfo& si)
 {
-	bool found = false;
+	if(!si.bb.IsInside(tracker->GetPoint())) return;
 	const Vector2d* last = nullptr;
-	for(const Vector2d& p : mCompiledLocations)
+	for(const Vector2d& p : si.pixels)
 	{
 		if(last == nullptr) { last = &p; continue; }
 		Vector2d nearest;
-		double distanceSeg = DistanceToSegment(selector->GetPoint(), *last, p, &nearest);
-		if(selector->Validate(distanceSeg))
+		double distanceSeg = DistanceToSegment(tracker->GetPoint(), *last, p, &nearest);
+		if(tracker->Validate(distanceSeg, this))
 		{
-			found = true;
-			selector->SetSelected(mSection, Selectable::Section, distanceSeg, nearest);
+			mSection = si.section;
+			mNearest = nearest;
 		}
 		last = &p;
 	}
-	return found;
 }
 
+void SectionSelector::EmitResult()
+{
+	if(!mSection) return;
+	ClearResult();
+	mLastSection = mSection;
+	mLastNearest = mNearest;
+	mSection = nullptr;
+	SignalSelection.emit(mLastSection, mLastNearest);
+}
+
+void SectionSelector::ClearResult()
+{
+	if(!mLastSection) return;
+	SignalDeselection.emit(mLastSection, mLastNearest);
+	mLastSection = nullptr;
+}
+
+/*
 bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
 {
 	bool found = false;
@@ -184,60 +180,6 @@ bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
 		found = true;
 	}
 	return found;
-}
-
-void SectionSelector::SelectWayPoint(ComponentSelector* selector)
-{
-	const Vector2d* last = nullptr;
-	Section::LocationList::const_iterator it = mSection->GetLocations().begin();
-	for(const Vector2d& p : mCompiledLocations)
-	{
-		if(last == nullptr) { last = &p; it++; continue; }
-		Vector2d nearest;
-		double distanceSeg = DistanceToSegment(selector->GetPoint(), *last, p, &nearest);
-		if(selector->Validate(distanceSeg))
-			selector->SetSelected(new WayPoint(mSection, it, selector->GetViewport()->PixelToLocation(nearest)), Selectable::WayPoint, distanceSeg, nearest);
-		last = &p;
-		it++;
-	}
-}
-
-void SectionSelector::Compile(ComponentSelector* selector)
-{
-	mCompiledLocations.clear();
-	mBoundingBox.Clear();
-	for(const Location& loc : mSection->GetLocations())
-	{
-		Vector2d v = selector->GetViewport()->LocationToPixel(loc);
-		mCompiledLocations.push_back(v);
-		mBoundingBox.Add(v);
-	}
-	mValid = true;
-}
-
-MapObjectSelector::MapObjectSelector(const MapObjectContainer* container)
-{
-	for(Section* section : container->GetSections())
-		mCompiledSections.push_back(new SectionSelector(section));
-}
-
-MapObjectSelector::~MapObjectSelector()
-{
-	for(SectionSelector* selector : mCompiledSections)
-		delete selector;
-}
-
-void MapObjectSelector::Select(ComponentSelector* selector)
-{
-	if(!mValid) Compile(selector);
-	selector->Select(mCompiledSections.begin(), mCompiledSections.end());
-}
-
-void MapObjectSelector::Compile(ComponentSelector* selector)
-{
-	for(SectionSelector* secsel : mCompiledSections)
-		secsel->Compile(selector);
-	mValid = true;
 }
 */
 }

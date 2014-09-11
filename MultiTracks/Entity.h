@@ -25,12 +25,10 @@ public:
 
 	void SetRenderer(std::shared_ptr<EntityRenderer> renderer) { mRenderer = renderer; }
 	void Draw(Gdiplus::Graphics* g, MapViewport* viewport);
-	std::shared_ptr<EntitySelector> GetSelector() { return mSelector; }
 
 private:
 	const Component* mComponent;
 	std::shared_ptr<EntityRenderer> mRenderer;
-	std::shared_ptr<EntitySelector> mSelector;
 };
 
 template <class T>
@@ -39,7 +37,6 @@ mComponent(component)
 {
 	mComponent = component;
 	mRenderer = DefaultRenderer<T>::value;
-	mSelector = SelectorBuilder<T>::Make(component);
 }
 
 }

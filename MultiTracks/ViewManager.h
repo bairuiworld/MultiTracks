@@ -28,8 +28,6 @@ private:
 	void OpenEditMode(EditMode* editMode);
 	void CloseEditMode();
 
-	void OnMapClick(ww::MouseEvent ev, const Location& location);
-
 private:
 	ww::Window* mWindow;
 	Map* mMap;

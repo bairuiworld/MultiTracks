@@ -10,12 +10,13 @@ class EditMode
 {
 public:
 	EditMode(WindowMapRenderer* renderer);
-	virtual ~EditMode() = default;
+	virtual ~EditMode();
 
-	virtual void AppendLocation(const Location& location) {};
+	virtual void OnMapClick(ww::MouseEvent ev, const Location& location) {}
 
 protected:
 	WindowMapRenderer* mMapRenderer;
+	int mSlotId;
 };
 
 class Track;
@@ -25,7 +26,7 @@ public:
 	TrackEditMode(WindowMapRenderer* renderer, Track* track);
 	virtual ~TrackEditMode();
 
-	virtual void AppendLocation(const Location& location);
+	virtual void OnMapClick(ww::MouseEvent ev, const Location& location);
 
 protected:
 	Track* mTrack;
@@ -37,9 +38,14 @@ public:
 	TrackReviewMode(WindowMapRenderer* renderer, Track* track);
 	virtual ~TrackReviewMode();
 
+	virtual void OnMapClick(ww::MouseEvent ev, const Location& location);
+
 protected:
 	Track* mTrack;
-	WayPointSelector* mWPSelector;
+	WayPointSelector* mWayPointSelector;
+	SectionSelector* mSectionSelector;
+
+	WayPoint* mLastWayPoint;
 };
 
 }

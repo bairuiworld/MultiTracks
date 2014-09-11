@@ -54,8 +54,6 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mProjectManager->LoadProject("projet.txt");
 	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
 	mProjectManager->SignalEditTrack += sig::slot(this, &ViewManager::OnEditTrack);
-
-	mMapRenderer->SignalMapClick += sig::slot(this, &ViewManager::OnMapClick);
 }
 
 ViewManager::~ViewManager()
@@ -110,14 +108,6 @@ void ViewManager::CloseEditMode()
 	mEditButton->SetText("Edit");
 	mReviewButton->Enable(true);
 	mProjectManager->SetActiveNode(nullptr);
-}
-
-void ViewManager::OnMapClick(ww::MouseEvent ev, const Location& location)
-{
-	if(ev.GetButton() != ww::MouseButton::Left || ev.GetClicks() != 1) return;
-	if(mEditMode)
-		mEditMode->AppendLocation(location);
-
 }
 
 }

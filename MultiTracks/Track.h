@@ -11,6 +11,8 @@
 namespace mt
 {
 
+class WayPoint;
+
 class Track : public MapObjectContainer
 {
 public:
@@ -39,8 +41,12 @@ public:
 	static Track* LoadXML(tinyxml2::XMLElement* element, Track* parent = nullptr);
 	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc);
 
+	Track* GetReview();
+	Section* SubSection(WayPoint* wp1, WayPoint* wp2);
+
 private:
 	std::string mName;
+	Track* mReview;
 	std::vector<Track*> mAlternatives;
 	Track* mParent;
 };

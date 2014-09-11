@@ -125,7 +125,7 @@ void MapRenderer::RemoveComponent(const Component* component)
 }
 
 WindowMapRenderer::WindowMapRenderer(Map* map) :
-MapRenderer(map), mHoverComponent(nullptr)
+MapRenderer(map)
 {
 	mNewTileId = mMap->SignalNewTile += [this]()
 	{ 
@@ -169,11 +169,8 @@ void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 
 void WindowMapRenderer::OnMouseClick(ww::MouseEvent ev)
 {
-	if(!mHoverComponent)
-	{
-		Vector2d pixel{(double)ev.GetPoint().x, (double)ev.GetPoint().y};
-		SignalMapClick.emit(ev, mMap->GetViewport()->PixelToLocation(pixel));
-	}
+	Vector2d pixel{(double)ev.GetPoint().x, (double)ev.GetPoint().y};
+	SignalMapClick.emit(ev, mMap->GetViewport()->PixelToLocation(pixel));
 }
 
 void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)

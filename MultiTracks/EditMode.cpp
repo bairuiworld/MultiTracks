@@ -12,7 +12,12 @@ namespace mt
 EditMode::EditMode(WindowMapRenderer* renderer) :
 mMapRenderer(renderer)
 {
+	mSlotId = mMapRenderer->SignalMapClick += sig::slot(this, &EditMode::OnMapClick);
+}
 
+EditMode::~EditMode()
+{
+	mMapRenderer->SignalMapClick -= mSlotId;
 }
 
 TrackEditMode::TrackEditMode(WindowMapRenderer* renderer, Track* track) :
@@ -39,7 +44,7 @@ TrackEditMode::~TrackEditMode()
 	mMapRenderer->Invalidate();
 }
 
-void TrackEditMode::AppendLocation(const Location& location)
+void TrackEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 {
 	const Location* end = mTrack->GetLastLocation();
 	if(end) mMapRenderer->RemoveComponent(end);
@@ -50,25 +55,67 @@ void TrackEditMode::AppendLocation(const Location& location)
 
 
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
-EditMode(renderer), mTrack(track)
+EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
 {
-	mWPSelector = new WayPointSelector;
-	mWPSelector->Add({track});
-	mWPSelector->SignalSelection += [this](WayPoint* wp) {
+	mWayPointSelector = new WayPointSelector;
+	mWayPointSelector->Add({track});
+	mWayPointSelector->SignalSelection += [this](WayPoint* wp) {
 		mMapRenderer->AddComponent(wp->GetLocation());
 		mMapRenderer->Invalidate();
 	};
-	mWPSelector->SignalDeselection += [this](WayPoint* wp) {
+	mWayPointSelector->SignalDeselection += [this](WayPoint* wp) {
 		mMapRenderer->RemoveComponent(wp->GetLocation());
 		mMapRenderer->Invalidate();
 	};
-	mMapRenderer->AddSelector(mWPSelector);
+
+	Track* review = mTrack->GetReview();
+	review->GetProperties().Set<int>("color", Gdiplus::Color::Red);
+	mSectionSelector = new SectionSelector;
+	mSectionSelector->Add({review});
+	mSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
+		section->GetProperties().Push().Set<int>("color", Gdiplus::Color::Yellow);
+		mMapRenderer->Invalidate();
+	};
+	mSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {
+		section->GetProperties().Pop();
+		mMapRenderer->Invalidate();
+	};
+
+	mMapRenderer->AddComponent(review);
+	mMapRenderer->AddSelector(mWayPointSelector);
+	mMapRenderer->AddSelector(mSectionSelector);
+	mMapRenderer->Invalidate();
 }
 
 TrackReviewMode::~TrackReviewMode()
 {
-	mMapRenderer->RemoveSelector(mWPSelector);
-	delete mWPSelector;
+	mMapRenderer->RemoveSelector(mWayPointSelector);
+	mMapRenderer->RemoveSelector(mSectionSelector);
+	mMapRenderer->RemoveComponent(mTrack->GetReview());
+	delete mSectionSelector;
+	delete mWayPointSelector;
+}
+
+void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
+{
+	if(ev.GetButton() != ww::MouseButton::Left || ev.GetClicks() != 1) return;
+	WayPoint* wp = mWayPointSelector->GetCurrentWayPoint();
+	if(!wp) return;
+	if(!mLastWayPoint)
+	{
+		mLastWayPoint = new WayPoint(*wp);
+		return;
+	}
+
+	Section* subsection = mTrack->SubSection(mLastWayPoint, wp);
+	subsection->GetProperties().Set<int>("color", Gdiplus::Color::Red).Set("linewidth", 3.f);
+	mTrack->GetReview()->Add(subsection);
+	mSectionSelector->Add({subsection});
+
+	delete mLastWayPoint;
+	mLastWayPoint = nullptr;
+
+	mMapRenderer->Invalidate();
 }
 
 }
