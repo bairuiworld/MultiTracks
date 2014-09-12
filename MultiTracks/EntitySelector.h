@@ -26,7 +26,10 @@ class SelectionTracker
 public:
 	SelectionTracker(MapViewport* viewport, const Vector2d& point, double threshold);
 
+	void Select(Selector* selector);
+
 	MapViewport* GetViewport() const { return mViewport; }
+	double GetThreshold() const { return mThreshold; }
 	const Vector2d& GetPoint() const { return mPoint; }
 	bool Validate(double distance, Selector* selector);
 	void EmitResult();
@@ -43,12 +46,19 @@ private:
 class Selector
 {
 public:
+	Selector() : mPriority(0) {}
 	virtual ~Selector() = default;
+
+	void SetPriority(int priority) { mPriority = priority; }
+	int GetPriority() const { return mPriority; }
 
 	virtual void Select(SelectionTracker* tracker) = 0;
 	virtual void EmitResult() = 0;
 	virtual void ClearResult() = 0;
 	virtual void Invalidate() {};
+
+protected:
+	int mPriority;
 };
 
 class SectionSelectorBase : public Selector
@@ -69,14 +79,14 @@ public:
 		mValid = false;
 	}
 
-	void Add(std::initializer_list<Track*> tracks)
+	void Add(std::initializer_list<MapObjectContainer*> tracks)
 	{
-		for(Track* track : tracks)
+		for(MapObjectContainer* track : tracks)
 			Add(track->GetSections().begin(), track->GetSections().end());
 	}
 
 	virtual void Invalidate() { mValid = false; }
-	void Compile(MapViewport* viewport);
+	void Compile(SelectionTracker* tracker);
 
 protected:
 	struct SectionInfo

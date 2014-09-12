@@ -167,10 +167,10 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 	return track;
 }
 
-Track* Track::GetReview()
+MapObjectContainer* Track::GetReview()
 {
 	if(!mReview)
-		mReview = new Track(this);
+		mReview = new MapObjectContainer;
 	return mReview;
 }
 
@@ -185,10 +185,8 @@ Section* Track::SubSection(WayPoint* wp1, WayPoint* wp2)
 		{
 			if(it == wp1->GetAfter() || it == wp2->GetAfter())
 			{
-				if(it == wp1->GetAfter())
-					sub->Add(*wp1->GetLocation());
-				else
-					sub->Add(*wp2->GetLocation());
+				if(it == wp1->GetAfter()) sub->Add(*wp1->GetLocation());
+				else					  sub->Add(*wp2->GetLocation());
 				if(copy) return sub;
 				copy = true;
 			}

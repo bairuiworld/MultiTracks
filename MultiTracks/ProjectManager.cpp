@@ -97,7 +97,8 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 		{
 			ww::PopupMenu menu;
 			Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
-			menu.AddItem("Expoter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+			menu.AddItem("Exporter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
+			//menu.AddItem("Exporter GPX", std::bind(&ProjectManager::ExportGPX, this, track));
 			menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
 			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 		}

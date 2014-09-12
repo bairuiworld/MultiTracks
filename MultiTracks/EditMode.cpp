@@ -38,7 +38,6 @@ EditMode(renderer), mTrack(track)
 TrackEditMode::~TrackEditMode()
 {
 	mTrack->GetProperties().Pop();
-	mMapRenderer->RemoveComponent(mTrack);
 	const Location* end = mTrack->GetLastLocation();
 	if(end) mMapRenderer->RemoveComponent(end);
 	mMapRenderer->Invalidate();
@@ -68,9 +67,10 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
 		mMapRenderer->Invalidate();
 	};
 
-	Track* review = mTrack->GetReview();
+	MapObjectContainer* review = mTrack->GetReview();
 	review->GetProperties().Set<int>("color", Gdiplus::Color::Red);
-	mSectionSelector = new SectionSelector;
+	mSectionSelector = new SectionSelector; 
+	mSectionSelector->SetPriority(1);
 	mSectionSelector->Add({review});
 	mSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
 		section->GetProperties().Push().Set<int>("color", Gdiplus::Color::Yellow);
@@ -104,6 +104,7 @@ void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	if(!mLastWayPoint)
 	{
 		mLastWayPoint = new WayPoint(*wp);
+		mMapRenderer->AddComponent(mLastWayPoint->GetLocation());
 		return;
 	}
 
@@ -112,6 +113,7 @@ void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	mTrack->GetReview()->Add(subsection);
 	mSectionSelector->Add({subsection});
 
+	mMapRenderer->RemoveComponent(mLastWayPoint->GetLocation());
 	delete mLastWayPoint;
 	mLastWayPoint = nullptr;
 

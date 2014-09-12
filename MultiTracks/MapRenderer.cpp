@@ -200,7 +200,7 @@ void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
 	SelectionTracker tracker(mMap->GetViewport(), Vector2d(ev.GetPoint().x, ev.GetPoint().y), 5);
 	for(Selector* s : mSelectors)
-		s->Select(&tracker);
+		tracker.Select(s);
 	tracker.EmitResult();
 }
 

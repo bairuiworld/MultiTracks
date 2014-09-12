@@ -37,17 +37,26 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mEditButton->SetBounds({260, 10, 330, 70});
 	mReviewButton->SetBounds({340, 10, 410, 70});
 	mEditButton->SignalClicked += [this]() { 
-		if(mEditButton->IsChecked()) mProjectManager->EditCurrentTrack();
+		if(mEditButton->IsChecked())
+		{
+			if(mReviewButton->IsChecked())
+			{
+				Track* track = mProjectManager->GetCurrentTrack();
+				if(track)
+					OpenEditMode(new TrackReviewMode(mMapRenderer, track));
+			}
+			else
+				mProjectManager->EditCurrentTrack();
+		}
 		else CloseEditMode();
 	};
 	mReviewButton->SignalClicked += [this]() {
+		Track* track = mProjectManager->GetCurrentTrack();
 		if(mReviewButton->IsChecked())
-		{
-			Track* track = mProjectManager->GetCurrentTrack();
-			if(track)
-				OpenEditMode(new TrackReviewMode(mMapRenderer, track));
-		}
-		else CloseEditMode();
+			mMapRenderer->AddComponent(track->GetReview());
+		else
+			mMapRenderer->RemoveComponent(track->GetReview());
+		mMapRenderer->Invalidate();
 	};
 
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
@@ -93,7 +102,6 @@ void ViewManager::OpenEditMode(EditMode* editMode)
 {
 	mEditButton->SetCheck(true);
 	mEditButton->SetText("Quitter edit");
-	mReviewButton->SetCheck(false);
 	mReviewButton->Enable(false);
 	if(mEditMode)
 		CloseEditMode();

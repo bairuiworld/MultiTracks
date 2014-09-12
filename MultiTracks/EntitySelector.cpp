@@ -13,11 +13,17 @@ mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeri
 {
 
 }
+void SelectionTracker::Select(Selector* selector)
+{
+	mSelectors.insert(selector);
+	selector->Select(this);
+}
 
 bool SelectionTracker::Validate(double distance, Selector* selector)
 {
-	mSelectors.insert(selector);
-	if(distance <= mThreshold && distance <= mDistance)
+	bool have_priority = !mCurrentSelector || mCurrentSelector->GetPriority() <= selector->GetPriority();
+	if(!have_priority) return false;
+	if(distance <= mThreshold && (mCurrentSelector != selector || distance <= mDistance))
 	{
 		mCurrentSelector = selector;
 		mDistance = distance;
@@ -37,7 +43,7 @@ void SelectionTracker::EmitResult()
 	}
 }
 
-void SectionSelectorBase::Compile(MapViewport* viewport)
+void SectionSelectorBase::Compile(SelectionTracker* tracker)
 {
 	if(mValid) return;
 	for(SectionInfo& s : mSections)
@@ -46,10 +52,11 @@ void SectionSelectorBase::Compile(MapViewport* viewport)
 		s.bb.Clear();
 		for(const Location& loc : s.section->GetLocations())
 		{
-			Vector2d v = viewport->LocationToPixel(loc);
+			Vector2d v = tracker->GetViewport()->LocationToPixel(loc);
 			s.pixels.emplace_back(v);
 			s.bb.Add(v);
 		}
+		s.bb.SetPadding(tracker->GetThreshold());
 	}
 	mValid = true;
 }
@@ -69,7 +76,7 @@ WayPointSelector::~WayPointSelector()
 
 void WayPointSelector::Select(SelectionTracker* tracker)
 {
-	Compile(tracker->GetViewport());
+	Compile(tracker);
 	for(auto it : mSections)
 		SelectWayPoint(tracker, it);
 }
@@ -119,7 +126,7 @@ mSection(nullptr), mLastSection(nullptr)
 
 void SectionSelector::Select(SelectionTracker* tracker)
 {
-	Compile(tracker->GetViewport());
+	Compile(tracker);
 	for(auto it : mSections)
 		SelectSection(tracker, it);
 }
@@ -145,6 +152,11 @@ void SectionSelector::SelectSection(SelectionTracker* tracker, const SectionInfo
 void SectionSelector::EmitResult()
 {
 	if(!mSection) return;
+	if(mSection == mLastSection)
+	{
+		mSection = nullptr;
+		return;
+	}
 	ClearResult();
 	mLastSection = mSection;
 	mLastNearest = mNearest;
