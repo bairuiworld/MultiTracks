@@ -60,7 +60,7 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	};
 
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
-	mProjectManager->LoadProject("projet.txt");
+	mProjectManager->LoadProject("C:\\Users\\Eisenheim\\Projets\\cpp\\MultiTracks\\MultiTracks\\projet.txt");
 	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
 	mProjectManager->SignalEditTrack += sig::slot(this, &ViewManager::OnEditTrack);
 }

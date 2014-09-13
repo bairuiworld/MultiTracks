@@ -26,6 +26,9 @@ public:
 	const SectionList& GetSections() const { return mSections; }
 	const LocationList& GetLocations() const { return mLocations; }
 
+	static MapObjectContainer* LoadXML(tinyxml2::XMLElement* element);
+	tinyxml2::XMLElement* SaveXML(tinyxml2::XMLDocument* doc, const char* name = "mapobjectcontainer");
+
 protected:
 	SectionList mSections;
 	LocationList mLocations;

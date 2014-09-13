@@ -102,6 +102,12 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 			menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
 			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 		}
+		if(node->GetType() == ProjectNodeType::Project)
+		{
+			ww::PopupMenu menu;
+			menu.AddItem("Enregistrer", [this]() { mProject->Save(); std::cout << "Saved" << std::endl; });
+			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
+		}
 	}
 	else if(ev.GetButton() == ww::MouseButton::Left && ev.GetClicks() == 2 && node->GetType() == ProjectNodeType::Track)
 	{
@@ -173,7 +179,6 @@ void ProjectManager::ImportTrack(ProjectTreeNodeBase* groupNode)
 			std::cout << "D- : " << track->GetNegativeElevation() << " m" << std::endl;
 			track->GetProperties().Set("color", (int)Gdiplus::Color::Blue).Set("linewidth", 4.f);
 			mProject->AddTrack(track, groupNode->GetText());
-			mProject->Save();
 			ww::TreeNode* trackNode = new ProjectTreeNode<Track>(MakeTrackName(track), track);
 			groupNode->AddNode(trackNode);
 			trackNode->Select();

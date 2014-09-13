@@ -22,6 +22,8 @@ public:
 	Section(const Section& s);
 	virtual ~Section();
 
+	void SetParent(MapObjectContainer* container) { mContainer = container; }
+
 	void Add(const Location& location);
 	template <class LocItr>	void Add(LocItr begin, LocItr end)
 	{

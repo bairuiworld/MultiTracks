@@ -8,7 +8,7 @@ namespace mt
 
 Track::Track(Track* parent) : mName("Unnamed track"), mReview(nullptr), mParent(parent)
 {
-	mSections.push_back(new Section(this));
+	//mSections.push_back(new Section(this));
 }
 
 Track::~Track()
@@ -132,6 +132,9 @@ Track* Track::LoadXML(tinyxml2::XMLElement* element, Track* parent)
 		e = e->NextSiblingElement("alternatives");
 	}
 
+	e = element->FirstChildElement("review");
+	if(e) track->mReview = MapObjectContainer::LoadXML(e);
+
 	return track;
 }
 	
@@ -164,6 +167,9 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 		for(Track* t : mAlternatives)
 			track->InsertEndChild(t->SaveXML(doc));
 	}
+
+	if(mReview)
+		track->InsertEndChild(mReview->SaveXML(doc, "review"));
 	return track;
 }
 

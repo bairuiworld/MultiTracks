@@ -68,7 +68,9 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
 	};
 
 	MapObjectContainer* review = mTrack->GetReview();
-	review->GetProperties().Set<int>("color", Gdiplus::Color::Red);
+	review->GetProperties()
+		.Set<int>("color", Gdiplus::Color::Red)
+		.Set<float>("linewidth", 3.f);
 	mSectionSelector = new SectionSelector; 
 	mSectionSelector->SetPriority(1);
 	mSectionSelector->Add({review});
@@ -109,7 +111,6 @@ void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	}
 
 	Section* subsection = mTrack->SubSection(mLastWayPoint, wp);
-	subsection->GetProperties().Set<int>("color", Gdiplus::Color::Red).Set("linewidth", 3.f);
 	mTrack->GetReview()->Add(subsection);
 	mSectionSelector->Add({subsection});
 
