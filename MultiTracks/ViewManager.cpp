@@ -1,4 +1,5 @@
 #include "Layout.h"
+#include "PropertyGrid.h"
 #include "MapRenderer.h"
 #include "Map.h"
 #include "MapSource.h"
@@ -27,6 +28,11 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mProjectTree = new ww::TreeView;
 	mMapRenderer->Add(mProjectTree);
 	mProjectTree->SetBounds({10, 10, 250, 350});
+
+	ww::PropertyGrid* pg = new ww::PropertyGrid;
+	mMapRenderer->Add(pg);
+	pg->SetBounds({300, 300, 500, 500});
+	pg->Test();
 
 	mEditButton = new ww::CheckBox("Edit", ww::CheckBoxStyle::PushLike);
 	mReviewButton = new ww::CheckBox("Review", ww::CheckBoxStyle::PushLike);

@@ -111,6 +111,7 @@ void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	}
 
 	Section* subsection = mTrack->SubSection(mLastWayPoint, wp);
+	subsection->SetParent(mTrack->GetReview());
 	mTrack->GetReview()->Add(subsection);
 	mSectionSelector->Add({subsection});
 

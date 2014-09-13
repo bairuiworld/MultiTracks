@@ -8,6 +8,27 @@
 
 namespace mt {
 
+namespace SectionType
+{
+static const int Flat = 0;
+static const int DownhillOnly = 1;
+static const int UpDownBoth = 2;
+}
+
+namespace SectionDifficulty
+{
+static const int Easy = 0;
+static const int Medium = 1;
+static const int Hard = 2;
+}
+
+namespace SectionInterest
+{
+static const int OneStar = 0;
+static const int TwoStars = 1;
+static const int ThreeStars = 2;
+}
+
 class MapObjectContainer;
 class Location;
 class Area;
