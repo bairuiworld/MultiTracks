@@ -29,10 +29,9 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mMapRenderer->Add(mProjectTree);
 	mProjectTree->SetBounds({10, 10, 250, 350});
 
-	ww::PropertyGrid* pg = new ww::PropertyGrid;
-	mMapRenderer->Add(pg);
-	pg->SetBounds({300, 300, 500, 500});
-	pg->Test();
+	mPropertyGrid = new ww::PropertyGrid;
+	mMapRenderer->Add(mPropertyGrid);
+	mPropertyGrid->SetBounds({10, 360, 250, 500});
 
 	mEditButton = new ww::CheckBox("Edit", ww::CheckBoxStyle::PushLike);
 	mReviewButton = new ww::CheckBox("Review", ww::CheckBoxStyle::PushLike);
@@ -79,6 +78,14 @@ ViewManager::~ViewManager()
 	delete mProjectManager;
 }
 
+void ViewManager::AddMapObjectContainerProperties(MapObjectContainer* container, const std::string& catalog)
+{
+	Properties& prop = container->GetProperties();
+	ww::ColorProperty* colorprop = new ww::ColorProperty("Couleur", catalog, prop.Get<int>("color", 0));
+	colorprop->SignalPropertyChanged += [this, &prop](int color) { prop.Set("color", color); mMapRenderer->Invalidate(); };
+	mPropertyGrid->AddProperty(colorprop);
+}
+
 void ViewManager::OnTrackSelect(Track* track)
 {
 	if(!mEditButton->IsChecked() && !mReviewButton->IsChecked())
@@ -86,9 +93,14 @@ void ViewManager::OnTrackSelect(Track* track)
 		mEditButton->Enable(true);
 		mReviewButton->Enable(true);
 	}
+	
 	if(mDisplayedTrack)
+	{
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
+		mPropertyGrid->DeleteCatalog(mDisplayedTrack->GetName());
+	}
 	mDisplayedTrack = track;
+	AddMapObjectContainerProperties(track, track->GetName());
 	mMapRenderer->AddComponent(mDisplayedTrack);
 	mMapRenderer->Invalidate();
 }

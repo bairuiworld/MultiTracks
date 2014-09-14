@@ -4,6 +4,7 @@
 #include "TreeView.h"
 #include "CheckBox.h"
 #include "Window.h"
+#include "PropertyGrid.h"
 #include "Location.h"
 
 namespace mt
@@ -11,6 +12,7 @@ namespace mt
 
 class Map;
 class WindowMapRenderer;
+class MapObjectContainer;
 class Track;
 class ProjectManager;
 class EditMode;
@@ -20,6 +22,8 @@ class ViewManager
 public:
 	ViewManager();
 	~ViewManager();
+
+	void AddMapObjectContainerProperties(MapObjectContainer* container, const std::string& catalog);
 
 private:
 	void OnTrackSelect(Track* track);
@@ -32,9 +36,10 @@ private:
 	ww::Window* mWindow;
 	Map* mMap;
 	WindowMapRenderer* mMapRenderer;
-	ww::TreeView* mProjectTree;
 	ProjectManager* mProjectManager;
 
+	ww::TreeView* mProjectTree;
+	ww::PropertyGrid* mPropertyGrid;
 	ww::CheckBox* mEditButton;
 	ww::CheckBox* mReviewButton;
 
