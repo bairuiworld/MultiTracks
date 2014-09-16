@@ -98,13 +98,12 @@ Track* Track::LoadXML(tinyxml2::XMLElement* element, Track* parent)
 	track->mName = element->Attribute("name");
 
 	int color;
-	if(element->QueryIntAttribute("color", &color) == tinyxml2::XMLError::XML_NO_ERROR)
-		track->GetProperties().Set("color", color);
+	if(element->QueryIntAttribute(prop::Color::name, &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		track->GetProperties().Set<prop::Color>(color);
 	float linewidth;
-	if(element->QueryFloatAttribute("linewidth", &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
-		track->GetProperties().Set("linewidth", linewidth);
+	if(element->QueryFloatAttribute(prop::LineWidth::name, &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		track->GetProperties().Set<prop::LineWidth>(linewidth);
 
-		
 	tinyxml2::XMLElement* e = element->FirstChildElement("section");
 	while(e)
 	{
@@ -143,10 +142,10 @@ tinyxml2::XMLElement* Track::SaveXML(tinyxml2::XMLDocument* doc)
 	tinyxml2::XMLElement* track = mParent == nullptr ? doc->NewElement("track") : doc->NewElement("alternative");
 	track->SetAttribute("name", mName.c_str());
 	
-	if(mProperties.Exists("color"))
-		track->SetAttribute("color", mProperties.Get<int>("color"));
-	if(mProperties.Exists("linewidth"))
-		track->SetAttribute("linewidth", mProperties.Get<float>("linewidth"));
+	if(mProperties.Exists(prop::Color::name))
+		track->SetAttribute(prop::Color::name, mProperties.Get<prop::Color>());
+	if(mProperties.Exists(prop::LineWidth::name))
+		track->SetAttribute(prop::LineWidth::name, mProperties.Get<prop::LineWidth>());
 
 	if(mSections.size() != 0)
 	{

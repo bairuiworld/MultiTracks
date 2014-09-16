@@ -80,12 +80,12 @@ void Project::LoadXML(tinyxml2::XMLDocument* doc)
 void Project::LoadDatabaseXML(tinyxml2::XMLElement* db)
 {
 	int color;
-	if(db->QueryIntAttribute("color", &color) == tinyxml2::XMLError::XML_NO_ERROR)
-		mDatabase.GetProperties().Set("color", color);
+	if(db->QueryIntAttribute(prop::Color::name, &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		mDatabase.GetProperties().Set<prop::Color>(color);
 
 	float linewidth;
-	if(db->QueryFloatAttribute("linewidth", &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
-		mDatabase.GetProperties().Set("linewidth", linewidth);
+	if(db->QueryFloatAttribute(prop::LineWidth::name, &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		mDatabase.GetProperties().Set<prop::LineWidth>(linewidth);
 
 	tinyxml2::XMLElement* e = db->FirstChildElement("section");
 	while(e)
@@ -142,16 +142,16 @@ void Project::Save(std::string file)
 
 void Project::SaveDatabase(tinyxml2::XMLDocument* doc, tinyxml2::XMLElement* db)
 {
-	if(mDatabase.GetProperties().Exists("color"))
+	if(mDatabase.GetProperties().Exists(prop::Color::name))
 	{
-		int color = mDatabase.GetProperties().Get<int>("color");
-		db->SetAttribute("color", color);
+		int color = mDatabase.GetProperties().Get<prop::Color>();
+		db->SetAttribute(prop::Color::name, color);
 	}
 
-	if(mDatabase.GetProperties().Exists("linewidth"))
+	if(mDatabase.GetProperties().Exists(prop::LineWidth::name))
 	{
-		float lineWidth = mDatabase.GetProperties().Get<float>("linewidth");
-		db->SetAttribute("linewidth", lineWidth);
+		float lineWidth = mDatabase.GetProperties().Get<prop::LineWidth>();
+		db->SetAttribute(prop::LineWidth::name, lineWidth);
 	}
 
 	for(Section* s : mDatabase.GetSections())

@@ -10,6 +10,30 @@
 
 namespace mt {
 
+namespace prop
+{
+
+#define MAKE_PROP(struct_, name_, type_) \
+	namespace priv { \
+	template <class T = type_> \
+	struct struct_##_\
+	{ \
+		static const char* name; \
+		using type = T; \
+	}; \
+	const char* struct_##_<type_>::name = name_; \
+	} \
+	using struct_ = priv::struct_##_<>;
+
+MAKE_PROP(Color, "color", int)
+MAKE_PROP(LineWidth, "linewidth", float)
+MAKE_PROP(Type, "type", int)
+MAKE_PROP(Difficulty, "difficulty", int)
+MAKE_PROP(Interest, "interest", int)
+MAKE_PROP(Comment, "comment", std::string)
+
+}
+
 class Properties
 {
 	class Placeholder
@@ -69,6 +93,12 @@ public:
 		return it != mProperties.end();
 	}
 
+	template <class Prop>
+	Properties& Set(typename Prop::type prop)
+	{
+		return Set<typename Prop::type>(Prop::name, prop);
+	}
+
 	template <class T>
 	Properties& Set(std::string key, T prop)
 	{
@@ -78,6 +108,12 @@ public:
 			delete it->second;
 		mProperties.insert({key, new Holder<T>(prop)});
 		return *this;
+	}
+
+	template <class Prop>
+	const typename Prop::type& Get() const
+	{
+		return Get<typename Prop::type>(Prop::name);
 	}
 
 	template <class T>

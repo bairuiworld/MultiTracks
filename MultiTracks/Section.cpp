@@ -2,6 +2,7 @@
 #include "Location.h"
 #include "MapObjectContainer.h"
 #include "Area.h"
+#include "Properties.h"
 #include "Section.h"
 
 namespace mt {
@@ -164,14 +165,14 @@ Section* Section::LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* con
 	Section* section = new Section(container);
 
 	int type;
-	if(element->QueryIntAttribute("type", &type) == tinyxml2::XMLError::XML_NO_ERROR)
-		section->mProperties.Set("type", type);
+	if(element->QueryIntAttribute(prop::Type::name, &type) == tinyxml2::XMLError::XML_NO_ERROR)
+		section->mProperties.Set<prop::Type>(type);
 	int difficulty;
-	if(element->QueryIntAttribute("difficulty", &difficulty) == tinyxml2::XMLError::XML_NO_ERROR)
-		section->mProperties.Set("difficulty", difficulty);
+	if(element->QueryIntAttribute(prop::Difficulty::name, &difficulty) == tinyxml2::XMLError::XML_NO_ERROR)
+		section->mProperties.Set<prop::Difficulty>(difficulty);
 	int interest;
-	if(element->QueryIntAttribute("interest", &interest) == tinyxml2::XMLError::XML_NO_ERROR)
-		section->mProperties.Set("interest", interest);
+	if(element->QueryIntAttribute(prop::Interest::name, &interest) == tinyxml2::XMLError::XML_NO_ERROR)
+		section->mProperties.Set<prop::Interest>(interest);
 
 	tinyxml2::XMLElement* location = element->FirstChildElement("l");
 	while(location != nullptr)
@@ -180,9 +181,9 @@ Section* Section::LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* con
 		location = location->NextSiblingElement("l");
 	}
 
-	tinyxml2::XMLElement* comment = element->FirstChildElement("comment");
+	tinyxml2::XMLElement* comment = element->FirstChildElement(prop::Comment::name);
 	if(comment)
-		section->mProperties.Set("comment", std::string(comment->GetText()));
+		section->mProperties.Set<prop::Comment>(std::string(comment->GetText()));
 	return section;
 }
 
@@ -190,20 +191,20 @@ tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc) const
 {
 	tinyxml2::XMLElement* section = doc->NewElement("section");
 
-	if(mProperties.Exists("type"))
-		section->SetAttribute("type", mProperties.Get<int>("type"));
-	if(mProperties.Exists("interest"))
-		section->SetAttribute("interest", mProperties.Get<int>("interest"));
-	if(mProperties.Exists("difficulty"))
-		section->SetAttribute("difficulty", mProperties.Get<int>("difficulty"));
+	if(mProperties.Exists(prop::Type::name))
+		section->SetAttribute(prop::Type::name, mProperties.Get<prop::Type>());
+	if(mProperties.Exists(prop::Interest::name))
+		section->SetAttribute(prop::Interest::name, mProperties.Get<prop::Interest>());
+	if(mProperties.Exists(prop::Difficulty::name))
+		section->SetAttribute(prop::Difficulty::name, mProperties.Get<prop::Difficulty>());
 
 	for(const Location& l : mLocations)
 		section->InsertEndChild(l.SaveXML(doc));
 
-	if(mProperties.Exists("comment"))
+	if(mProperties.Exists(prop::Comment::name))
 	{
-		tinyxml2::XMLElement* comment = doc->NewElement("comment");
-		comment->SetText(mProperties.Get<std::string>("comment").c_str());
+		tinyxml2::XMLElement* comment = doc->NewElement(prop::Comment::name);
+		comment->SetText(mProperties.Get<prop::Comment>().c_str());
 		section->InsertEndChild(comment);
 	}
 	return section;
