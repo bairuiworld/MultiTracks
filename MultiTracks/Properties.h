@@ -31,6 +31,7 @@ MAKE_PROP(Type, "type", int)
 MAKE_PROP(Difficulty, "difficulty", int)
 MAKE_PROP(Interest, "interest", int)
 MAKE_PROP(Comment, "comment", std::string)
+MAKE_PROP(DashStyle, "dashstyle", int)
 
 }
 
@@ -114,6 +115,12 @@ public:
 	const typename Prop::type& Get() const
 	{
 		return Get<typename Prop::type>(Prop::name);
+	}
+
+	template <class Prop>
+	const typename Prop::type& Get(const typename Prop::type& bydefault) const 
+	{
+		return Get<typename Prop::type>(Prop::name, bydefault);
 	}
 
 	template <class T>

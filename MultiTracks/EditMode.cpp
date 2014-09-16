@@ -25,8 +25,8 @@ TrackEditMode::TrackEditMode(WindowMapRenderer* renderer, Track* track) :
 EditMode(renderer), mTrack(track)
 {
 	mTrack->GetProperties().Push()
-		.Set<int>("color", Gdiplus::Color::Magenta)
-		.Set("linewidth", 3.f);
+		.Set<prop::Color>(Gdiplus::Color::Magenta)
+		.Set<prop::LineWidth>(3);
 	mMapRenderer->AddComponent(mTrack);
 	
 	const Location* end = mTrack->GetLastLocation();
@@ -70,15 +70,15 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
 
 	MapObjectContainer* review = mTrack->GetReview();
 	review->GetProperties()
-		.Set<int>("color", Gdiplus::Color::Red)
-		.Set<float>("linewidth", 3.f);
+		.Set<prop::Color>(Gdiplus::Color::Red)
+		.Set<prop::LineWidth>(3);
 	mSectionSelector = new SectionSelector; 
 	mCurrentSectionSelector = new SectionSelector;
 	mSectionSelector->SetPriority(1);
 	mSectionSelector->Add({review});
 	mCurrentSectionSelector->Add({review});
 	mSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
-		section->GetProperties().Push().Set<int>("color", Gdiplus::Color::Yellow);
+		section->GetProperties().Push().Set<prop::Color>(Gdiplus::Color::Yellow);
 		mMapRenderer->Invalidate();
 	};
 	mSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {
@@ -88,16 +88,16 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
 
 	mCurrentSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
 		mSelectionSection = new Section(*section);
-		mSelectionSection->GetProperties().Set<int>("color", 0xffffffff).Set<float>("linewidth", 6.f);
+		mSelectionSection->GetProperties().Set<prop::Color>(0xffffffff).Set<prop::LineWidth>(6.f);
 		mMapRenderer->AddComponent(mSelectionSection);
 		mMapRenderer->RemoveComponent(section);
 		mMapRenderer->AddComponent(section);
 		mPropGrid = new ww::PropertyGrid;
 		mMapRenderer->Add(mPropGrid);
 		mPropGrid->SetBounds({10, 510, 250, 650});
-		ww::ColorProperty* color = new ww::ColorProperty("Couleur", "Section", section->GetProperties().Get<int>("color", 0));
+		ww::ColorProperty* color = new ww::ColorProperty("Couleur", "Section", section->GetProperties().Get<prop::Color>(0));
 		mPropGrid->AddProperty(color);
-		color->SignalPropertyChanged += [this, section](int color) { section->GetProperties().Set("color", color); mMapRenderer->Invalidate(); };
+		color->SignalPropertyChanged += [this, section](int color) { section->GetProperties().Set<prop::Color>(color); mMapRenderer->Invalidate(); };
 		mMapRenderer->Invalidate();
 	};
 	mCurrentSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {

@@ -15,10 +15,10 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Co
 	Vector2d last;
 	bool haslast = false;
 	
-	const Properties& prop = component->GetProperties();
-	Gdiplus::Pen pen(Gdiplus::Color(prop.Get<int>("color", Gdiplus::Color::Black)),
-									prop.Get<float>("linewidth", 1));
-	pen.SetDashStyle((Gdiplus::DashStyle)prop.Get<int>("dashstyle", Gdiplus::DashStyle::DashStyleSolid));
+	const Properties& props = component->GetProperties();
+	Gdiplus::Pen pen(Gdiplus::Color(props.Get<prop::Color>(Gdiplus::Color::Black)),
+									props.Get<prop::LineWidth>(2));
+	pen.SetDashStyle((Gdiplus::DashStyle)props.Get<prop::DashStyle>(Gdiplus::DashStyle::DashStyleSolid));
 	pen.SetLineJoin(Gdiplus::LineJoin::LineJoinRound);
 
 	Gdiplus::GraphicsPath path;
