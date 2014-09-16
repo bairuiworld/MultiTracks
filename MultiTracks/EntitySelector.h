@@ -52,10 +52,13 @@ public:
 	void SetPriority(int priority) { mPriority = priority; }
 	int GetPriority() const { return mPriority; }
 
-	virtual void Select(SelectionTracker* tracker) = 0;
 	virtual void EmitResult() = 0;
 	virtual void ClearResult() = 0;
 	virtual void Invalidate() {};
+
+protected:
+	friend class SelectionTracker;
+	virtual void Select(SelectionTracker* tracker) = 0;
 
 protected:
 	int mPriority;
@@ -108,11 +111,13 @@ public:
 	WayPointSelector();
 	virtual ~WayPointSelector();
 
-	virtual void Select(SelectionTracker* tracker);
 	virtual void EmitResult();
 	virtual void ClearResult();
 
 	WayPoint* GetCurrentWayPoint() const { return mLastWayPoint; }
+
+protected:
+	virtual void Select(SelectionTracker* tracker);
 
 private:
 	void SelectWayPoint(SelectionTracker* tracker, const SectionInfo& si);
@@ -132,11 +137,13 @@ public:
 	SectionSelector();
 	virtual ~SectionSelector() = default;
 
-	virtual void Select(SelectionTracker* tracker);
 	virtual void EmitResult();
 	virtual void ClearResult();
 
 	Section* GetCurrentSection() const { return mLastSection; }
+
+protected:
+	virtual void Select(SelectionTracker* tracker);
 
 private:
 	void SelectSection(SelectionTracker* tracker, const SectionInfo& si);

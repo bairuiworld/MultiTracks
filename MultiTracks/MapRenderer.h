@@ -39,14 +39,16 @@ protected:
 	std::vector<Entity*> mEntities;
 };
 
+enum class SelectorAction { MouseMove, MouseClick };
+
 class WindowMapRenderer : public MapRenderer, public ww::DrawingArea
 {
 public:
 	WindowMapRenderer(Map* map);
 	virtual ~WindowMapRenderer();
 
-	void AddSelector(Selector* selector);
-	void RemoveSelector(Selector* selector);
+	void AddSelector(Selector* selector, SelectorAction action);
+	void RemoveSelector(Selector* selector, SelectorAction action);
 
 protected:
 	void InvalidateEntities();
@@ -59,9 +61,11 @@ protected:
 	virtual void OnMouseMove(ww::MouseEvent ev);
 	virtual void OnMouseClick(ww::MouseEvent ev);
 
+	void Select(const std::vector<Selector*>& v, const Vector2d& p);
+
 protected:
 	int mNewTileId;
-	std::vector<Selector*> mSelectors;
+	std::map<SelectorAction, std::vector<Selector*>> mSelectors;
 
 public:
 	sig::Signal<void(ww::MouseEvent, const Location&)> SignalMapClick;

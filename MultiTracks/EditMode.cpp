@@ -4,6 +4,7 @@
 #include "Section.h"
 #include "WayPoint.h"
 #include "MapRenderer.h"
+#include "Map.h"
 #include "EditMode.h"
 
 namespace mt
@@ -54,7 +55,7 @@ void TrackEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 
 
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
-EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
+EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
 {
 	mWayPointSelector = new WayPointSelector;
 	mWayPointSelector->Add({track});
@@ -72,8 +73,10 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
 		.Set<int>("color", Gdiplus::Color::Red)
 		.Set<float>("linewidth", 3.f);
 	mSectionSelector = new SectionSelector; 
+	mCurrentSectionSelector = new SectionSelector;
 	mSectionSelector->SetPriority(1);
 	mSectionSelector->Add({review});
+	mCurrentSectionSelector->Add({review});
 	mSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
 		section->GetProperties().Push().Set<int>("color", Gdiplus::Color::Yellow);
 		mMapRenderer->Invalidate();
@@ -83,19 +86,49 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr)
 		mMapRenderer->Invalidate();
 	};
 
+	mCurrentSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
+		mSelectionSection = new Section(*section);
+		mSelectionSection->GetProperties().Set<int>("color", 0xffffffff).Set<float>("linewidth", 6.f);
+		mMapRenderer->AddComponent(mSelectionSection);
+		mMapRenderer->RemoveComponent(section);
+		mMapRenderer->AddComponent(section);
+		mPropGrid = new ww::PropertyGrid;
+		mMapRenderer->Add(mPropGrid);
+		mPropGrid->SetBounds({10, 510, 250, 650});
+		ww::ColorProperty* color = new ww::ColorProperty("Couleur", "Section", section->GetProperties().Get<int>("color", 0));
+		mPropGrid->AddProperty(color);
+		color->SignalPropertyChanged += [this, section](int color) { section->GetProperties().Set("color", color); mMapRenderer->Invalidate(); };
+		mMapRenderer->Invalidate();
+	};
+	mCurrentSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {
+		if(mPropGrid)
+		{
+			mMapRenderer->Remove(mPropGrid);
+			mMapRenderer->RemoveComponent(mSelectionSection);
+			delete mSelectionSection;
+			delete mPropGrid;
+			mPropGrid = nullptr;
+		}
+		section->GetProperties().Pop();
+		mMapRenderer->Invalidate();
+	};
+
 	mMapRenderer->AddComponent(review);
-	mMapRenderer->AddSelector(mWayPointSelector);
-	mMapRenderer->AddSelector(mSectionSelector);
+	mMapRenderer->AddSelector(mWayPointSelector, SelectorAction::MouseMove);
+	mMapRenderer->AddSelector(mSectionSelector, SelectorAction::MouseMove);
+	mMapRenderer->AddSelector(mCurrentSectionSelector, SelectorAction::MouseClick);
 	mMapRenderer->Invalidate();
 }
 
 TrackReviewMode::~TrackReviewMode()
 {
-	mMapRenderer->RemoveSelector(mWayPointSelector);
-	mMapRenderer->RemoveSelector(mSectionSelector);
+	mMapRenderer->RemoveSelector(mWayPointSelector, SelectorAction::MouseMove);
+	mMapRenderer->RemoveSelector(mSectionSelector, SelectorAction::MouseMove);
+	mMapRenderer->RemoveSelector(mCurrentSectionSelector, SelectorAction::MouseClick);
 	mMapRenderer->RemoveComponent(mTrack->GetReview());
 	delete mSectionSelector;
 	delete mWayPointSelector;
+	delete mCurrentSectionSelector;
 }
 
 void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
@@ -114,6 +147,7 @@ void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	subsection->SetParent(mTrack->GetReview());
 	mTrack->GetReview()->Add(subsection);
 	mSectionSelector->Add({subsection});
+	mCurrentSectionSelector->Add({subsection});
 
 	mMapRenderer->RemoveComponent(mLastWayPoint->GetLocation());
 	delete mLastWayPoint;

@@ -97,7 +97,7 @@ void ViewManager::OnTrackSelect(Track* track)
 	if(mDisplayedTrack)
 	{
 		mMapRenderer->RemoveComponent(mDisplayedTrack);
-		mPropertyGrid->DeleteCatalog(mDisplayedTrack->GetName());
+		mPropertyGrid->Reset();
 	}
 	mDisplayedTrack = track;
 	AddMapObjectContainerProperties(track, track->GetName());

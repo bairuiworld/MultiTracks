@@ -1,6 +1,8 @@
 #ifndef __MULTITRACKS_EDITMODE_H__
 #define __MULTITRACKS_EDITMODE_H__
 
+#include "PropertyGrid.h"
+
 namespace mt
 {
 
@@ -44,8 +46,11 @@ protected:
 	Track* mTrack;
 	WayPointSelector* mWayPointSelector;
 	SectionSelector* mSectionSelector;
+	SectionSelector* mCurrentSectionSelector;
+	Section* mSelectionSection;
 
 	WayPoint* mLastWayPoint;
+	ww::PropertyGrid* mPropGrid;
 };
 
 }

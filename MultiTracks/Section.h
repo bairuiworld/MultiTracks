@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "tinyxml2.h"
 #include "Component.h"
+#include "MapObjectContainer.h"
 
 namespace mt {
 
@@ -29,7 +30,6 @@ static const int TwoStars = 1;
 static const int ThreeStars = 2;
 }
 
-class MapObjectContainer;
 class Location;
 class Area;
 
@@ -43,7 +43,7 @@ public:
 	Section(const Section& s);
 	virtual ~Section();
 
-	void SetParent(MapObjectContainer* container) { mContainer = container; }
+	void SetParent(MapObjectContainer* container) { mContainer = container; mProperties.SetParent(&container->GetProperties()); }
 
 	void Add(const Location& location);
 	template <class LocItr>	void Add(LocItr begin, LocItr end)

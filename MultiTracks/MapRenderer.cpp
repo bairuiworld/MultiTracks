@@ -139,22 +139,25 @@ WindowMapRenderer::~WindowMapRenderer()
 	mMap->SignalNewTile -= mNewTileId;
 }
 
-void WindowMapRenderer::AddSelector(Selector* selector)
+void WindowMapRenderer::AddSelector(Selector* selector, SelectorAction action)
 {
-	mSelectors.push_back(selector);
+	mSelectors[action].push_back(selector);
 }
 
-void WindowMapRenderer::RemoveSelector(Selector* selector)
+void WindowMapRenderer::RemoveSelector(Selector* selector, SelectorAction action)
 {
-	std::vector<Selector*>::const_iterator it = std::find(mSelectors.begin(), mSelectors.end(), selector);
-	if(it != mSelectors.end())
-		mSelectors.erase(it);
+	auto it = mSelectors.find(action);
+	if(it == mSelectors.end()) return;
+	std::vector<Selector*>::const_iterator sit = std::find((*it).second.begin(), (*it).second.end(), selector);
+	if(sit != (*it).second.end())
+		(*it).second.erase(sit);
 }
 
 void WindowMapRenderer::InvalidateEntities()
 {
-	for(Selector* s : mSelectors)
-		s->Invalidate();
+	for(auto it : mSelectors)
+		for(Selector* s : it.second)
+			s->Invalidate();
 }
 
 void WindowMapRenderer::OnPaint(Gdiplus::Graphics* g, const RECT& clip)
@@ -170,6 +173,7 @@ void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 void WindowMapRenderer::OnMouseClick(ww::MouseEvent ev)
 {
 	Vector2d pixel{(double)ev.GetPoint().x, (double)ev.GetPoint().y};
+	Select(mSelectors[SelectorAction::MouseClick], pixel);		
 	SignalMapClick.emit(ev, mMap->GetViewport()->PixelToLocation(pixel));
 }
 
@@ -198,8 +202,13 @@ void WindowMapRenderer::OnResize(int width, int height)
 
 void WindowMapRenderer::OnMouseMove(ww::MouseEvent ev)
 {
-	SelectionTracker tracker(mMap->GetViewport(), Vector2d(ev.GetPoint().x, ev.GetPoint().y), 5);
-	for(Selector* s : mSelectors)
+	Select(mSelectors[SelectorAction::MouseMove], Vector2d(ev.GetPoint().x, ev.GetPoint().y));
+}
+
+void WindowMapRenderer::Select(const std::vector<Selector*>& v, const Vector2d& p)
+{
+	SelectionTracker tracker(mMap->GetViewport(), p, 5);
+	for(Selector* s : v)
 		tracker.Select(s);
 	tracker.EmitResult();
 }
