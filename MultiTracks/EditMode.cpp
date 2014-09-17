@@ -59,14 +59,8 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
 {
 	mWayPointSelector = new WayPointSelector;
 	mWayPointSelector->Add({track});
-	mWayPointSelector->SignalSelection += [this](WayPoint* wp) {
-		mMapRenderer->AddComponent(wp->GetLocation());
-		mMapRenderer->Invalidate();
-	};
-	mWayPointSelector->SignalDeselection += [this](WayPoint* wp) {
-		mMapRenderer->RemoveComponent(wp->GetLocation());
-		mMapRenderer->Invalidate();
-	};
+	mWayPointSelector->SignalSelection += sig::slot(this, &TrackReviewMode::OnSelectWayPoint);
+	mWayPointSelector->SignalDeselection += sig::slot(this, &TrackReviewMode::OnDeselectWayPoint);
 
 	MapObjectContainer* review = mTrack->GetReview();
 	review->GetProperties()
@@ -77,41 +71,11 @@ EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
 	mSectionSelector->SetPriority(1);
 	mSectionSelector->Add({review});
 	mCurrentSectionSelector->Add({review});
-	mSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
-		section->GetProperties().Push().Set<prop::Color>(Gdiplus::Color::Yellow);
-		mMapRenderer->Invalidate();
-	};
-	mSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {
-		section->GetProperties().Pop();
-		mMapRenderer->Invalidate();
-	};
 
-	mCurrentSectionSelector->SignalSelection += [this](Section* section, const Vector2d& nearest) {
-		mSelectionSection = new Section(*section);
-		mSelectionSection->GetProperties().Set<prop::Color>(0xffffffff).Set<prop::LineWidth>(6.f);
-		mMapRenderer->AddComponent(mSelectionSection);
-		mMapRenderer->RemoveComponent(section);
-		mMapRenderer->AddComponent(section);
-		mPropGrid = new ww::PropertyGrid;
-		mMapRenderer->Add(mPropGrid);
-		mPropGrid->SetBounds({10, 510, 250, 650});
-		ww::ColorProperty* color = new ww::ColorProperty("Couleur", "Section", section->GetProperties().Get<prop::Color>(0));
-		mPropGrid->AddProperty(color);
-		color->SignalPropertyChanged += [this, section](int color) { section->GetProperties().Set<prop::Color>(color); mMapRenderer->Invalidate(); };
-		mMapRenderer->Invalidate();
-	};
-	mCurrentSectionSelector->SignalDeselection += [this](Section* section, const Vector2d& nearest) {
-		if(mPropGrid)
-		{
-			mMapRenderer->Remove(mPropGrid);
-			mMapRenderer->RemoveComponent(mSelectionSection);
-			delete mSelectionSection;
-			delete mPropGrid;
-			mPropGrid = nullptr;
-		}
-		section->GetProperties().Pop();
-		mMapRenderer->Invalidate();
-	};
+	mSectionSelector->SignalSelection += sig::slot(this, &TrackReviewMode::OnSelectSection);
+	mSectionSelector->SignalDeselection += sig::slot(this, &TrackReviewMode::OnDeselectSection);
+	mCurrentSectionSelector->SignalSelection += sig::slot(this, &TrackReviewMode::OnSelectCurrentSection);
+	mCurrentSectionSelector->SignalDeselection += sig::slot(this, &TrackReviewMode::OnDeselectCurrentSection);
 
 	mMapRenderer->AddComponent(review);
 	mMapRenderer->AddSelector(mWayPointSelector, SelectorAction::MouseMove);
@@ -129,6 +93,80 @@ TrackReviewMode::~TrackReviewMode()
 	delete mSectionSelector;
 	delete mWayPointSelector;
 	delete mCurrentSectionSelector;
+}
+
+void TrackReviewMode::OnSelectWayPoint(WayPoint* wp)
+{
+	mMapRenderer->AddComponent(wp->GetLocation());
+	mMapRenderer->Invalidate();
+}
+
+void TrackReviewMode::OnDeselectWayPoint(WayPoint* wp)
+{
+	mMapRenderer->RemoveComponent(wp->GetLocation());
+	mMapRenderer->Invalidate();
+}
+
+void TrackReviewMode::OnSelectSection(Section* section, const Vector2d& nearest)
+{
+	section->GetProperties().Push().Set<prop::Color>(Gdiplus::Color::Yellow);
+	mMapRenderer->Invalidate();
+}
+
+void TrackReviewMode::OnDeselectSection(Section* section, const Vector2d& nearest)
+{
+	section->GetProperties().Pop();
+	mMapRenderer->Invalidate();
+}
+
+void TrackReviewMode::OnSelectCurrentSection(Section* section, const Vector2d& nearest)
+{
+	mSelectionSection = new Section(*section);
+	mSelectionSection->GetProperties().Set<prop::Color>(0xffffffff).Set<prop::LineWidth>(6.f);
+	mMapRenderer->AddComponent(mSelectionSection);
+	mMapRenderer->RemoveComponent(section);
+	mMapRenderer->AddComponent(section);
+	mPropGrid = new ww::PropertyGrid;
+	mMapRenderer->Add(mPropGrid);
+	mPropGrid->SetBounds({10, 510, 250, 650});
+	
+	ww::ColorProperty* color = new ww::ColorProperty("Couleur", "Section", section->GetProperties().Get<prop::Color>(0));
+	ww::DropDownProperty* ddp = new ww::DropDownProperty("Type", "Section");
+	*ddp << " " << "Plat" << "Descente/Montée" << "Descente uniquement";
+	ddp->SetSelected(section->GetProperties().Get<prop::Type>(0));
+	ww::DropDownProperty* diffp = new ww::DropDownProperty("Difficulté", "Section");
+	*diffp << " " << "Facile" << "Moyenne" << "Difficile";
+	diffp->SetSelected(section->GetProperties().Get<prop::Difficulty>(0));
+	ww::DropDownProperty* interestp = new ww::DropDownProperty("Intérêt", "Section");
+	*interestp << " " << "x" << "xx" << "xxx";
+	interestp->SetSelected(section->GetProperties().Get<prop::Interest>(0));
+
+	mPropGrid->AddProperty(color);
+	mPropGrid->AddProperty(ddp);
+	mPropGrid->AddProperty(diffp);
+	mPropGrid->AddProperty(interestp);
+	mPropGrid->ExpandAllCatalogs();
+
+	color->SignalPropertyChanged += [this, section](int color) { section->GetProperties().Set<prop::Color>(color); mMapRenderer->Invalidate(); };
+	ddp->SignalPropertyChanged += [this, section](int index) { section->GetProperties().Set<prop::Type>(index); };
+	diffp->SignalPropertyChanged += [this, section](int index) { section->GetProperties().Set<prop::Difficulty>(index); };
+	interestp->SignalPropertyChanged += [this, section](int index) { section->GetProperties().Set<prop::Interest>(index); };
+	
+	mMapRenderer->Invalidate();
+}
+
+void TrackReviewMode::OnDeselectCurrentSection(Section* section, const Vector2d& nearest)
+{
+	if(mPropGrid)
+	{
+		mMapRenderer->Remove(mPropGrid);
+		mMapRenderer->RemoveComponent(mSelectionSection);
+		delete mSelectionSection;
+		delete mPropGrid;
+		mPropGrid = nullptr;
+	}
+	section->GetProperties().Pop();
+	mMapRenderer->Invalidate();
 }
 
 void TrackReviewMode::OnMapClick(ww::MouseEvent ev, const Location& location)

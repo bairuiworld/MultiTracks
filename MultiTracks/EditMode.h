@@ -43,6 +43,14 @@ public:
 	virtual void OnMapClick(ww::MouseEvent ev, const Location& location);
 
 protected:
+	void OnSelectSection(Section* section, const Vector2d& nearest);
+	void OnDeselectSection(Section* section, const Vector2d& nearest);
+	void OnSelectWayPoint(WayPoint* wp);
+	void OnDeselectWayPoint(WayPoint* wp);
+	void OnSelectCurrentSection(Section* section, const Vector2d& nearest);
+	void OnDeselectCurrentSection(Section* section, const Vector2d& nearest);
+
+protected:
 	Track* mTrack;
 	WayPointSelector* mWayPointSelector;
 	SectionSelector* mSectionSelector;

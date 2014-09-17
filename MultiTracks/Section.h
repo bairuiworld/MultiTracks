@@ -11,23 +11,23 @@ namespace mt {
 
 namespace SectionType
 {
-static const int Flat = 0;
-static const int DownhillOnly = 1;
-static const int UpDownBoth = 2;
+static const int Flat = 1;
+static const int DownhillOnly = 2;
+static const int UpDownBoth = 3;
 }
 
 namespace SectionDifficulty
 {
-static const int Easy = 0;
-static const int Medium = 1;
-static const int Hard = 2;
+static const int Easy = 1;
+static const int Medium = 2;
+static const int Hard = 3;
 }
 
 namespace SectionInterest
 {
-static const int OneStar = 0;
-static const int TwoStars = 1;
-static const int ThreeStars = 2;
+static const int OneStar = 1;
+static const int TwoStars = 2;
+static const int ThreeStars = 3;
 }
 
 class Location;
