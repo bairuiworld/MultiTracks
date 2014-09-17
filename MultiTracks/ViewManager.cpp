@@ -82,8 +82,12 @@ void ViewManager::AddMapObjectContainerProperties(MapObjectContainer* container,
 {
 	Properties& prop = container->GetProperties();
 	ww::ColorProperty* colorprop = new ww::ColorProperty("Couleur", catalog, prop.Get<int>("color", 0));
-	colorprop->SignalPropertyChanged += [this, &prop](int color) { prop.Set("color", color); mMapRenderer->Invalidate(); };
+	ww::EditProperty* lwp = new ww::EditProperty("Epaisseur", catalog, std::to_string(prop.Get<prop::LineWidth>(2)));
+	colorprop->SignalPropertyChanged += [this, &prop](int color) { prop.Set<prop::Color>(color); mMapRenderer->Invalidate(); };
+	lwp->SignalPropertyChanged += [this, &prop](const std::string& val) { prop.Set<prop::LineWidth>(std::stof(val)); mMapRenderer->Invalidate(); };
 	mPropertyGrid->AddProperty(colorprop);
+	mPropertyGrid->AddProperty(lwp);
+	mPropertyGrid->ExpandAllCatalogs();
 }
 
 void ViewManager::OnTrackSelect(Track* track)

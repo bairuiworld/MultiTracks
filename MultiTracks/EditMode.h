@@ -55,6 +55,7 @@ protected:
 	WayPointSelector* mWayPointSelector;
 	SectionSelector* mSectionSelector;
 	SectionSelector* mCurrentSectionSelector;
+	Section* mHoverSection;
 	Section* mSelectionSection;
 
 	WayPoint* mLastWayPoint;

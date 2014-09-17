@@ -55,7 +55,7 @@ void TrackEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 
 
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
-EditMode(renderer), mTrack(track), mLastWayPoint(nullptr), mPropGrid(nullptr)
+EditMode(renderer), mTrack(track), mHoverSection(nullptr), mSelectionSection(nullptr), mLastWayPoint(nullptr), mPropGrid(nullptr)
 {
 	mWayPointSelector = new WayPointSelector;
 	mWayPointSelector->Add({track});
@@ -109,23 +109,33 @@ void TrackReviewMode::OnDeselectWayPoint(WayPoint* wp)
 
 void TrackReviewMode::OnSelectSection(Section* section, const Vector2d& nearest)
 {
-	section->GetProperties().Push().Set<prop::Color>(Gdiplus::Color::Yellow);
+	mHoverSection = new Section(*section);
+	mHoverSection->GetProperties()
+		.Set<prop::Color>(0xffffffff)
+		.Set<prop::LineWidth>(section->GetProperties().Get<prop::LineWidth>(2) + 3);
+	mMapRenderer->AddComponent(mHoverSection);
+	mMapRenderer->RemoveComponent(section);
+	mMapRenderer->AddComponent(section);
 	mMapRenderer->Invalidate();
 }
 
 void TrackReviewMode::OnDeselectSection(Section* section, const Vector2d& nearest)
 {
-	section->GetProperties().Pop();
-	mMapRenderer->Invalidate();
+	if(mHoverSection)
+	{
+		mMapRenderer->RemoveComponent(mHoverSection);
+		delete mHoverSection;
+		mHoverSection = nullptr;
+		mMapRenderer->Invalidate();
+	}
 }
 
 void TrackReviewMode::OnSelectCurrentSection(Section* section, const Vector2d& nearest)
 {
-	mSelectionSection = new Section(*section);
-	mSelectionSection->GetProperties().Set<prop::Color>(0xffffffff).Set<prop::LineWidth>(6.f);
-	mMapRenderer->AddComponent(mSelectionSection);
-	mMapRenderer->RemoveComponent(section);
-	mMapRenderer->AddComponent(section);
+	if(!mHoverSection) return;
+	mSelectionSection = mHoverSection;
+	mHoverSection = nullptr;
+
 	mPropGrid = new ww::PropertyGrid;
 	mMapRenderer->Add(mPropGrid);
 	mPropGrid->SetBounds({10, 510, 250, 650});
@@ -138,7 +148,7 @@ void TrackReviewMode::OnSelectCurrentSection(Section* section, const Vector2d& n
 	*diffp << " " << "Facile" << "Moyenne" << "Difficile";
 	diffp->SetSelected(section->GetProperties().Get<prop::Difficulty>(0));
 	ww::DropDownProperty* interestp = new ww::DropDownProperty("Intérêt", "Section");
-	*interestp << " " << "x" << "xx" << "xxx";
+	*interestp << " " << "x" << "x x" << "x x x";
 	interestp->SetSelected(section->GetProperties().Get<prop::Interest>(0));
 
 	mPropGrid->AddProperty(color);
