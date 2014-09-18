@@ -9,7 +9,7 @@ namespace mt
 {
 
 MapViewport::MapViewport(MapSource* mapSource, int zoom, const Vector2d& origin) :
-	mMapSource(mapSource), mOrigin(origin)
+mMapSource(mapSource), mMapSize(1), mOrigin(origin), mViewDimension(0, 0)
 {
 	SetZoom(zoom);
 }

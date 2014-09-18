@@ -21,7 +21,9 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mWindow->SetLayout(new ww::FillLayout);
 
 	mMap = new Map(&MapSource::IGN);
-	mMap->GetViewport()->SetZoom(4);
+	MapViewport* vp = mMap->GetViewport();
+	vp->SetZoom(5);
+	vp->SetOrigin(vp->LocationToPixel(Location(55, -25)));
 	mMapRenderer = new WindowMapRenderer(mMap);
 	mWindow->Add(mMapRenderer);
 	
@@ -111,11 +113,6 @@ void ViewManager::OnTrackSelect(Track* track)
 
 bool ViewManager::OnEditTrack(Track* track)
 {
-	if(mDisplayedTrack == track)
-	{
-		mMapRenderer->RemoveComponent(mDisplayedTrack);
-		mDisplayedTrack = nullptr;
-	}
 	OpenEditMode(new TrackEditMode(mMapRenderer, track));
 	return true;
 }

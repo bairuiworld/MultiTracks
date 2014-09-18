@@ -13,13 +13,13 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 	std::ios::sync_with_stdio();
 	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_ALLOC_MEM_DF);
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
-#endif
+//#endif
 	// Init
 	mt::DownloadManager::Init();
 	curl_global_init(CURL_GLOBAL_ALL);

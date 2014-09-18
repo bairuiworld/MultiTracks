@@ -41,6 +41,7 @@ TrackEditMode::~TrackEditMode()
 	mTrack->GetProperties().Pop();
 	const Location* end = mTrack->GetLastLocation();
 	if(end) mMapRenderer->RemoveComponent(end);
+	mMapRenderer->RemoveComponent(mTrack);
 	mMapRenderer->Invalidate();
 }
 
