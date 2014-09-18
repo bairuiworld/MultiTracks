@@ -135,7 +135,7 @@ class SectionSelector : public SectionSelectorBase
 {
 public:
 	SectionSelector();
-	virtual ~SectionSelector() = default;
+	virtual ~SectionSelector();
 
 	virtual void EmitResult();
 	virtual void ClearResult();

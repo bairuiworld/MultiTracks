@@ -114,7 +114,6 @@ void TrackReviewMode::OnSelectSection(Section* section, const Vector2d& nearest)
 		.Set<prop::Color>(0xffffffff)
 		.Set<prop::LineWidth>(section->GetProperties().Get<prop::LineWidth>(2) + 3);
 	mMapRenderer->AddComponent(mHoverSection);
-	mMapRenderer->RemoveComponent(section);
 	mMapRenderer->AddComponent(section);
 	mMapRenderer->Invalidate();
 }
@@ -124,6 +123,7 @@ void TrackReviewMode::OnDeselectSection(Section* section, const Vector2d& neares
 	if(mHoverSection)
 	{
 		mMapRenderer->RemoveComponent(mHoverSection);
+		mMapRenderer->RemoveComponent(section);
 		delete mHoverSection;
 		mHoverSection = nullptr;
 		mMapRenderer->Invalidate();
@@ -176,6 +176,7 @@ void TrackReviewMode::OnDeselectCurrentSection(Section* section, const Vector2d&
 		mPropGrid = nullptr;
 	}
 	section->GetProperties().Pop();
+	mMapRenderer->RemoveComponent(section);
 	mMapRenderer->Invalidate();
 }
 

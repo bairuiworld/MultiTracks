@@ -13,6 +13,7 @@ mViewport(viewport), mPoint(point), mThreshold(threshold), mDistance(std::numeri
 {
 
 }
+
 void SelectionTracker::Select(Selector* selector)
 {
 	mSelectors.insert(selector);
@@ -122,6 +123,11 @@ SectionSelector::SectionSelector() :
 mSection(nullptr), mLastSection(nullptr)
 {
 
+}
+
+SectionSelector::~SectionSelector()
+{
+	ClearResult();
 }
 
 void SectionSelector::Select(SelectionTracker* tracker)
