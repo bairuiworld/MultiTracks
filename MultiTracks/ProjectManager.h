@@ -17,6 +17,7 @@ class ProjectTreeNodeBase : public ww::TreeNode
 {
 public:
 	ProjectTreeNodeBase(std::string text, ProjectNodeType type) : ww::TreeNode(text), mType(type) {}
+	virtual ~ProjectTreeNodeBase() = default;
 	ProjectNodeType GetType() const { return mType; }
 
 protected:
@@ -28,6 +29,7 @@ class ProjectTreeNode : public ProjectTreeNodeBase
 {
 public:
 	ProjectTreeNode(std::string text, T* object) : ProjectTreeNodeBase(text, ProjectNodeTypeSelector<T>::type), mObject(object) {}
+	virtual ~ProjectTreeNode() = default;
 
 	T* GetObject() const { return mObject; }
 

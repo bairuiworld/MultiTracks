@@ -94,6 +94,7 @@ TrackReviewMode::~TrackReviewMode()
 	delete mSectionSelector;
 	delete mWayPointSelector;
 	delete mCurrentSectionSelector;
+	delete mLastWayPoint;
 }
 
 void TrackReviewMode::OnSelectWayPoint(WayPoint* wp)

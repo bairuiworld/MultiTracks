@@ -13,6 +13,7 @@ class WayPoint : public Component
 public:
 	WayPoint(Section* section, Section::LocationList::const_iterator& after, const Location& location);
 	WayPoint(Section* section, Section::LocationList::const_iterator& after);
+	virtual ~WayPoint() = default;
 
 	Location* GetLocation() { return &mLocation; }
 	Section* GetSection() { return mSection; }

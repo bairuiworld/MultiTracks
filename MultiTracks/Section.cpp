@@ -15,6 +15,8 @@ Section::Section(MapObjectContainer* container) : mContainer(container)
 
 Section::Section(const Section& section) : mContainer(section.mContainer)
 {
+	if(mContainer)
+		mProperties.SetParent(&mContainer->GetProperties());
 	Add(section.mLocations.begin(), section.mLocations.end());
 }
 
