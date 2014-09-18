@@ -46,7 +46,7 @@ public:
 	ProjectManager(mt::WindowMapRenderer* renderer, ww::TreeView* projectTree);
 	~ProjectManager();
 
-	bool LoadProject(std::string filename);
+	bool LoadProject(const std::string& filename);
 	void UnloadProject();
 
 	void ExportTrackOnMap(Track* track);

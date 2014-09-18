@@ -25,8 +25,9 @@ ProjectManager::~ProjectManager()
 	delete mProject;
 }
 
-bool ProjectManager::LoadProject(std::string filename)
+bool ProjectManager::LoadProject(const std::string& filename)
 {
+	std::cout << "Loading " << filename << std::endl;
 	if(mProject) UnloadProject();
 	mProject = new Project;
 	if(!mProject->LoadXML(filename))

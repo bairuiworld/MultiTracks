@@ -6,6 +6,7 @@
 #include "MapViewport.h"
 #include "Track.h"
 #include "EditMode.h"
+#include "ConfigManager.h"
 #include "ViewManager.h"
 
 #include <iostream>
@@ -66,8 +67,11 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 		mMapRenderer->Invalidate();
 	};
 
+	std::string pf = Config::g->GetValue("path", "Project", "shit");
+	char fullpath[MAX_PATH];
+	GetFullPathName(pf.c_str(), MAX_PATH, fullpath, nullptr);
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
-	mProjectManager->LoadProject("C:\\Users\\Eisenheim\\Projets\\cpp\\MultiTracks\\MultiTracks\\projet.txt");
+	mProjectManager->LoadProject(fullpath);
 	mProjectManager->SignalSelectTrack += sig::slot(this, &ViewManager::OnTrackSelect);
 	mProjectManager->SignalEditTrack += sig::slot(this, &ViewManager::OnEditTrack);
 }

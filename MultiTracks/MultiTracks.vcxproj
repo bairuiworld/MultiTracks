@@ -92,6 +92,8 @@
   <ItemGroup>
     <ClCompile Include="Algorithm.cpp" />
     <ClCompile Include="Area.cpp" />
+    <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="DataFile.cpp" />
     <ClCompile Include="DownloadManager.cpp" />
     <ClCompile Include="EditMode.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -118,6 +120,8 @@
     <ClInclude Include="Area.h" />
     <ClInclude Include="BoundingBox.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ConfigManager.h" />
+    <ClInclude Include="DataFile.h" />
     <ClInclude Include="DownloadManager.h" />
     <ClInclude Include="EditMode.h" />
     <ClInclude Include="Entity.h" />

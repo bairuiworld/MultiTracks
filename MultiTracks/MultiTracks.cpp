@@ -1,6 +1,7 @@
 #include "DownloadManager.h"
 #include "ViewManager.h"
 #include "Application.h"
+#include "ConfigManager.h"
 
 #include <windows.h>
 #include <CommCtrl.h>
@@ -21,6 +22,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 //#endif
 	// Init
+	if(!mt::Config::g->Load("config.ini"))
+	{
+		std::cout << "File not found" << std::endl;
+		mt::Config::g->SetFileName("config.ini");
+		mt::Config::g->SetInt("version", 1, "", "MultiTracks");
+		std::cout << mt::Config::g->GetValue("path", "Project", "shiiiit") << std::endl;
+	}
+
 	mt::DownloadManager::Init();
 	curl_global_init(CURL_GLOBAL_ALL);
 	ilInit();
@@ -42,6 +51,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 	mt::DownloadManager::CleanUp();
 	curl_global_cleanup();
+#ifdef _DEBUG
 	system("pause");
+#endif
 	return 0;
 }
