@@ -132,6 +132,7 @@ bool ProjectManager::OnEndLabelEdit(ww::TreeNode* node_, std::string& text)
 	if(node->GetType() == ProjectNodeType::Track)
 	{
 		Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
+		track->SetName(text);
 		text += " (" + std::to_string((int)std::round(track->GetLength())) + " km)";
 	}
 	return true;
@@ -218,6 +219,8 @@ std::string ProjectManager::MakeTrackName(const Track* track) const
 void ProjectManager::EditCurrentTrack()
 {
 	ww::TreeNode* node = mProjectTree->GetSelectedNode();
+	if(reinterpret_cast<ProjectTreeNodeBase*>(node)->GetType() != ProjectNodeType::Track)
+		return;
 	EditTrack(reinterpret_cast<ProjectTreeNode<Track>*>(node));
 }
 

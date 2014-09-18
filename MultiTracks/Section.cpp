@@ -166,6 +166,12 @@ Section* Section::LoadXML(tinyxml2::XMLElement* element, MapObjectContainer* con
 {
 	Section* section = new Section(container);
 
+	int color;
+	if(element->QueryIntAttribute(prop::Color::name, &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		section->mProperties.Set<prop::Color>(color);
+	float linewidth;
+	if(element->QueryFloatAttribute(prop::LineWidth::name, &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		section->mProperties.Set<prop::LineWidth>(linewidth);
 	int type;
 	if(element->QueryIntAttribute(prop::Type::name, &type) == tinyxml2::XMLError::XML_NO_ERROR)
 		section->mProperties.Set<prop::Type>(type);
@@ -193,6 +199,10 @@ tinyxml2::XMLElement* Section::SaveXML(tinyxml2::XMLDocument* doc) const
 {
 	tinyxml2::XMLElement* section = doc->NewElement("section");
 
+	if(mProperties.Exists(prop::Color::name))
+		section->SetAttribute(prop::Color::name, mProperties.Get<prop::Color>());
+	if(mProperties.Exists(prop::LineWidth::name))
+		section->SetAttribute(prop::LineWidth::name, mProperties.Get<prop::LineWidth>());
 	if(mProperties.Exists(prop::Type::name))
 		section->SetAttribute(prop::Type::name, mProperties.Get<prop::Type>());
 	if(mProperties.Exists(prop::Interest::name))

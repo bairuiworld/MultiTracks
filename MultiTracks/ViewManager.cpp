@@ -60,6 +60,11 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	};
 	mReviewButton->SignalClicked += [this]() {
 		Track* track = mProjectManager->GetCurrentTrack();
+		if(!track)
+		{
+			mReviewButton->SetCheck(false);
+			return;
+		}
 		if(mReviewButton->IsChecked())
 			mMapRenderer->AddComponent(track->GetReview());
 		else

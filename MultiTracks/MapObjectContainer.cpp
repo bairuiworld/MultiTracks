@@ -37,11 +37,11 @@ MapObjectContainer* MapObjectContainer::LoadXML(tinyxml2::XMLElement* element)
 	MapObjectContainer* c = new MapObjectContainer;
 	
 	int color;
-	if(element->QueryIntAttribute("color", &color) == tinyxml2::XMLError::XML_NO_ERROR)
-		c->GetProperties().Set("color", color);
+	if(element->QueryIntAttribute(prop::Color::name, &color) == tinyxml2::XMLError::XML_NO_ERROR)
+		c->mProperties.Set<prop::Color>(color);
 	float linewidth;
-	if(element->QueryFloatAttribute("linewidth", &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
-		c->GetProperties().Set("linewidth", linewidth);
+	if(element->QueryFloatAttribute(prop::LineWidth::name, &linewidth) == tinyxml2::XMLError::XML_NO_ERROR)
+		c->mProperties.Set<prop::LineWidth>(linewidth);
 
 	tinyxml2::XMLElement* e = element->FirstChildElement("section");
 	while(e)
@@ -64,10 +64,10 @@ tinyxml2::XMLElement* MapObjectContainer::SaveXML(tinyxml2::XMLDocument* doc, co
 {
 	tinyxml2::XMLElement* reviewElement = doc->NewElement(name);
 
-	if(mProperties.Exists("color"))
-		reviewElement->SetAttribute("color", mProperties.Get<int>("color"));
-	if(mProperties.Exists("linewidth"))
-		reviewElement->SetAttribute("linewidth", mProperties.Get<float>("linewidth"));
+	if(mProperties.Exists(prop::Color::name))
+		reviewElement->SetAttribute(prop::Color::name, mProperties.Get<prop::Color>());
+	if(mProperties.Exists(prop::LineWidth::name))
+		reviewElement->SetAttribute(prop::LineWidth::name, mProperties.Get<prop::LineWidth>());
 
 	for(Section* section : mSections)
 		reviewElement->InsertEndChild(section->SaveXML(doc));
