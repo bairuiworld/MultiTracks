@@ -14,20 +14,24 @@ namespace SectionType
 static const int Flat = 1;
 static const int DownhillOnly = 2;
 static const int UpDownBoth = 3;
+static const int UphillPreferred = 4;
 }
 
 namespace SectionDifficulty
 {
-static const int Easy = 1;
-static const int Medium = 2;
-static const int Hard = 3;
+static const int None = 1;
+static const int Technical = 2;
+static const int Physical = 3;
+static const int TechnicalPhysical = 4;
 }
 
 namespace SectionInterest
 {
-static const int OneStar = 1;
-static const int TwoStars = 2;
-static const int ThreeStars = 3;
+static const int None = 1;
+static const int Usable = 2;
+static const int Pleasant = 3;
+static const int UseIfPossible = 4;
+static const int Unavoidable = 5;
 }
 
 class Location;

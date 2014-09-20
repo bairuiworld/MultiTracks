@@ -112,7 +112,7 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 	}
 	else if(ev.GetButton() == ww::MouseButton::Left && ev.GetClicks() == 2 && node->GetType() == ProjectNodeType::Track)
 	{
-		EditTrack(reinterpret_cast<ProjectTreeNode<Track>*>(node_));
+		//KeepTrackDisplayed(reinterpret_cast<ProjectTreeNode<Track>*>(node_));
 	}
 }
 

@@ -112,15 +112,20 @@ void MapRenderer::Save(std::string filename, ImageFormat imformat) const
 	Draw()->Save(wfilename.c_str(), &clsid, NULL);
 }
 
-void MapRenderer::RemoveComponent(const Component* component)
+void MapRenderer::RemoveComponent(const Component* component, RemovingPolicy policy)
 {
 	auto it = std::find_if(mEntities.begin(), mEntities.end(), [component](Entity* e) {
 		return e->GetComponent() == component;
 	});
 	if(it != mEntities.end())
 	{
-		delete *it;
-		mEntities.erase(it);
+		if(policy == RemovingPolicy::DecRef)
+			(*it)->DecRef();
+		if((*it)->GetRef() == 0 || policy == RemovingPolicy::Always)
+		{
+			delete *it;
+			mEntities.erase(it);
+		}
 	}
 }
 

@@ -14,6 +14,8 @@ namespace mt
 class Map;
 
 enum class ImageFormat { png, jpeg, bmp, gif, tiff };
+enum class AddingPolicy { Ensure, IncRef };
+enum class RemovingPolicy { DecRef, Always };
 
 class MapRenderer
 {
@@ -28,8 +30,8 @@ public:
 	void Save(std::string filename, ImageFormat imformat = ImageFormat::jpeg) const;
 
 	template <class T>
-	void AddComponent(T* component);
-	void RemoveComponent(const Component* component);
+	void AddComponent(T* component, AddingPolicy policy = AddingPolicy::IncRef);
+	void RemoveComponent(const Component* component, RemovingPolicy policy = RemovingPolicy::DecRef);
 
 protected:
 	void InternalDraw(Gdiplus::Graphics* g, bool synchronous) const;
@@ -72,9 +74,15 @@ public:
 };
 
 template <class T>
-void MapRenderer::AddComponent(T* component)
+void MapRenderer::AddComponent(T* component, AddingPolicy policy)
 {
-	mEntities.push_back(new Entity(component));
+	auto it = std::find_if(mEntities.begin(), mEntities.end(), [component](Entity* e) {
+		return e->GetComponent() == component;
+	});
+	if(it != mEntities.end() && policy == AddingPolicy::IncRef)
+		(*it)->IncRef();
+	else
+		mEntities.push_back(new Entity(component));
 }
 
 }
