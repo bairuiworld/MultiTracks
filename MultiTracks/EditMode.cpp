@@ -150,7 +150,7 @@ void TrackReviewMode::OnSelectCurrentSection(Section* section, const Vector2d& n
 	*diffp << " " << "Aucune" << "Technique" << "Physique" << "Technique/Physique";
 	diffp->SetSelected(section->GetProperties().Get<prop::Difficulty>(0));
 	ww::DropDownProperty* interestp = new ww::DropDownProperty("Intérêt", "Section");
-	*interestp << " " << "Aucun" << "Utilisable" << "Agréable" << "A utiliser si possible" << "Incontournable";
+	*interestp << " " << "Aucun" << "Utilisable" << "Agréable" << "A utiliser si possible" << "Incontournable" << "Impraticable" << "A éviter";
 	interestp->SetSelected(section->GetProperties().Get<prop::Interest>(0));
 
 	mPropGrid->AddProperty(color);

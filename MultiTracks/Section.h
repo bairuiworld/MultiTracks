@@ -32,6 +32,8 @@ static const int Usable = 2;
 static const int Pleasant = 3;
 static const int UseIfPossible = 4;
 static const int Unavoidable = 5;
+static const int Impraticable = 6;
+static const int ToBeAvoided = 7;
 }
 
 class Location;
