@@ -10,6 +10,13 @@
 namespace mt
 {
 
+namespace Shape
+{
+static const int Circle = 1;
+static const int FilledCircle = 2;
+}
+
+
 class EntityRenderer;
 struct NullRenderer {};
 template <class T> struct RendererSelector { typedef NullRenderer type; };

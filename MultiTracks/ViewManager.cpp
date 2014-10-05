@@ -72,7 +72,7 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 		mMapRenderer->Invalidate();
 	};
 
-	std::string pf = Config::g->GetValue("path", "Project", "shit");
+	std::string pf = Config::CurrentProjectPath();
 	char fullpath[MAX_PATH];
 	GetFullPathName(pf.c_str(), MAX_PATH, fullpath, nullptr);
 	mProjectManager = new ProjectManager(mMapRenderer, mProjectTree);
@@ -122,7 +122,7 @@ void ViewManager::OnTrackSelect(Track* track)
 
 bool ViewManager::OnEditTrack(Track* track)
 {
-	OpenEditMode(new TrackEditMode(mMapRenderer, track));
+	OpenEditMode(new ContainerEditMode(mMapRenderer, track));
 	return true;
 }
 

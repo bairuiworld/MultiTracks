@@ -8,7 +8,7 @@ namespace mt
 
 Track::Track(Track* parent) : mName("Unnamed track"), mReview(nullptr), mParent(parent)
 {
-	//mSections.push_back(new Section(this));
+
 }
 
 Track::~Track()
@@ -27,16 +27,20 @@ Track* Track::NewAlternative()
 
 const Location* Track::GetFirstLocation() const
 {
+	if(mSections.size() == 0) return nullptr;
 	return mSections.front()->GetFirstLocation();
 }
 
 const Location* Track::GetLastLocation() const
 {
+	if(mSections.size() == 0) return nullptr;
 	return mSections.back()->GetLastLocation();
 }
 
 Section* Track::GetLastSection()
 {
+	if(mSections.size() == 0)
+		mSections.push_back(new Section(this));
 	return mSections.back();
 }
 

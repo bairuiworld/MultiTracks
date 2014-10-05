@@ -22,12 +22,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 //#endif
 	// Init
-	if(!mt::Config::g->Load("config.ini"))
+	if(!mt::Config::Load("config.ini"))
 	{
-		std::cout << "File not found" << std::endl;
-		mt::Config::g->SetFileName("config.ini");
-		mt::Config::g->SetInt("version", 1, "", "MultiTracks");
-		std::cout << mt::Config::g->GetValue("path", "Project", "shiiiit") << std::endl;
+		
 	}
 
 	mt::DownloadManager::Init();

@@ -177,27 +177,68 @@ void SectionSelector::ClearResult()
 	mLastSection = nullptr;
 }
 
-/*
-bool SectionSelector::SelectSectionEnd(ComponentSelector* selector)
+SectionEndSelector::SectionEndSelector() :
+mSectionEnd(nullptr), mLastSectionEnd(nullptr), mSection(nullptr), mLastSection(nullptr)
+{
+
+}
+
+SectionEndSelector::~SectionEndSelector()
+{
+	ClearResult();
+}
+
+void SectionEndSelector::Select(SelectionTracker* tracker)
+{
+	Compile(tracker);
+	for(auto it : mSections)
+		SelectSectionEnd(tracker, it);
+}
+
+void SectionEndSelector::SelectSectionEnd(SelectionTracker* tracker, const SectionInfo& si)
 {
 	bool found = false;
-	const Vector2d& first = mCompiledLocations.front();
-	double d = first.GetDistance(selector->GetPoint());
-	if(selector->Validate(d))
+	const Vector2d& first = si.pixels.front();
+	double d = first.GetDistance(tracker->GetPoint());
+	if(tracker->Validate(d, this))
 	{
-		selector->SetSelected(const_cast<Location*>(mSection->GetFirstLocation()), Selectable::SectionEnd, d, first);
-		found = true;
+		mSection = si.section;
+		mSectionEnd = mSection->GetFirstLocation();
 	}
 
-	if(mCompiledLocations.size() < 1) return found;
-	const Vector2d& last = mCompiledLocations.back();
-	d = last.GetDistance(selector->GetPoint());
-	if(selector->Validate(d))
+	if(si.pixels.size() < 1) return;
+	const Vector2d& last = si.pixels.back();
+	d = last.GetDistance(tracker->GetPoint());
+	if(tracker->Validate(d, this))
 	{
-		selector->SetSelected(const_cast<Location*>(mSection->GetLastLocation()), Selectable::SectionEnd, d, last);
-		found = true;
+		mSection = si.section;
+		mSectionEnd = mSection->GetLastLocation();
 	}
-	return found;
 }
-*/
+
+void SectionEndSelector::EmitResult()
+{
+	if(!mSection) return;
+	if(mSectionEnd == mLastSectionEnd)
+	{
+		mSection = nullptr;
+		mSectionEnd = nullptr;
+		return;
+	}
+	ClearResult();
+	mLastSection = mSection;
+	mLastSectionEnd = mSectionEnd;
+	mSection = nullptr;
+	mSectionEnd = nullptr;
+	SignalSelection.emit(mLastSection, mLastSectionEnd);
+}
+
+void SectionEndSelector::ClearResult()
+{
+	if(!mLastSectionEnd) return;
+	SignalDeselection.emit(mLastSection, mLastSectionEnd);
+	mLastSection = nullptr;
+	mLastSectionEnd = nullptr;
+}
+
 }

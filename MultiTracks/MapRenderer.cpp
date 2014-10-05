@@ -158,7 +158,7 @@ void WindowMapRenderer::RemoveSelector(Selector* selector, SelectorAction action
 		(*it).second.erase(sit);
 }
 
-void WindowMapRenderer::InvalidateEntities()
+void WindowMapRenderer::InvalidateSelectors()
 {
 	for(auto it : mSelectors)
 		for(Selector* s : it.second)
@@ -187,7 +187,7 @@ void WindowMapRenderer::OnMouseDrag(ww::MouseEvent ev)
 	mMap->GetViewport()->MoveOrigin(static_cast<float>(ev.GetPrevPoint().x - ev.GetPoint().x), static_cast<float>(ev.GetPrevPoint().y - ev.GetPoint().y));
 	if(mParent)
 		mParent->Invalidate();
-	InvalidateEntities();
+	InvalidateSelectors();
 }
 
 void WindowMapRenderer::OnMouseWheel(ww::MouseEvent ev)
@@ -197,7 +197,7 @@ void WindowMapRenderer::OnMouseWheel(ww::MouseEvent ev)
 	view->SetZoom(view->GetZoom() + ev.GetWheelRotation(), Vector2d(pt.x, pt.y));
 	if(mParent)
 		mParent->Invalidate();
-	InvalidateEntities();
+	InvalidateSelectors();
 }
 
 void WindowMapRenderer::OnResize(int width, int height)

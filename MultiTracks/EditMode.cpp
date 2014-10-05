@@ -5,6 +5,7 @@
 #include "WayPoint.h"
 #include "MapRenderer.h"
 #include "Map.h"
+#include "ConfigManager.h"
 #include "EditMode.h"
 
 namespace mt
@@ -21,36 +22,86 @@ EditMode::~EditMode()
 	mMapRenderer->SignalMapClick -= mSlotId;
 }
 
-TrackEditMode::TrackEditMode(WindowMapRenderer* renderer, Track* track) :
-EditMode(renderer), mTrack(track)
+ContainerEditMode::ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container) :
+EditMode(renderer), mContainer(container), mCurrentSection(nullptr), mCurrentLocation(nullptr)
 {
-	mTrack->GetProperties().Push()
-		.Set<prop::Color>(Gdiplus::Color::Magenta)
-		.Set<prop::LineWidth>(3);
-	mMapRenderer->AddComponent(mTrack);
-	
-	const Location* end = mTrack->GetLastLocation();
-	if(end)
-		mMapRenderer->AddComponent(end);
-	
+	mSectionEndSelector = new SectionEndSelector;
+	mSectionEndSelector->Add({container});
+	mSectionEndSelector->SignalSelection += sig::slot(this, &ContainerEditMode::OnSelectSectionEnd);
+	mSectionEndSelector->SignalDeselection += sig::slot(this, &ContainerEditMode::OnDeselectSectionEnd);
+	mMapRenderer->AddSelector(mSectionEndSelector, SelectorAction::MouseMove);
+
+	renderer->SignalMouseMove += sig::slot(this, &ContainerEditMode::OnMouseMove);
+
+	mContainer->GetProperties().Push()
+		.Set<prop::Color>(Config::TrackEditLineColor())
+		.Set<prop::LineWidth>(Config::TrackEditLineWidth());
+	mMapRenderer->AddComponent(mContainer);	
 	mMapRenderer->Invalidate();
 }
 
-TrackEditMode::~TrackEditMode()
+ContainerEditMode::~ContainerEditMode()
 {
-	mTrack->GetProperties().Pop();
-	const Location* end = mTrack->GetLastLocation();
-	if(end) mMapRenderer->RemoveComponent(end);
-	mMapRenderer->RemoveComponent(mTrack);
+	mContainer->GetProperties().Pop();
+	if(mCurrentLocation)
+	{
+		mMapRenderer->RemoveComponent(mCurrentLocation);
+		mCurrentLocation->GetProperties().Pop();
+	}
+	mMapRenderer->RemoveComponent(mContainer);
+	mMapRenderer->Invalidate();
+	mMapRenderer->RemoveSelector(mSectionEndSelector, SelectorAction::MouseMove);
+}
+
+void ContainerEditMode::OnSelectSectionEnd(Section* section, Location* sectionEnd)
+{
+	std::cout << "sel" << std::endl;
+	mMapRenderer->AddComponent(sectionEnd);
+	sectionEnd->GetProperties()
+		.Push()
+		.Set<prop::Shape>(Shape::Circle)
+		.Set<prop::LineWidth>(2);
 	mMapRenderer->Invalidate();
 }
 
-void TrackEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
+void ContainerEditMode::OnDeselectSectionEnd(Section* section, Location* sectionEnd)
 {
-	const Location* end = mTrack->GetLastLocation();
-	if(end) mMapRenderer->RemoveComponent(end);
-	mTrack->GetLastSection()->Add(location);
-	mMapRenderer->AddComponent(mTrack->GetLastLocation());
+	mMapRenderer->RemoveComponent(sectionEnd);
+	sectionEnd->GetProperties().Pop();
+	mMapRenderer->Invalidate();
+}
+
+void ContainerEditMode::OnMouseMove(ww::MouseEvent ev)
+{
+
+}
+
+void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
+{
+	if(mCurrentLocation)
+	{
+		mMapRenderer->RemoveComponent(mCurrentLocation);
+		mCurrentLocation->GetProperties().Pop();
+	}
+	if(!mCurrentSection)
+	{
+		mCurrentSection = mSectionEndSelector->GetCurrentSection();
+		if(!mCurrentSection)
+		{
+			mCurrentSection = new Section(mContainer);
+			mContainer->Add(mCurrentSection);
+			mSectionEndSelector->Invalidate();
+		}
+	}
+	mCurrentLocation = mSectionEndSelector->GetCurrentSectionEnd();
+	if(!mCurrentLocation)
+		mCurrentSection->Add(location);
+	mCurrentLocation = mCurrentSection->GetLastLocation();
+	mCurrentLocation->GetProperties()
+		.Push()
+		.Set<prop::Shape>(Shape::Circle)
+		.Set<prop::LineWidth>(2);
+	mMapRenderer->AddComponent(mCurrentLocation);
 	mMapRenderer->Invalidate();
 }
 

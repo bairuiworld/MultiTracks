@@ -54,9 +54,21 @@ void MapObjectContainerRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewpor
 
 void LocationRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component)
 {
-	Gdiplus::SolidBrush brush(Gdiplus::Color::Red);
+	const Properties& prop = component->GetProperties();
+	Gdiplus::SolidBrush brush(prop.Get<prop::Color>(Gdiplus::Color::Red));
 	Vector2d p = viewport->LocationToPixel(*static_cast<const Location*>(component));
-	g->FillEllipse(&brush, (float)p.GetX() - 5, (float)p.GetY() - 5, 10., 10.);
+	switch(prop.Get<prop::Shape>(Shape::FilledCircle))
+	{
+	case Shape::FilledCircle:
+		g->FillEllipse(&brush, (float)p.GetX() - 5, (float)p.GetY() - 5, 10.f, 10.f);
+		break;
+
+	case Shape::Circle:
+		Gdiplus::Pen pen(&brush, prop.Get<prop::LineWidth>(2));
+		g->DrawEllipse(&pen, (float)p.GetX() - 5, (float)p.GetY() - 5, 10.f, 10.f);
+		break;
+	}
+	
 }
 
 }

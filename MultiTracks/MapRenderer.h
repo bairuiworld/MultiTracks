@@ -52,9 +52,9 @@ public:
 	void AddSelector(Selector* selector, SelectorAction action);
 	void RemoveSelector(Selector* selector, SelectorAction action);
 
-protected:
-	void InvalidateEntities();
+	void InvalidateSelectors();
 
+protected:
 	virtual void OnPaint(Gdiplus::Graphics* g, const RECT& clip);
 	virtual void OnResize(int width, int height);
 	virtual void OnMouseDown(ww::MouseEvent ev);

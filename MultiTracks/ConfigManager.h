@@ -9,11 +9,16 @@ namespace mt
 class Config
 {
 public:
-	CDataFile* operator->() { return &mConfig; }
+	static bool Load(const char* file) { return g.mConfig.Load(file); }
 
-	static Config g;
+	static int MultiTracksVersion() { return g.mConfig.GetInt("version", "MultiTracks", -1); }
+	static std::string CurrentProjectPath() { return g.mConfig.GetValue("path", "Project", ""); }
+
+	static float TrackEditLineWidth() { return g.mConfig.GetFloat("linewidth", "TrackEdit", 2); }
+	static int TrackEditLineColor() { return g.mConfig.GetInt("linecolor", "TrackEdit", 0xFF0000); }
 
 private:
+	static Config g;
 	CDataFile mConfig;
 };
 

@@ -21,17 +21,25 @@ protected:
 	int mSlotId;
 };
 
-class Track;
-class TrackEditMode : public EditMode
+class MapObjectContainer;
+class ContainerEditMode : public EditMode
 {
 public:
-	TrackEditMode(WindowMapRenderer* renderer, Track* track);
-	virtual ~TrackEditMode();
+	ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container);
+	virtual ~ContainerEditMode();
 
 	virtual void OnMapClick(ww::MouseEvent ev, const Location& location);
 
 protected:
-	Track* mTrack;
+	void OnSelectSectionEnd(Section* section, Location* sectionEnd);
+	void OnDeselectSectionEnd(Section* section, Location* sectionEnd);
+	void OnMouseMove(ww::MouseEvent ev);
+
+protected:
+	MapObjectContainer* mContainer;
+	SectionEndSelector* mSectionEndSelector;
+	Section* mCurrentSection;
+	Location* mCurrentLocation;
 };
 
 class TrackReviewMode : public EditMode

@@ -65,8 +65,8 @@ public:
 	void Reverse();
 
 	const LocationList& GetLocations() const { return mLocations; }
-	const Location* GetFirstLocation() const;
-	const Location* GetLastLocation() const;
+	Location* GetFirstLocation();
+	Location* GetLastLocation();
 
 	double GetElevationDifference() const;
 	double GetPositiveElevation() const;

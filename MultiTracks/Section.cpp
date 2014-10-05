@@ -77,13 +77,13 @@ void Section::Reverse()
 	std::reverse(mLocations.begin(), mLocations.end());
 }
 
-const Location* Section::GetFirstLocation() const
+Location* Section::GetFirstLocation()
 {
 	if(mLocations.size() == 0) return nullptr;
 	return &mLocations.front();
 }
 
-const Location* Section::GetLastLocation() const
+Location* Section::GetLastLocation()
 {
 	if(mLocations.size() == 0) return nullptr;
 	return &mLocations.back();
@@ -92,7 +92,7 @@ const Location* Section::GetLastLocation() const
 double Section::GetElevationDifference() const
 {
 	if(mLocations.size() <= 1) return 0;
-	return GetLastLocation()->GetElevation() - GetFirstLocation()->GetElevation();
+	return mLocations.back().GetElevation() - mLocations.front().GetElevation();
 }
 
 double Section::GetPositiveElevation() const

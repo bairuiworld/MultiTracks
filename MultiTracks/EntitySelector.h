@@ -160,6 +160,36 @@ public:
 	sig::Signal<void(Section*, const Vector2d&)> SignalDeselection;
 };
 
+class SectionEndSelector : public SectionSelectorBase
+{
+public:
+	SectionEndSelector();
+	virtual ~SectionEndSelector();
+
+	virtual void EmitResult();
+	virtual void ClearResult();
+
+	Location* GetCurrentSectionEnd() const { return mLastSectionEnd; }
+	Section* GetCurrentSection() const { return mLastSection; }
+
+protected:
+	virtual void Select(SelectionTracker* tracker);
+
+private:
+	void SelectSectionEnd(SelectionTracker* tracker, const SectionInfo& si);
+
+private:
+	Section* mSection;
+	Location* mSectionEnd;
+
+	Section* mLastSection;
+	Location* mLastSectionEnd;
+
+public:
+	sig::Signal<void(Section*, Location*)> SignalSelection;
+	sig::Signal<void(Section*, Location*)> SignalDeselection;
+};
+
 }
 
 #endif // !__MULTITRACKS_ENTITYSELECTOR_H__
