@@ -99,7 +99,7 @@ void ProjectManager::OnTreeClick(ww::TreeNode* node_, ww::MouseEvent ev)
 			ww::PopupMenu menu;
 			Track* track = reinterpret_cast<ProjectTreeNode<Track>*>(node_)->GetObject();
 			menu.AddItem("Exporter sur une carte", std::bind(&ProjectManager::ExportTrackOnMap, this, track));
-			//menu.AddItem("Exporter GPX", std::bind(&ProjectManager::ExportGPX, this, track));
+			menu.AddItem("Exporter GPX", std::bind(&ProjectManager::ExportGPX, this, track));
 			menu.AddItem("Centrer la trace", std::bind(&ProjectManager::CenterTrack, this, track));
 			menu.Track(mProjectTree->GetHandle(), ev.GetPoint());
 		}
@@ -202,6 +202,11 @@ void ProjectManager::ExportTrackOnMap(Track* track)
 	mRenderer->Save(savedlg.GetFileName(), ImageFormat::jpeg);
 	vp->SetOrigin(save.GetOrigin());
 	vp->SetViewDimension(save.GetWidth(), save.GetHeight());
+}
+
+void ProjectManager::ExportGPX(Track* track)
+{
+	GPX::Save(track->GetName().c_str(), track);
 }
 
 void ProjectManager::CenterTrack(Track* track)

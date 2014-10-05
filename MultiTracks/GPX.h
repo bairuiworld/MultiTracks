@@ -10,6 +10,7 @@ class GPX
 {
 public:
 	static Track* Load(const char* filename);
+	static void Save(const char* filename, Track* track);
 };
 
 }

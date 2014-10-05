@@ -51,4 +51,31 @@ Track* GPX::Load(const char* filename)
 	return track;
 }
 
+void GPX::Save(const char* filename, Track* track)
+{
+	tinyxml2::XMLDocument doc;
+
+	tinyxml2::XMLElement* root = doc.NewElement("gpx");
+	doc.InsertEndChild(root);
+	tinyxml2::XMLElement* trk = doc.NewElement("trk");
+	root->InsertEndChild(trk);
+	tinyxml2::XMLElement* name = doc.NewElement("name");
+	name->SetText(track->GetName().c_str());
+	trk->InsertEndChild(name);
+
+	for(Section* section : track->GetSections())
+	{
+		tinyxml2::XMLElement* trkseg = doc.NewElement("trkseg");
+		for(const Location& location : section->GetLocations())
+		{
+			tinyxml2::XMLElement* trkpt = doc.NewElement("trkpt");
+			trkpt->SetAttribute("lat", location.GetLatitude());
+			trkpt->SetAttribute("lon", location.GetLongitude());
+			trkseg->InsertEndChild(trkpt);
+		}
+		trk->InsertEndChild(trkseg);
+	}
+	doc.SaveFile(filename);
+}
+
 }

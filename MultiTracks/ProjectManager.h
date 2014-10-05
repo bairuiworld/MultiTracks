@@ -66,6 +66,7 @@ private:
 	void LoadProjectTree();
 	void AddTrack(ProjectTreeNodeBase* groupNode);
 	void ImportTrack(ProjectTreeNodeBase* groupNode);
+	void ExportGPX(Track* track);
 	void CenterTrack(Track* track);
 	std::string MakeTrackName(const Track* track) const;
 	void EditTrack(ProjectTreeNode<Track>* trackNode);
