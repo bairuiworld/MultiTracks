@@ -40,8 +40,8 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 	mReviewButton = new ww::CheckBox("Review", ww::CheckBoxStyle::PushLike);
 	mMapRenderer->Add(mEditButton);
 	mMapRenderer->Add(mReviewButton);
-	mEditButton->Enable(false);
-	mReviewButton->Enable(false);
+	//mEditButton->Enable(false);
+	//mReviewButton->Enable(false);
 	mEditButton->SetBounds({260, 10, 330, 70});
 	mReviewButton->SetBounds({340, 10, 410, 70});
 	mEditButton->SignalClicked += [this]() { 

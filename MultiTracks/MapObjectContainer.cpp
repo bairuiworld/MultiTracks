@@ -24,6 +24,13 @@ void MapObjectContainer::Add(Section* section)
 	section->SetParent(this);
 }
 
+void MapObjectContainer::Remove(Section* section)
+{
+	SectionList::iterator it = std::find(mSections.begin(), mSections.end(), section);
+	if(it == mSections.end()) return;
+	mSections.erase(it);
+}
+
 void MapObjectContainer::InsertAfter(Section* after, Section* section)
 {
 	SectionList::iterator it = std::find(mSections.begin(), mSections.end(), after);

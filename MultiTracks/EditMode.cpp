@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <windowsx.h>
 #include <gdiplus.h>
 #include "Track.h"
 #include "Section.h"
@@ -6,6 +7,7 @@
 #include "MapRenderer.h"
 #include "Map.h"
 #include "ConfigManager.h"
+#include "Menu.h"
 #include "EditMode.h"
 
 namespace mt
@@ -31,6 +33,11 @@ EditMode(renderer), mContainer(container), mCurrentSection(nullptr), mCurrentLoc
 	mSectionEndSelector->SignalDeselection += sig::slot(this, &ContainerEditMode::OnDeselectSectionEnd);
 	mMapRenderer->AddSelector(mSectionEndSelector, SelectorAction::MouseMove);
 
+	mWayPointSelector = new WayPointSelector;
+	mWayPointSelector->Add({container});
+	mWayPointSelector->SignalSelection += sig::slot(this, &ContainerEditMode::OnSectionClick);
+	mMapRenderer->AddSelector(mWayPointSelector, SelectorAction::MouseRightClick);
+
 	renderer->SignalMouseMove += sig::slot(this, &ContainerEditMode::OnMouseMove);
 
 	mContainer->GetProperties().Push()
@@ -43,11 +50,7 @@ EditMode(renderer), mContainer(container), mCurrentSection(nullptr), mCurrentLoc
 ContainerEditMode::~ContainerEditMode()
 {
 	mContainer->GetProperties().Pop();
-	if(mCurrentLocation)
-	{
-		mMapRenderer->RemoveComponent(mCurrentLocation);
-		mCurrentLocation->GetProperties().Pop();
-	}
+	ClearCurrentLocation();
 	mMapRenderer->RemoveComponent(mContainer);
 	mMapRenderer->Invalidate();
 	mMapRenderer->RemoveSelector(mSectionEndSelector, SelectorAction::MouseMove);
@@ -55,7 +58,6 @@ ContainerEditMode::~ContainerEditMode()
 
 void ContainerEditMode::OnSelectSectionEnd(Section* section, Location* sectionEnd)
 {
-	std::cout << "sel" << std::endl;
 	mMapRenderer->AddComponent(sectionEnd);
 	sectionEnd->GetProperties()
 		.Push()
@@ -71,6 +73,26 @@ void ContainerEditMode::OnDeselectSectionEnd(Section* section, Location* section
 	mMapRenderer->Invalidate();
 }
 
+void ContainerEditMode::OnSectionClick(WayPoint* wp)
+{
+	ww::PopupMenu menu;
+	menu.AddItem("Supprimer", [this, wp]() {
+		Section* s = wp->GetSection();
+		MapObjectContainer* parent = s->GetParent();
+		parent->Remove(s);
+		if(mCurrentSection == s)
+		{
+			mCurrentSection = nullptr;
+			ClearCurrentLocation();
+		}
+		delete s;
+		mMapRenderer->Invalidate();
+	});
+	menu.AddItem("Couper ici", [](){});
+	DWORD pt = GetMessagePos();
+	menu.Track(mMapRenderer->GetHandle(), POINT{GET_X_LPARAM(pt), GET_Y_LPARAM(pt)});
+}
+
 void ContainerEditMode::OnMouseMove(ww::MouseEvent ev)
 {
 
@@ -78,11 +100,8 @@ void ContainerEditMode::OnMouseMove(ww::MouseEvent ev)
 
 void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 {
-	if(mCurrentLocation)
-	{
-		mMapRenderer->RemoveComponent(mCurrentLocation);
-		mCurrentLocation->GetProperties().Pop();
-	}
+	if(ev.GetButton() != ww::MouseButton::Left || ev.GetClicks() != 1) return;
+	ClearCurrentLocation();
 	if(!mCurrentSection)
 	{
 		mCurrentSection = mSectionEndSelector->GetCurrentSection();
@@ -105,6 +124,15 @@ void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 	mMapRenderer->Invalidate();
 }
 
+void ContainerEditMode::ClearCurrentLocation()
+{
+	if(mCurrentLocation)
+	{
+		mMapRenderer->RemoveComponent(mCurrentLocation);
+		mCurrentLocation->GetProperties().Pop();
+		mCurrentLocation = nullptr;
+	}
+}
 
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
 EditMode(renderer), mTrack(track), mHoverSection(nullptr), mSelectionSection(nullptr), mLastWayPoint(nullptr), mPropGrid(nullptr)
@@ -132,7 +160,7 @@ EditMode(renderer), mTrack(track), mHoverSection(nullptr), mSelectionSection(nul
 	mMapRenderer->AddComponent(review);
 	mMapRenderer->AddSelector(mWayPointSelector, SelectorAction::MouseMove);
 	mMapRenderer->AddSelector(mSectionSelector, SelectorAction::MouseMove);
-	mMapRenderer->AddSelector(mCurrentSectionSelector, SelectorAction::MouseClick);
+	mMapRenderer->AddSelector(mCurrentSectionSelector, SelectorAction::MouseLeftClick);
 	mMapRenderer->Invalidate();
 }
 
@@ -140,7 +168,7 @@ TrackReviewMode::~TrackReviewMode()
 {
 	mMapRenderer->RemoveSelector(mWayPointSelector, SelectorAction::MouseMove);
 	mMapRenderer->RemoveSelector(mSectionSelector, SelectorAction::MouseMove);
-	mMapRenderer->RemoveSelector(mCurrentSectionSelector, SelectorAction::MouseClick);
+	mMapRenderer->RemoveSelector(mCurrentSectionSelector, SelectorAction::MouseLeftClick);
 	mMapRenderer->RemoveComponent(mTrack->GetReview());
 	delete mSectionSelector;
 	delete mWayPointSelector;

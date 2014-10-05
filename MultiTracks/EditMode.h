@@ -33,11 +33,15 @@ public:
 protected:
 	void OnSelectSectionEnd(Section* section, Location* sectionEnd);
 	void OnDeselectSectionEnd(Section* section, Location* sectionEnd);
+	void OnSectionClick(WayPoint* wp);
 	void OnMouseMove(ww::MouseEvent ev);
+
+	void ClearCurrentLocation();
 
 protected:
 	MapObjectContainer* mContainer;
 	SectionEndSelector* mSectionEndSelector;
+	WayPointSelector* mWayPointSelector;
 	Section* mCurrentSection;
 	Location* mCurrentLocation;
 };

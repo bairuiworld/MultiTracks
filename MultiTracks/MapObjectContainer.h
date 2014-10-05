@@ -20,6 +20,7 @@ public:
 
 	void Add(Section* section);
 	void InsertAfter(Section* after, Section* section);
+	void Remove(Section* section);
 
 	void Clear();
 

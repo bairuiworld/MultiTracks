@@ -50,6 +50,7 @@ public:
 	virtual ~Section();
 
 	void SetParent(MapObjectContainer* container) { mContainer = container; mProperties.SetParent(&container->GetProperties()); }
+	MapObjectContainer* GetParent() const { return mContainer; }
 
 	void Add(const Location& location);
 	template <class LocItr>	void Add(LocItr begin, LocItr end)

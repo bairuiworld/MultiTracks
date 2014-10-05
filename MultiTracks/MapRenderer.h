@@ -41,7 +41,7 @@ protected:
 	std::vector<Entity*> mEntities;
 };
 
-enum class SelectorAction { MouseMove, MouseClick };
+enum class SelectorAction { MouseMove, MouseRightClick, MouseLeftClick };
 
 class WindowMapRenderer : public MapRenderer, public ww::DrawingArea
 {

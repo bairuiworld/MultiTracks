@@ -178,7 +178,16 @@ void WindowMapRenderer::OnMouseDown(ww::MouseEvent ev)
 void WindowMapRenderer::OnMouseClick(ww::MouseEvent ev)
 {
 	Vector2d pixel{(double)ev.GetPoint().x, (double)ev.GetPoint().y};
-	Select(mSelectors[SelectorAction::MouseClick], pixel);		
+	switch(ev.GetButton())
+	{
+	case ww::MouseButton::Left:
+		Select(mSelectors[SelectorAction::MouseLeftClick], pixel);
+		break;
+
+	case ww::MouseButton::Right:
+		Select(mSelectors[SelectorAction::MouseRightClick], pixel);
+		break;
+	}
 	SignalMapClick.emit(ev, mMap->GetViewport()->PixelToLocation(pixel));
 }
 
