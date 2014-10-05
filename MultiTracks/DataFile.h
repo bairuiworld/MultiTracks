@@ -100,13 +100,8 @@ typedef struct st_key
 	t_Str		szValue;
 	t_Str		szComment;
 
-	st_key()
-	{
-		szKey = t_Str("");
-		szValue = t_Str("");
-		szComment = t_Str("");
-	}
-
+	st_key(const t_Str& key = "", const t_Str& value = "", const t_Str& comment = "") : szKey(key), szValue(value), szComment(comment)
+	{}
 } t_Key;
 
 typedef std::vector<t_Key> KeyList;
@@ -122,13 +117,10 @@ typedef struct st_section
 	t_Str		szComment;
 	KeyList		Keys;
 
-	st_section()
+	st_section(const t_Str& name = "", const t_Str& comment = "") : szName(name), szComment(comment)
 	{
-		szName = t_Str("");
-		szComment = t_Str("");
 		Keys.clear();
 	}
-
 } t_Section;
 
 typedef std::vector<t_Section> SectionList;

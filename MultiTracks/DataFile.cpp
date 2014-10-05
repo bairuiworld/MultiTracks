@@ -65,7 +65,7 @@ CDataFile::CDataFile(t_Str szFileName)
 	m_bDirty = false;
 	m_szFileName = szFileName;
 	m_Flags = (AUTOCREATE_SECTIONS | AUTOCREATE_KEYS);
-	m_Sections.push_back( *(new t_Section) );
+	m_Sections.emplace_back();
 
 	Load(m_szFileName);
 }
@@ -74,7 +74,7 @@ CDataFile::CDataFile()
 {
 	Clear();
 	m_Flags = (AUTOCREATE_SECTIONS | AUTOCREATE_KEYS);
-	m_Sections.push_back( *(new t_Section) );
+	m_Sections.emplace_back();
 }
 
 // ~CDataFile
@@ -342,15 +342,8 @@ bool CDataFile::SetValue(t_Str szKey, t_Str szValue, t_Str szComment, t_Str szSe
 	// is not t_Str("") then add the new key.
 	if ( pKey == NULL && szValue.size() > 0 && (m_Flags & AUTOCREATE_KEYS))
 	{
-		pKey = new t_Key;
-
-		pKey->szKey = szKey;
-		pKey->szValue = szValue;
-		pKey->szComment = szComment;
-		
 		m_bDirty = true;
-		
-		pSection->Keys.push_back(*pKey);
+		pSection->Keys.emplace_back(szKey, szValue, szComment);
 
 		return true;
 	}
@@ -540,12 +533,7 @@ bool CDataFile::CreateSection(t_Str szSection, t_Str szComment)
 		Report(E_INFO, "[CDataFile::CreateSection] Section <%s> allready exists. Aborting.", szSection.c_str());
 		return false;
 	}
-
-	pSection = new t_Section;
-
-	pSection->szName = szSection;
-	pSection->szComment = szComment;
-	m_Sections.push_back(*pSection);
+	m_Sections.emplace_back(szSection, szComment);
 	m_bDirty = true;
 
 	return true;
@@ -571,14 +559,7 @@ bool CDataFile::CreateSection(t_Str szSection, t_Str szComment, KeyList Keys)
 
 	pSection->szName = szSection;
 	for (k_pos = Keys.begin(); k_pos != Keys.end(); k_pos++)
-	{
-		t_Key* pKey = new t_Key;
-		pKey->szComment = (*k_pos).szComment;
-		pKey->szKey = (*k_pos).szKey;
-		pKey->szValue = (*k_pos).szValue;
-
-		pSection->Keys.push_back(*pKey);
-	}
+		pSection->Keys.emplace_back((*k_pos).szKey, (*k_pos).szValue, (*k_pos).szComment);
 
 	m_Sections.push_back(*pSection);
 	m_bDirty = true;
