@@ -54,6 +54,9 @@ ContainerEditMode::~ContainerEditMode()
 	mMapRenderer->RemoveComponent(mContainer);
 	mMapRenderer->Invalidate();
 	mMapRenderer->RemoveSelector(mSectionEndSelector, SelectorAction::MouseMove);
+	mMapRenderer->RemoveSelector(mWayPointSelector, SelectorAction::MouseRightClick);
+	delete mSectionEndSelector;
+	delete mWayPointSelector;
 }
 
 void ContainerEditMode::OnSelectSectionEnd(Section* section, Location* sectionEnd)
@@ -75,6 +78,7 @@ void ContainerEditMode::OnDeselectSectionEnd(Section* section, Location* section
 
 void ContainerEditMode::OnSectionClick(WayPoint* wp)
 {
+	if(mCurrentLocation) return;
 	ww::PopupMenu menu;
 	menu.AddItem("Supprimer", [this, wp]() {
 		Section* s = wp->GetSection();
@@ -87,8 +91,15 @@ void ContainerEditMode::OnSectionClick(WayPoint* wp)
 		}
 		delete s;
 		mMapRenderer->Invalidate();
+		mSectionEndSelector->Invalidate();
+		mWayPointSelector->Invalidate();
 	});
-	menu.AddItem("Couper ici", [](){});
+	menu.AddItem("Couper ici", [this, wp]() {
+		Section* s = wp->GetSection();
+		Section* r = s->Split(wp->GetAfter(), *wp->GetLocation());
+		mSectionEndSelector->Invalidate();
+		mWayPointSelector->Invalidate();
+	});
 	DWORD pt = GetMessagePos();
 	menu.Track(mMapRenderer->GetHandle(), POINT{GET_X_LPARAM(pt), GET_Y_LPARAM(pt)});
 }
@@ -100,6 +111,14 @@ void ContainerEditMode::OnMouseMove(ww::MouseEvent ev)
 
 void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 {
+	if(ev.GetButton() == ww::MouseButton::Right && ev.GetClicks() == 1) // stop editing current section
+	{
+		ClearCurrentLocation();
+		mCurrentSection = nullptr;
+		mMapRenderer->Invalidate();
+		return;
+	}
+
 	if(ev.GetButton() != ww::MouseButton::Left || ev.GetClicks() != 1) return;
 	ClearCurrentLocation();
 	if(!mCurrentSection)
@@ -121,6 +140,7 @@ void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 		.Set<prop::Shape>(Shape::Circle)
 		.Set<prop::LineWidth>(2);
 	mMapRenderer->AddComponent(mCurrentLocation);
+	mWayPointSelector->Invalidate();
 	mMapRenderer->Invalidate();
 }
 

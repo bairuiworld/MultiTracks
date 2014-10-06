@@ -47,7 +47,15 @@ void SelectionTracker::EmitResult()
 void SectionSelectorBase::Compile(SelectionTracker* tracker)
 {
 	if(mValid) return;
-	for(SectionInfo& s : mSections)
+
+	mCompiledSections.clear();
+	for(Section* s : mSectionSources)
+		mCompiledSections.emplace_back(s);
+	for(MapObjectContainer* c : mContainerSources)
+		for(Section* s : c->GetSections())
+			mCompiledSections.emplace_back(s);
+
+	for(SectionInfo& s : mCompiledSections)
 	{
 		s.pixels.clear();
 		s.bb.Clear();
@@ -78,7 +86,7 @@ WayPointSelector::~WayPointSelector()
 void WayPointSelector::Select(SelectionTracker* tracker)
 {
 	Compile(tracker);
-	for(auto it : mSections)
+	for(auto it : mCompiledSections)
 		SelectWayPoint(tracker, it);
 }
 
@@ -95,7 +103,7 @@ void WayPointSelector::SelectWayPoint(SelectionTracker* tracker, const SectionIn
 		if(tracker->Validate(distanceSeg, this))
 		{
 			delete mWayPoint;
-			mWayPoint = new WayPoint(si.section, it, tracker->GetViewport()->PixelToLocation(nearest));
+			mWayPoint = new WayPoint(si.section, it - 1, tracker->GetViewport()->PixelToLocation(nearest));
 		}
 		last = &p;
 		it++;
@@ -133,7 +141,7 @@ SectionSelector::~SectionSelector()
 void SectionSelector::Select(SelectionTracker* tracker)
 {
 	Compile(tracker);
-	for(auto it : mSections)
+	for(auto it : mCompiledSections)
 		SelectSection(tracker, it);
 }
 
@@ -191,7 +199,7 @@ SectionEndSelector::~SectionEndSelector()
 void SectionEndSelector::Select(SelectionTracker* tracker)
 {
 	Compile(tracker);
-	for(auto it : mSections)
+	for(auto it : mCompiledSections)
 		SelectSectionEnd(tracker, it);
 }
 

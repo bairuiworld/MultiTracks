@@ -7,6 +7,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <algorithm>
 #include "Vector.h"
 #include "BoundingBox.h"
 #include "SimpleSignal.h"
@@ -77,15 +78,18 @@ public:
 
 	template <class Itr> void Add(Itr begin, Itr end)
 	{
-		for(Itr it = begin; it != end; it++)
-			mSections.emplace_back(*it);
+		//for(Itr it = begin; it != end; it++)
+		//	mSections.emplace_back(*it);
+		std::copy(begin, end, std::back_inserter(mSectionSources));
 		mValid = false;
 	}
 
-	void Add(std::initializer_list<MapObjectContainer*> tracks)
+	void Add(std::initializer_list<MapObjectContainer*> container)
 	{
-		for(MapObjectContainer* track : tracks)
-			Add(track->GetSections().begin(), track->GetSections().end());
+		//for(MapObjectContainer* track : tracks)
+		//	Add(track->GetSections().begin(), track->GetSections().end());
+		std::copy(container.begin(), container.end(), std::back_inserter(mContainerSources));
+		mValid = false;
 	}
 
 	virtual void Invalidate() { mValid = false; }
@@ -101,7 +105,9 @@ protected:
 	};
 
 protected:
-	std::vector<SectionInfo> mSections;
+	std::vector<SectionInfo> mCompiledSections;
+	std::vector<MapObjectContainer*> mContainerSources;
+	std::vector<Section*> mSectionSources;
 	bool mValid;
 };
 

@@ -55,10 +55,10 @@ Section* Section::Split(LocationList::const_iterator after)
 
 Section* Section::Split(LocationList::const_iterator after, const Location& location)
 {
-	if(after == mLocations.begin() || after == mLocations.end() || after == mLocations.end() - 1)
+	if(after == mLocations.end() || after == mLocations.end() - 1)
 		return nullptr; // nothing to split
 
-	Section* right = new Section;
+	Section* right = new Section(mContainer);
 	right->Add(location);
 	after++;
 
