@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	//
 	{ // Force Gdi+ object cleanup before shutting down
 		ww::Application app(ww::PropertyGridSupport);
-		mt::ViewManager view;
+		mt::ViewManager view(&app);
 		app.Run();
 	}
 

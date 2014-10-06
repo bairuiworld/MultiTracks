@@ -1,6 +1,7 @@
 #ifndef __MULTITRACKS_EDITMODE_H__
 #define __MULTITRACKS_EDITMODE_H__
 
+#include "Application.h"
 #include "PropertyGrid.h"
 
 namespace mt
@@ -11,13 +12,14 @@ class WindowMapRenderer;
 class EditMode
 {
 public:
-	EditMode(WindowMapRenderer* renderer);
+	EditMode(WindowMapRenderer* renderer, ww::Application* app);
 	virtual ~EditMode();
 
 	virtual void OnMapClick(ww::MouseEvent ev, const Location& location) {}
 
 protected:
 	WindowMapRenderer* mMapRenderer;
+	ww::Application* mApp;
 	int mSlotId;
 };
 
@@ -25,7 +27,7 @@ class MapObjectContainer;
 class ContainerEditMode : public EditMode
 {
 public:
-	ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container);
+	ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container, ww::Application* app);
 	virtual ~ContainerEditMode();
 
 	virtual void OnMapClick(ww::MouseEvent ev, const Location& location);
@@ -37,8 +39,11 @@ protected:
 	void OnMouseMove(ww::MouseEvent ev);
 
 	void ClearCurrentLocation();
+	void EndSectionEdit();
 
 protected:
+	int mKeyboardEventSlot;
+	int mMouseMoveSlot;
 	MapObjectContainer* mContainer;
 	SectionEndSelector* mSectionEndSelector;
 	WayPointSelector* mWayPointSelector;

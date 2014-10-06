@@ -1,6 +1,7 @@
 #ifndef __MULTITRACKS_VIEWMANAGER_H__
 #define __MULTITRACKS_VIEWMANAGER_H__
 
+#include "Application.h"
 #include "TreeView.h"
 #include "CheckBox.h"
 #include "Window.h"
@@ -20,7 +21,7 @@ class EditMode;
 class ViewManager
 {
 public:
-	ViewManager();
+	ViewManager(ww::Application* app);
 	~ViewManager();
 
 	void AddMapObjectContainerProperties(MapObjectContainer* container, const std::string& catalog);
@@ -33,6 +34,7 @@ private:
 	void CloseEditMode();
 
 private:
+	ww::Application* mApp;
 	ww::Window* mWindow;
 	Map* mMap;
 	WindowMapRenderer* mMapRenderer;

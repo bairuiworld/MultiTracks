@@ -13,8 +13,8 @@
 namespace mt
 {
 
-EditMode::EditMode(WindowMapRenderer* renderer) :
-mMapRenderer(renderer)
+EditMode::EditMode(WindowMapRenderer* renderer, ww::Application* app) :
+mMapRenderer(renderer), mApp(app)
 {
 	mSlotId = mMapRenderer->SignalMapClick += sig::slot(this, &EditMode::OnMapClick);
 }
@@ -24,8 +24,8 @@ EditMode::~EditMode()
 	mMapRenderer->SignalMapClick -= mSlotId;
 }
 
-ContainerEditMode::ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container) :
-EditMode(renderer), mContainer(container), mCurrentSection(nullptr), mCurrentLocation(nullptr)
+ContainerEditMode::ContainerEditMode(WindowMapRenderer* renderer, MapObjectContainer* container, ww::Application* app) :
+EditMode(renderer, app), mContainer(container), mCurrentSection(nullptr), mCurrentLocation(nullptr)
 {
 	mSectionEndSelector = new SectionEndSelector;
 	mSectionEndSelector->Add({container});
@@ -38,7 +38,15 @@ EditMode(renderer), mContainer(container), mCurrentSection(nullptr), mCurrentLoc
 	mWayPointSelector->SignalSelection += sig::slot(this, &ContainerEditMode::OnSectionClick);
 	mMapRenderer->AddSelector(mWayPointSelector, SelectorAction::MouseRightClick);
 
-	renderer->SignalMouseMove += sig::slot(this, &ContainerEditMode::OnMouseMove);
+	mMouseMoveSlot = renderer->SignalMouseMove += sig::slot(this, &ContainerEditMode::OnMouseMove);
+	mKeyboardEventSlot = app->SignalKeyUp += [this](ww::KeyboardEvent ev) {
+		if(ev.GetKeyCode() == ww::KeyCode::Escape && mCurrentLocation)
+		{
+			EndSectionEdit();
+			return true;
+		}
+		return false;
+	};
 
 	mContainer->GetProperties().Push()
 		.Set<prop::Color>(Config::TrackEditLineColor())
@@ -57,6 +65,9 @@ ContainerEditMode::~ContainerEditMode()
 	mMapRenderer->RemoveSelector(mWayPointSelector, SelectorAction::MouseRightClick);
 	delete mSectionEndSelector;
 	delete mWayPointSelector;
+
+	mMapRenderer->SignalMouseMove -= mMouseMoveSlot;
+	mApp->SignalKeyUp -= mKeyboardEventSlot;
 }
 
 void ContainerEditMode::OnSelectSectionEnd(Section* section, Location* sectionEnd)
@@ -113,9 +124,7 @@ void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 {
 	if(ev.GetButton() == ww::MouseButton::Right && ev.GetClicks() == 1) // stop editing current section
 	{
-		ClearCurrentLocation();
-		mCurrentSection = nullptr;
-		mMapRenderer->Invalidate();
+		EndSectionEdit();
 		return;
 	}
 
@@ -154,8 +163,15 @@ void ContainerEditMode::ClearCurrentLocation()
 	}
 }
 
+void ContainerEditMode::EndSectionEdit()
+{
+	ClearCurrentLocation();
+	mCurrentSection = nullptr;
+	mMapRenderer->Invalidate();
+}
+
 TrackReviewMode::TrackReviewMode(WindowMapRenderer* renderer, Track* track) :
-EditMode(renderer), mTrack(track), mHoverSection(nullptr), mSelectionSection(nullptr), mLastWayPoint(nullptr), mPropGrid(nullptr)
+EditMode(renderer, nullptr), mTrack(track), mHoverSection(nullptr), mSelectionSection(nullptr), mLastWayPoint(nullptr), mPropGrid(nullptr)
 {
 	mWayPointSelector = new WayPointSelector;
 	mWayPointSelector->Add({track});

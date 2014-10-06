@@ -15,8 +15,8 @@
 namespace mt
 {
 
-ViewManager::ViewManager() :
-mDisplayedTrack(nullptr), mEditMode(nullptr)
+ViewManager::ViewManager(ww::Application* app) :
+mApp(app), mDisplayedTrack(nullptr), mEditMode(nullptr)
 {
 	mWindow = new ww::Window("MultiTracks");
 	mWindow->SetLayout(new ww::FillLayout);
@@ -72,6 +72,15 @@ mDisplayedTrack(nullptr), mEditMode(nullptr)
 		mMapRenderer->Invalidate();
 	};
 
+	mApp->SignalKeyUp += [this](ww::KeyboardEvent ev) {
+		if(ev.GetKeyCode() == ww::KeyCode::Escape)
+		{
+			CloseEditMode();
+			return true;
+		}
+		return false;
+	};
+
 	std::string pf = Config::CurrentProjectPath();
 	char fullpath[MAX_PATH];
 	GetFullPathName(pf.c_str(), MAX_PATH, fullpath, nullptr);
@@ -122,7 +131,7 @@ void ViewManager::OnTrackSelect(Track* track)
 
 bool ViewManager::OnEditTrack(Track* track)
 {
-	OpenEditMode(new ContainerEditMode(mMapRenderer, track));
+	OpenEditMode(new ContainerEditMode(mMapRenderer, track, mApp));
 	return true;
 }
 
@@ -138,6 +147,7 @@ void ViewManager::OpenEditMode(EditMode* editMode)
 
 void ViewManager::CloseEditMode()
 {
+	if(!mEditMode) return;
 	delete mEditMode;
 	mEditMode = nullptr;
 	mEditButton->SetCheck(false);
