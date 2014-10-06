@@ -50,7 +50,8 @@ EditMode(renderer, app), mContainer(container), mCurrentSection(nullptr), mCurre
 
 	mContainer->GetProperties().Push()
 		.Set<prop::Color>(Config::TrackEditLineColor())
-		.Set<prop::LineWidth>(Config::TrackEditLineWidth());
+		.Set<prop::LineWidth>(Config::TrackEditLineWidth())
+		.Set<prop::DisplaySectionEnd>(true);
 	mMapRenderer->AddComponent(mContainer);	
 	mMapRenderer->Invalidate();
 }
@@ -138,6 +139,7 @@ void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 			mCurrentSection = new Section(mContainer);
 			mContainer->Add(mCurrentSection);
 			mSectionEndSelector->Invalidate();
+			mWayPointSelector->Invalidate();
 		}
 	}
 	mCurrentLocation = mSectionEndSelector->GetCurrentSectionEnd();
@@ -150,6 +152,7 @@ void ContainerEditMode::OnMapClick(ww::MouseEvent ev, const Location& location)
 		.Set<prop::LineWidth>(2);
 	mMapRenderer->AddComponent(mCurrentLocation);
 	mWayPointSelector->Invalidate();
+	mSectionEndSelector->Invalidate();
 	mMapRenderer->Invalidate();
 }
 

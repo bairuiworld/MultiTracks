@@ -33,6 +33,7 @@ MAKE_PROP(Interest, "interest", int)
 MAKE_PROP(Comment, "comment", std::string)
 MAKE_PROP(DashStyle, "dashstyle", int)
 MAKE_PROP(Shape, "shape", int)
+MAKE_PROP(DisplaySectionEnd, "displaysectionend", bool)
 
 }
 

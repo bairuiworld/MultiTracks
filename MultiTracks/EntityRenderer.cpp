@@ -20,6 +20,7 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Co
 									props.Get<prop::LineWidth>(2));
 	pen.SetDashStyle((Gdiplus::DashStyle)props.Get<prop::DashStyle>(Gdiplus::DashStyle::DashStyleSolid));
 	pen.SetLineJoin(Gdiplus::LineJoin::LineJoinRound);
+	bool dispEnd = props.Get<prop::DisplaySectionEnd>(false);
 
 	Gdiplus::GraphicsPath path;
 
@@ -33,6 +34,14 @@ void SectionRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Co
 		haslast = true;
 	}
 	g->DrawPath(&pen, &path);
+
+	if(dispEnd)
+	{
+		Vector2d point = viewport->LocationToPixel(locations.front());
+		g->FillEllipse(pen.GetBrush(), point.GetX() - 3.f, point.GetY() - 3.f, 6.f, 6.f);
+		point.Set(viewport->LocationToPixel(locations.back()));
+		g->FillEllipse(pen.GetBrush(), point.GetX() - 3.f, point.GetY() - 3.f, 6.f, 6.f);
+	}
 }
 
 void TrackRenderer::Draw(Gdiplus::Graphics* g, MapViewport* viewport, const Component* component)
