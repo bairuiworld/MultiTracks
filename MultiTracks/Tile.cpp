@@ -3,6 +3,7 @@
 #include "MapSource.h"
 #include "Tile.h"
 #include "DownloadManager.h"
+#include "ConfigManager.h"
 #include <iostream>
 #include <fstream>
 namespace mt
@@ -63,7 +64,8 @@ void Tile::DownloadTask()
 	mMapSource->InitSession(curl, mCoordinates);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &Tile::WriteMemoryCallback);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)&data);
-	curl_easy_setopt(curl, CURLOPT_PROXY, "http://193.54.120.35:3128");
+	if(Config::UseProxy())
+		curl_easy_setopt(curl, CURLOPT_PROXY, Config::ProxyAddress().c_str());
 	res = curl_easy_perform(curl);
 	
 	int res_code;

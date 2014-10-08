@@ -447,8 +447,8 @@ bool CDataFile::GetBool(t_Str szKey, t_Str szSection, bool def)
 	if(szValue == "_not_found") return def;
 
 	if ( szValue.find("1") == 0 
-		|| CompareNoCase(szValue, "true") 
-		|| CompareNoCase(szValue, "yes") )
+		|| !CompareNoCase(szValue, "true") 
+		|| !CompareNoCase(szValue, "yes") )
 	{
 		bValue = true;
 	}
