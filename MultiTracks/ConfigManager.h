@@ -15,7 +15,7 @@ public:
 	static std::string CurrentProjectPath() { return g.mConfig.GetValue("path", "Project", ""); }
 
 	static float TrackEditLineWidth() { return g.mConfig.GetFloat("linewidth", "TrackEdit", 2); }
-	static int TrackEditLineColor() { return g.mConfig.GetInt("linecolor", "TrackEdit", 0xFF0000); }
+	static int TrackEditLineColor() { return g.mConfig.GetInt("linecolor", "TrackEdit", -65536); }
 	
 	static std::string ProxyAddress() { return g.mConfig.GetValue("address", "Proxy", ""); }
 	static bool UseProxy() { return g.mConfig.GetBool("use", "Proxy", false); }

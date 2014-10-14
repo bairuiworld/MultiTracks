@@ -185,23 +185,27 @@ MapObjectContainer* Track::GetReview()
 
 Section* Track::SubSection(WayPoint* wp1, WayPoint* wp2)
 {
+	if(wp1->GetSection() != wp2->GetSection()) return nullptr;
 	Section* sub = new Section;
 	bool copy = false;
 	Section::LocationList::const_iterator it;
-	for(Section* section : mSections)
+	Section* section = wp1->GetSection();
+	for(it = section->GetLocations().begin(); it != section->GetLocations().end(); it++)
 	{
-		for(it = section->GetLocations().begin(); it != section->GetLocations().end(); it++)
-		{
-			if(it == wp1->GetAfter() || it == wp2->GetAfter())
-			{
-				if(it == wp1->GetAfter()) sub->Add(*wp1->GetLocation());
-				else					  sub->Add(*wp2->GetLocation());
-				if(copy) return sub;
-				copy = true;
-			}
+		if(copy) sub->Add(*it);
 
-			if(copy)
-				sub->Add(*it);
+		if(it == wp1->GetAfter())
+		{
+			sub->Add(*wp1->GetLocation());
+			if(copy) return sub;
+			copy = true;
+		}
+
+		if(it == wp2->GetAfter())
+		{
+			sub->Add(*wp2->GetLocation());
+			if(copy) return sub;
+			copy = true;
 		}
 	}
 	return sub;

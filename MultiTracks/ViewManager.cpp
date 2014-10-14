@@ -26,6 +26,7 @@ mApp(app), mDisplayedTrack(nullptr), mEditMode(nullptr)
 	vp->SetZoom(5);
 	vp->SetOrigin(vp->LocationToPixel(Location(55, -25)));
 	mMapRenderer = new WindowMapRenderer(mMap);
+	mMapRenderer->SetCursor(LoadCursorFromFile("AddPoint.cur"));
 	mWindow->Add(mMapRenderer);
 	
 	mProjectTree = new ww::TreeView;
